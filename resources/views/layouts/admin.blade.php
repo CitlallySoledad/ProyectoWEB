@@ -330,6 +330,198 @@
             font-size: 0.85rem;
         }
 
+                /* FORMULARIOS CREAR / EDITAR */
+        .admin-form-title {
+            font-size: 1.9rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 26px;
+            color: #9ca3af;
+        }
+
+        .admin-form-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .admin-form-input,
+        .admin-form-select,
+        .admin-form-textarea {
+            width: 100%;
+            border-radius: 999px;
+            border: none;
+            outline: none;
+            padding: 8px 18px;
+            background: rgba(37, 99, 235, 0.25);
+            color: #e5e7eb;
+            font-size: 0.9rem;
+        }
+
+        .admin-form-textarea {
+            border-radius: 18px;
+            resize: none;
+            min-height: 70px;
+        }
+
+        .admin-form-input::placeholder,
+        .admin-form-select::placeholder,
+        .admin-form-textarea::placeholder {
+            color: #9ca3af;
+        }
+
+        .admin-form-row {
+            margin-bottom: 14px;
+        }
+
+        .admin-form-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .admin-form-col {
+            flex: 1;
+            min-width: 260px;
+        }
+
+        .admin-form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 28px;
+        }
+
+        .admin-btn-pill {
+            border-radius: 999px;
+            padding: 8px 24px;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .admin-btn-secondary {
+            background: rgba(148, 163, 184, 0.35);
+            color: #e5e7eb;
+        }
+
+        .admin-btn-primary {
+            background: #60a5fa;
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .admin-btn-disabled {
+            background: rgba(148, 163, 184, 0.25);
+            color: #9ca3af;
+        }
+
+        .admin-team-members-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .admin-team-member-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 10px;
+        }
+
+        .admin-team-member-name {
+            flex: 1;
+        }
+
+        .admin-team-member-role {
+            width: 140px;
+            display: flex;
+            align-items: center;
+        }
+
+        .admin-role-label {
+            border-radius: 999px;
+            padding: 4px 14px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.75rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .admin-form-select-small {
+            border-radius: 999px;
+            border: none;
+            outline: none;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            background: #60a5fa;
+            color: #111827;
+            width: 100%;
+        }
+
+                /* PANEL DE EVALUACIONES */
+        .eval-header-row {
+            display: flex;
+            max-width: 700px;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #e5e7eb;
+        }
+
+        .eval-header-col {
+            flex: 1;
+            text-align: center;
+        }
+
+        .eval-header-col:first-child {
+            text-align: left;
+        }
+
+        .eval-row {
+            display: flex;
+            align-items: center;
+            background: rgba(37, 99, 235, 0.5);
+            border-radius: 999px;
+            padding: 10px 18px;
+            margin-bottom: 12px;
+            max-width: 700px;
+        }
+
+        .eval-row-name {
+            flex: 2;
+            font-weight: 600;
+        }
+
+        .eval-row-metric {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .eval-progress-track {
+            width: 100%;
+            height: 8px;
+            border-radius: 999px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+
+        .eval-progress-fill {
+            height: 100%;
+            background: #1d4ed8;
+        }
+
+        .eval-score-number {
+            width: 40px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
     </style>
 
     @stack('styles')

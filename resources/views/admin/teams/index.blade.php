@@ -28,6 +28,7 @@
 
         {{-- CONTENIDO PRINCIPAL --}}
         <div class="admin-page-main">
+
             <div class="admin-page-header">
                 <h1 class="admin-page-title">Lista de Equipos</h1>
 
@@ -43,38 +44,58 @@
                     <input type="text" placeholder="Buscar Equipo">
                 </div>
 
-                <button class="admin-page-create-btn">
+                <button class="admin-page-create-btn"
+                        onclick="window.location='{{ route('admin.teams.create') }}'">
                     Crear Equipo
                 </button>
             </div>
 
+            {{-- LISTA DE EQUIPOS DESDE BASE DE DATOS --}}
             <div class="admin-list">
-                <div class="admin-list-item">
-                    <div class="admin-list-item-title">Dinamita</div>
-                    <div class="admin-list-item-right">
-                        <span>3/4</span>
-                        <button class="admin-list-edit-btn">Editar</button>
-                    </div>
-                </div>
 
-                <div class="admin-list-item">
-                    <div class="admin-list-item-title">Escuadrón Suicida</div>
-                    <div class="admin-list-item-right">
-                        <span>3/4</span>
-                        <button class="admin-list-edit-btn">Editar</button>
-                    </div>
-                </div>
+                @forelse ($teams as $team)
+                    <div class="admin-list-item">
 
-                <div class="admin-list-item">
-                    <div class="admin-list-item-title">Buena onda</div>
-                    <div class="admin-list-item-right">
-                        <span>4/4</span>
-                        <button class="admin-list-edit-btn">Editar</button>
+                        {{-- NOMBRE DEL EQUIPO --}}
+                        <div class="admin-list-item-title">
+                            {{ $team->name }}
+                        </div>
+
+                        <div class="admin-list-item-right">
+
+                            {{-- AQUI LLEVARÁ LA CANTIDAD DE MIEMBROS EN EL FUTURO --}}
+                            <span class="me-3">-</span>
+
+                            {{-- BOTÓN EDITAR --}}
+                            <button class="admin-list-edit-btn"
+                                onclick="window.location='{{ route('admin.teams.edit', $team->id) }}'">
+                                Editar
+                            </button>
+
+                            {{-- BOTÓN ELIMINAR --}}
+                            <form action="{{ route('admin.teams.destroy', $team->id) }}"
+                                  method="POST"
+                                  style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+
+                                <button class="admin-list-edit-btn"
+                                        onclick="return confirm('¿Eliminar este equipo?')">
+                                    Eliminar
+                                </button>
+                            </form>
+
+                        </div>
+
                     </div>
-                </div>
+                @empty
+                    <p class="text-muted">No hay equipos registrados.</p>
+                @endforelse
             </div>
+
         </div>
 
     </div>
 </div>
 @endsection
+

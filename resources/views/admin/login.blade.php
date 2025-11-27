@@ -9,7 +9,7 @@
             {{-- LADO IZQUIERDO: ILUSTRACIÓN --}}
             <div class="col-md-6 login-left">
                 {{-- Pon una imagen tuya en public/images/login-illustration.png --}}
-                <img src="{{ asset('images/login-illustration.png') }}" alt="Ilustración">
+                <img src="{{ asset('imagenes/img1.jpg') }}" alt="Ilustración">
             </div>
 
             {{-- LADO DERECHO: FORMULARIO --}}

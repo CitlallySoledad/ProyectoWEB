@@ -28,6 +28,7 @@
 
         {{-- CONTENIDO PRINCIPAL --}}
         <div class="admin-page-main">
+
             <div class="admin-page-header">
                 <h1 class="admin-page-title">Eventos</h1>
 
@@ -43,42 +44,53 @@
                     <input type="text" placeholder="Buscar Evento">
                 </div>
 
-                <button class="admin-page-create-btn">
+                <button class="admin-page-create-btn" onclick="window.location='{{ route('admin.events.create') }}'">
                     Crear Evento
                 </button>
             </div>
 
+            {{-- LISTA DE EVENTOS DESDE BD --}}
             <div class="admin-list">
-                <div class="admin-list-item">
-                    <div class="admin-list-item-title">Torneo de programación</div>
-                    <div class="admin-list-item-right">
-                        <button class="admin-list-edit-btn">Editar</button>
-                    </div>
-                </div>
+                @forelse ($events as $event)
+                    <div class="admin-list-item">
 
-                <div class="admin-list-item">
-                    <div class="admin-list-item-title">Feria de tecnología</div>
-                    <div class="admin-list-item-right">
-                        <button class="admin-list-edit-btn">Editar</button>
-                    </div>
-                </div>
+                        {{-- TÍTULO DEL EVENTO --}}
+                        <div class="admin-list-item-title">
+                            {{ $event->title }}
+                        </div>
 
-                <div class="admin-list-item">
-                    <div class="admin-list-item-title">Desarrollo de videojuegos</div>
-                    <div class="admin-list-item-right">
-                        <button class="admin-list-edit-btn">Editar</button>
-                    </div>
-                </div>
+                        <div class="admin-list-item-right">
 
-                <div class="admin-list-item">
-                    <div class="admin-list-item-title">HackaTec</div>
-                    <div class="admin-list-item-right">
-                        <button class="admin-list-edit-btn">Editar</button>
+                            {{-- BOTÓN EDITAR --}}
+                            <button class="admin-list-edit-btn"
+                                onclick="window.location='{{ route('admin.events.edit', $event->id) }}'">
+                                Editar
+                            </button>
+
+                            {{-- BOTÓN ELIMINAR --}}
+                            <form action="{{ route('admin.events.destroy', $event->id) }}"
+                                  method="POST"
+                                  style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+
+                                <button class="admin-list-edit-btn"
+                                        onclick="return confirm('¿Eliminar este evento?')">
+                                    Eliminar
+                                </button>
+                            </form>
+
+                        </div>
+
                     </div>
-                </div>
+                @empty
+                    <p class="text-muted mt-3">No hay eventos registrados.</p>
+                @endforelse
             </div>
+
         </div>
 
     </div>
 </div>
 @endsection
+
