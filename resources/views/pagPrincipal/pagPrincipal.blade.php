@@ -4,18 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Big Programing - Inicio</title>
-  <link rel="stylesheet" href="panPrin.css">
+
+  {{-- Cargar CSS con Vite --}}
+  @vite(['resources/css/panPrin.css'])
 </head>
 <body>
   <header class="top-header">
     <div class="logo-box">
-      <img src="img/logo-tecnm.png" alt="Logo TecNM">
+      <img src="{{ asset('img/logo-tecnm.png') }}" alt="Logo TecNM">
     </div>
     <div class="logo-box logo-sep">
-      <img src="img/logo-sep.png" alt="Secretaría de Educación Pública">
+      <img src="{{ asset('img/logo-sep.png') }}" alt="Secretaría de Educación Pública">
     </div>
     <div class="logo-box">
-      <img src="img/logo-club.png" alt="Logo club de programación">
+      <img src="{{ asset('img/logo-club.png') }}" alt="Logo club de programación">
     </div>
   </header>
 
@@ -26,7 +28,7 @@
       <li><a href="#">Eventos</a></li>
       <li><a href="#">Reglamento</a></li>
       <li><a href="#">Noticias</a></li>
-      <li><a href="#">Contactanos</a></li>
+      <li><a href="#">Contáctanos</a></li>
     </ul>
   </nav>
 
@@ -62,13 +64,13 @@
     <!-- GALERÍA DE IMÁGENES -->
     <section class="galeria">
       <figure>
-        <img src="img/banner1.png" alt="Campeonato de programación">
+        <img src="{{ asset('img/banner1.png') }}" alt="Campeonato de programación">
       </figure>
       <figure>
-        <img src="img/banner2.png" alt="Equipos programando">
+        <img src="{{ asset('img/banner2.png') }}" alt="Equipos programando">
       </figure>
       <figure>
-        <img src="img/banner3.png" alt="Profesionales de programación">
+        <img src="{{ asset('img/banner3.png') }}" alt="Profesionales de programación">
       </figure>
     </section>
 

@@ -1,0 +1,239 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* RESET */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:"Poppins", system-ui, -apple-system, sans-serif;
+  background:#050816;          /* base oscura por si hay espacio extra */
+}
+
+/* CONTENEDOR PRINCIPAL */
+.auth-page{
+  display:flex;
+  height:100vh;                /* asegura mismo alto en escritorio */
+}
+
+/* ================= LADO IZQUIERDO ================= */
+.auth-aside{
+  position:relative;
+  width:32%;
+  min-width:270px;
+  height:100%;                 /* ocupa todo el alto del contenedor */
+  background:linear-gradient(180deg,#45217a,#2f1559);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;             /* evita que sobresalgan formas */
+}
+
+/* Curvas oscuras arriba y abajo */
+.shape-top,
+.shape-bottom{
+  position:absolute;
+  left:0;
+  right:0;
+  height:55%;
+  background:#2a0f4f;
+  border-radius:0 55% 55% 0;
+  z-index:0;
+}
+.shape-top{ top:-15%; }
+.shape-bottom{
+  top:auto;
+  bottom:-15%;
+}
+
+/* Círculos blancos con imagen (más pequeños y más separados) */
+.circle-card{
+  position:absolute;
+  width:70%;
+  max-width:230px;
+  aspect-ratio:1/1;
+  background:#fff;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1;
+  overflow:hidden;
+  box-shadow:0 18px 35px rgba(0,0,0,.35);
+}
+.circle-card img{
+  width:82%;
+  height:82%;
+  object-fit:contain;
+}
+
+/* más separación entre ambos círculos */
+.card-top{ top:10%; }
+.card-bottom{ bottom:10%; }
+
+/* ================= LADO DERECHO ================= */
+.auth-main{
+  flex:1;
+  height:100%;                 /* mismo alto que el aside */
+  background:radial-gradient(circle at top,#1f6ad7,#0b2449 55%,#081a33);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:32px 16px;
+}
+
+.login-card{
+  width:100%;
+  max-width:380px;
+  background:transparent;
+  text-align:center;
+  color:#fff;
+}
+
+/* Avatar cuadrado */
+.avatar{
+  width:140px;
+  height:140px;
+  margin:0 auto 18px;
+  background-image:
+    linear-gradient(135deg,#ffffff,#ffffff),
+    linear-gradient(135deg,#c1d7f5 20%,#9ec3ef 55%,#c1d7f5 90%);
+  background-origin:border-box;
+  background-clip:content-box, border-box;
+  border-radius:4px;
+  padding:4px;
+  box-shadow:0 12px 20px rgba(0,0,0,.4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.avatar svg{ width:70%; height:70%; }
+
+.login-card h1{
+  font-size:32px;
+  margin-bottom:18px;
+}
+
+/* CAMPOS */
+.field-label{
+  display:block;
+  margin:12px 0 4px;
+  font-weight:600;
+  text-align:left;
+  color:#f3f6ff;
+}
+
+.field{
+  width:100%;
+  background:#f5f7fb;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  padding:6px 14px;
+  box-shadow:0 4px 10px rgba(0,0,0,.2);
+}
+
+.field + .field-label{
+  margin-top:18px;
+}
+
+.field-icon{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:32px;
+  color:#7b8aa5;
+}
+.field-icon svg{
+  width:18px;
+  height:18px;
+  fill:#7b8aa5;
+}
+
+.field input{
+  border:none;
+  outline:none;
+  background:transparent;
+  flex:1;
+  padding:6px 4px;
+  font-size:14px;
+  color:#1c2743;
+}
+.field input::placeholder{
+  color:#a1aac2;
+}
+
+/* BOTÓN */
+.btn-primary{
+  margin-top:22px;
+  width:100%;
+  padding:10px 16px;
+  border:none;
+  border-radius:999px;
+  background:#372b7b;
+  color:#fff;
+  font-weight:600;
+  font-size:15px;
+  cursor:pointer;
+  box-shadow:0 8px 16px rgba(0,0,0,.35);
+}
+.btn-primary:hover{
+  filter:brightness(1.05);
+}
+
+/* LINKS */
+.link-small{
+  display:block;
+  margin-top:10px;
+  font-size:12px;
+  color:#c4d3ff;
+}
+.link-small:hover{ text-decoration:underline; }
+
+.register{
+  margin-top:24px;
+  font-size:13px;
+  color:#e3e9ff;
+}
+.register a{
+  margin-left:4px;
+  color:#ffd36b;
+  font-weight:600;
+}
+.register a:hover{ text-decoration:underline; }
+
+/* ================= RESPONSIVO ================= */
+@media (max-width:900px){
+  .auth-page{
+    flex-direction:column;
+    height:auto;               /* ya no forzamos 100vh en columna */
+    min-height:100vh;
+  }
+  .auth-aside{
+    width:100%;
+    height:260px;
+  }
+  .auth-main{
+    width:100%;
+    height:auto;
+    padding:24px 16px 32px;
+  }
+  .circle-card{
+    max-width:210px;
+  }
+}
+
+@media (max-width:520px){
+  .login-card{
+    max-width:320px;
+  }
+  .login-card h1{
+    font-size:26px;
+  }
+  .avatar{
+    width:120px;
+    height:120px;
+  }
+}

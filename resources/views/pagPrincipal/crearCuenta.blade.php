@@ -4,18 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Crear cuenta</title>
-  <link rel="stylesheet" href="crearCuenta.css">
+
+  <!-- Carga correcta del CSS con Vite -->
+  @vite(['resources/css/crearCuenta.css'])
 </head>
+
 <body>
   <div class="registro-page">
+
     <!-- COLUMNA MORADA CON AVATARES -->
     <aside class="registro-aside">
-      <!-- Usa tu imagen local -->
-      <img src="img/avatar.png" alt="Avatar" class="avatar">
-      <img src="img/avatar.png" alt="Avatar" class="avatar">
-      <img src="img/avatar.png" alt="Avatar" class="avatar">
-      <img src="img/avatar.png" alt="Avatar" class="avatar">
-      <img src="img/avatar.png" alt="Avatar" class="avatar">
+      <img src="{{ asset('img/avatar.png') }}" alt="Avatar" class="avatar">
+      <img src="{{ asset('img/avatar.png') }}" alt="Avatar" class="avatar">
+      <img src="{{ asset('img/avatar.png') }}" alt="Avatar" class="avatar">
+      <img src="{{ asset('img/avatar.png') }}" alt="Avatar" class="avatar">
+      <img src="{{ asset('img/avatar.png') }}" alt="Avatar" class="avatar">
     </aside>
 
     <!-- COLUMNA AZUL CON FORMULARIO -->
@@ -54,13 +57,13 @@
         </div>
 
         <div class="form-group">
-          <label for="correo">Ingresa tu correo electronico</label>
-          <input type="email" id="correo" placeholder="Correo electronico">
+          <label for="correo">Correo electrónico</label>
+          <input type="email" id="correo" placeholder="Correo electrónico">
         </div>
 
         <div class="form-group">
-          <label for="tel">Ingresa tu telefono</label>
-          <input type="tel" id="tel" placeholder="Telefono">
+          <label for="tel">Teléfono</label>
+          <input type="tel" id="tel" placeholder="Teléfono">
         </div>
 
         <div class="form-group">
@@ -79,6 +82,7 @@
         </div>
       </form>
     </main>
+
   </div>
 </body>
 </html>
