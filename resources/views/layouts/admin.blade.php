@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Admin')</title>
@@ -34,7 +35,7 @@
             border: none;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
         }
 
         .login-left {
@@ -159,7 +160,7 @@
 
         .dashboard-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.35);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
             background: rgba(37, 99, 235, 0.95);
         }
 
@@ -172,35 +173,44 @@
             font-weight: 500;
         }
 
-                /* PÁGINAS DE LISTADO (EVENTOS / EQUIPOS) */
+        /* PÁGINAS DE LISTADO (EVENTOS / EQUIPOS / EVALUACIONES) */
         .admin-page-wrapper {
             min-height: 100vh;
+            height: 100vh;
+            width: 100vw;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
+            align-items: stretch;
+            justify-content: stretch;
+            padding: 0;
             background: radial-gradient(circle at top left, #1d2b64, #090a0f);
             color: #fff;
         }
 
         .admin-page-card {
-            width: 1150px;
-            max-width: 100%;
-            border-radius: 26px;
+            flex: 1;
+            height: 100%;
+            width: 100%;
+            border-radius: 0;
+            /* sin margen, ocupa toda la pantalla */
             background: linear-gradient(135deg, #111827, #1f2937, #111827);
-            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+            box-shadow: none;
+            /* ya no hace falta sombra */
             display: flex;
             overflow: hidden;
         }
 
+
+
         .admin-sidebar {
             width: 90px;
+            height: 100%;
             background: linear-gradient(180deg, #a855f7, #3b82f6);
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 30px 0;
-            border-radius: 26px 0 0 26px;
+            border-radius: 0;
+            /* pega al borde izquierdo */
         }
 
         .admin-sidebar-back {
@@ -234,8 +244,11 @@
 
         .admin-page-main {
             flex: 1;
-            padding: 32px 40px;
+            padding: 32px 40px 40px 40px;
             position: relative;
+            height: 100%;
+            overflow-y: auto;
+            /* scroll interno si el contenido es largo */
         }
 
         .admin-page-header {
@@ -265,7 +278,7 @@
             align-items: center;
             gap: 16px;
             margin-bottom: 30px;
-            max-width: 650px;
+            max-width: 100%;
         }
 
         .admin-page-search-input-wrapper {
@@ -297,8 +310,9 @@
             display: flex;
             flex-direction: column;
             gap: 14px;
-            max-width: 650px;
+            max-width: 100%;
         }
+        
 
         .admin-list-item {
             display: flex;
@@ -330,7 +344,7 @@
             font-size: 0.85rem;
         }
 
-                /* FORMULARIOS CREAR / EDITAR */
+        /* FORMULARIOS CREAR / EDITAR */
         .admin-form-title {
             font-size: 1.9rem;
             font-weight: 600;
@@ -461,10 +475,22 @@
             width: 100%;
         }
 
-                /* PANEL DE EVALUACIONES */
+        /* Contenido interno centrado y con buen margen */
+        .admin-page-inner {
+            max-width: 1200px;
+            /* ancho máximo del contenido */
+            margin: 0 auto;
+            /* centrar horizontal */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        /* PANEL DE EVALUACIONES */
         .eval-header-row {
             display: flex;
-            max-width: 700px;
+            max-width: 100%;
             justify-content: space-between;
             font-size: 0.9rem;
             font-weight: 600;
@@ -488,7 +514,7 @@
             border-radius: 999px;
             padding: 10px 18px;
             margin-bottom: 12px;
-            max-width: 700px;
+            max-width: 100%;
         }
 
         .eval-row-name {
@@ -521,15 +547,16 @@
             text-align: center;
             font-size: 0.85rem;
         }
-
     </style>
 
     @stack('styles')
 </head>
+
 <body>
     @yield('content')
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>
+
 </html>

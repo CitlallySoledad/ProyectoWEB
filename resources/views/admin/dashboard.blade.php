@@ -73,6 +73,16 @@
                     </div>
                 </a>
 
+                <div class="dashboard-cards">
+                 
+
+                    {{-- 🔹 NUEVA Tarjeta Usuarios --}}
+                    <div class="dashboard-card" onclick="window.location='{{ route('admin.users.index') }}'">
+                        <i class="bi bi-person-badge dashboard-card-icon"></i>
+                        <div class="dashboard-card-title">Usuarios</div>
+                    </div>
+                </div>
+
 
             </div>
         </div>

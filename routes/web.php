@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminEventController;
 use App\Http\Controllers\AdminTeamController;
 use App\Http\Controllers\AdminEvaluationController;
+use App\Http\Controllers\AdminUserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -85,16 +86,33 @@ Route::middleware('auth')->group(function () {
         ->name('admin.events.destroy');
 
 
-    // PANEL DE EVALUACIONES
+        // PANEL DE EVALUACIONES
     Route::get('/admin/evaluaciones', [AdminEvaluationController::class, 'index'])
         ->name('admin.evaluations.index');
 
-    // EVALUAR UN PROYECTO (por ahora solo demo, sin BD)
+    // Crear evaluación de un proyecto (por nombre)
     Route::get('/admin/evaluaciones/{project}', [AdminEvaluationController::class, 'show'])
         ->name('admin.evaluations.show');
 
     Route::post('/admin/evaluaciones/{project}', [AdminEvaluationController::class, 'store'])
         ->name('admin.evaluations.store');
+
+    // JUZGAMIENTO / RESUMEN DE UNA EVALUATION ya guardada (usa el ID)
+    Route::get('/admin/evaluaciones/{evaluation}/juzgar', [AdminEvaluationController::class, 'judgement'])
+        ->name('admin.evaluations.judgement');
+
+    Route::post('/admin/evaluaciones/{evaluation}/juzgar', [AdminEvaluationController::class, 'saveJudgement'])
+        ->name('admin.evaluations.judgement.store');
+
+     // -------------------- USUARIOS --------------------
+    Route::get('/admin/usuarios', [AdminUserController::class, 'index'])
+        ->name('admin.users.index');
+
+    Route::get('/admin/usuarios/crear', [AdminUserController::class, 'create'])
+        ->name('admin.users.create');
+
+    Route::post('/admin/usuarios', [AdminUserController::class, 'store'])
+        ->name('admin.users.store');
 
 });
 

@@ -13,6 +13,14 @@ class Evaluation extends Model
         'functionality',
         'innovation',
         'comments',
+        'judge',
+        'team',
+        'total_score',
+        'evaluated_at',
+    ];
+
+    protected $casts = [
+        'evaluated_at' => 'date',
     ];
 }
 

@@ -43,6 +43,7 @@
                 <div class="eval-header-col">Creatividad</div>
                 <div class="eval-header-col">Funcionalidad</div>
                 <div class="eval-header-col">Innovación</div>
+                <div class="eval-header-col">Acciones</div>
             </div>
 
             {{-- LISTA DE PROYECTOS --}}
@@ -54,7 +55,7 @@
                 @endphp
 
                 <div class="eval-row">
-                    {{-- Nombre proyecto --}}
+                    {{-- Nombre proyecto (abre el formulario de evaluación de rúbrica) --}}
                     <div class="eval-row-name">
                         <button class="btn btn-link p-0 text-white text-decoration-none"
                                 onclick="window.location='{{ route('admin.evaluations.show', urlencode($project['name'])) }}'">
@@ -78,6 +79,20 @@
                     <div class="eval-row-metric">
                         <span class="eval-score-number">{{ $i }}</span>
                     </div>
+
+                    {{-- Botón Juzgar (usa el id de la evaluation si existe) --}}
+                    <div class="eval-row-metric">
+                        @if(isset($project['id']))
+                            <button type="button"
+                                    class="admin-list-edit-btn"
+                                    onclick="window.location='{{ route('admin.evaluations.judgement', ['evaluation' => $project['id']]) }}'">
+                                Juzgar
+                            </button>
+                        @else
+                            {{-- Cuando viene de datos demo sin BD --}}
+                            <span class="eval-score-number">-</span>
+                        @endif
+                    </div>
                 </div>
             @endforeach
 
@@ -86,3 +101,5 @@
     </div>
 </div>
 @endsection
+
+

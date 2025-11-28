@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Eventos')
+@section('title', 'Usuarios')
 
 @section('content')
 <div class="admin-page-wrapper">
@@ -12,7 +12,7 @@
                 <i class="bi bi-chevron-left"></i>
             </a>
 
-            <div class="admin-sidebar-icon active">
+            <div class="admin-sidebar-icon">
                 <i class="bi bi-calendar-event"></i>
             </div>
             <div class="admin-sidebar-icon">
@@ -21,7 +21,7 @@
             <div class="admin-sidebar-icon">
                 <i class="bi bi-grid-1x2"></i>
             </div>
-            <div class="admin-sidebar-icon">
+            <div class="admin-sidebar-icon active">
                 <i class="bi bi-person-badge"></i>
             </div>
         </div>
@@ -31,7 +31,7 @@
             <div class="admin-page-inner">
 
                 <div class="admin-page-header">
-                    <h1 class="admin-page-title">Eventos</h1>
+                    <h1 class="admin-page-title">Usuarios</h1>
 
                     <div class="admin-page-user">
                         <i class="bi bi-person-circle"></i>
@@ -42,37 +42,34 @@
                 <div class="admin-page-search-row">
                     <div class="admin-page-search-input-wrapper">
                         <i class="bi bi-search me-2 text-muted"></i>
-                        <input type="text" placeholder="Buscar Evento">
+                        <input type="text" placeholder="Buscar usuario (visual)">
                     </div>
 
                     <button class="admin-page-create-btn"
-                            onclick="window.location='{{ route('admin.events.create') }}'">
-                        Crear Evento
+                            onclick="window.location='{{ route('admin.users.create') }}'">
+                        Crear Usuario
                     </button>
                 </div>
 
                 <div class="admin-list">
-                    @foreach($events as $event)
+                    @forelse($users as $user)
                         <div class="admin-list-item">
-                            <div class="admin-list-item-title">{{ $event->title }}</div>
+                            <div class="admin-list-item-title">
+                                {{ $user->name }}
+                                <span class="d-block" style="font-size: 0.8rem; color:#cbd5f5;">
+                                    {{ $user->email }}
+                                </span>
+                            </div>
                             <div class="admin-list-item-right">
-                                <button class="admin-list-edit-btn"
-                                        onclick="window.location='{{ route('admin.events.edit', $event->id) }}'">
-                                    Editar
-                                </button>
-
-                                <form action="{{ route('admin.events.destroy', $event->id) }}"
-                                      method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="admin-list-edit-btn"
-                                            onclick="return confirm('¿Eliminar este evento?')">
-                                        Eliminar
-                                    </button>
-                                </form>
+                                <span style="font-size: 0.8rem;">
+                                    Creado: {{ $user->created_at->format('d/m/Y') }}
+                                </span>
+                                {{-- Aquí luego podrías agregar editar/eliminar --}}
                             </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <p>No hay usuarios registrados.</p>
+                    @endforelse
                 </div>
 
             </div>
@@ -81,5 +78,3 @@
     </div>
 </div>
 @endsection
-
-
