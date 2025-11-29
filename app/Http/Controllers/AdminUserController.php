@@ -24,21 +24,22 @@ class AdminUserController extends Controller
 
     // Guardar nuevo usuario
     public function store(Request $request)
-    {
-        $data = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
+{
+    $data = $request->validate([
+        'name'     => 'required|string|max:255',
+        'email'    => 'required|email|max:255|unique:users,email',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
 
-        User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+    User::create([
+        'name'     => $data['name'],
+        'email'    => $data['email'],
+        'password' => Hash::make($data['password']),
+        'is_admin' => true,   
+    ]);
 
-        return redirect()
-            ->route('admin.users.index')
-            ->with('success', 'Usuario administrador creado correctamente.');
-    }
+    return redirect()
+        ->route('admin.users.index')
+        ->with('success', 'Usuario administrador creado correctamente');
+}
 }

@@ -77,6 +77,14 @@
             width: 100%;
         }
 
+        .login-img-wrapper {
+            background: #fff;
+            /* fondo uniforme */
+            padding: 20px;
+            border-radius: 20px;
+            /* opcional */
+        }
+
         /* DASHBOARD */
         .dashboard-wrapper {
             min-height: 100vh;
@@ -312,7 +320,7 @@
             gap: 14px;
             max-width: 100%;
         }
-        
+
 
         .admin-list-item {
             display: flex;

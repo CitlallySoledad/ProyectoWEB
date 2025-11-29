@@ -9,7 +9,7 @@ class AdminAuthController extends Controller
 {
     public function showLoginForm()
     {
-        return view('admin.login');
+        return view('admin.login'); // tu vista actual
     }
 
     public function login(Request $request)
@@ -19,24 +19,35 @@ class AdminAuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
+            $user = Auth::user();
+
+            // 🔒 SOLO ADMINISTRADORES
+            if (! $user->is_admin) {
+                Auth::logout();
+
+                return back()->withErrors([
+                    'email' => 'No tienes permisos para acceder al panel de administrador.',
+                ])->withInput($request->only('email'));
+            }
+
             $request->session()->regenerate();
+
             return redirect()->route('admin.dashboard');
         }
 
         return back()->withErrors([
-            'email' => 'Las credenciales no son correctas.',
-        ])->onlyInput('email');
+            'email' => 'Las credenciales no son válidas.',
+        ])->withInput($request->only('email'));
     }
 
     public function logout(Request $request)
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect()->route('admin.login');
     }
-
 }
+
