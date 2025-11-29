@@ -1,78 +1,207 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pantalla de Inicio de Sesión</title>
+@extends('layouts.admin')
 
-  <!-- Carga correcta usando Vite -->
-  @vite(['resources/css/login.css'])
-</head>
+@section('title', 'Inicio de sesión')
 
-<body>
-  <div class="auth-page">
+@push('styles')
+<style>
+    .user-login-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at top left, #4c1d95, #020617);
+        padding: 20px;
+    }
 
-    <!-- LADO IZQUIERDO -->
-    <aside class="auth-aside">
-      <div class="shape-top"></div>
-      <div class="shape-bottom"></div>
+    .user-login-card {
+        width: 100%;
+        max-width: 960px;
+        background: linear-gradient(90deg, #4c1d95 0%, #4c1d95 45%, #0f172a 45%, #0f172a 100%);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+        display: grid;
+        grid-template-columns: 1.1fr 1.2fr;
+    }
 
-      <div class="circle-card card-top">
-        <img src="{{ asset('img/login-arriba.png') }}" alt="Ilustración superior">
-      </div>
+    .user-login-left {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        color: #e5e7eb;
+    }
 
-      <div class="circle-card card-bottom">
-        <img src="{{ asset('img/login-abajo.png') }}" alt="Ilustración inferior">
-      </div>
-    </aside>
+    .user-login-illustration {
+        flex: 1;
+        border-radius: 16px;
+        background-size: cover;
+        background-position: center;
+        background-color: #312e81;
+        margin-bottom: 16px;
+    }
 
-    <!-- LADO DERECHO -->
-    <main class="auth-main">
-      <div class="login-card">
+    .user-login-illustration.bottom {
+        margin-bottom: 0;
+    }
 
-        <div class="avatar">
-          <svg viewBox="0 0 40 40" aria-hidden="true">
-            <circle cx="20" cy="14" r="7" fill="none" stroke="#0c325c" stroke-width="2.3"/>
-            <path d="M8 34c2.5-6 6.7-9 12-9s9.5 3 12 9"
-                  fill="none" stroke="#0c325c" stroke-width="2.3" stroke-linecap="round"/>
-          </svg>
+    .user-login-right {
+        padding: 32px 40px;
+        color: #e5e7eb;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .user-login-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+
+    .user-login-subtitle {
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+    .user-login-label {
+        font-weight: 600;
+        margin-bottom: 4px;
+        font-size: 0.88rem;
+    }
+
+    .user-login-input {
+        border-radius: 999px;
+        border: none;
+        outline: none;
+        width: 100%;
+        padding: 10px 16px;
+        margin-bottom: 12px;
+        background: #e5edff;
+        color: #111827;
+    }
+
+    .user-login-input::placeholder {
+        color: #6b7280;
+    }
+
+    .user-login-btn {
+        width: 100%;
+        border-radius: 999px;
+        border: none;
+        padding: 10px 20px;
+        background: #2563eb;
+        color: #fff;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+
+    .user-login-link {
+        margin-top: 10px;
+        font-size: 0.85rem;
+        text-align: center;
+        color: #93c5fd;
+        cursor: pointer;
+    }
+
+    .user-login-link a {
+        color: #93c5fd;
+        text-decoration: none;
+    }
+
+    .user-login-link a:hover {
+        text-decoration: underline;
+    }
+
+    .user-login-admin-link {
+        margin-top: 12px;
+        font-size: 0.86rem;
+        text-align: center;
+    }
+
+    .user-login-admin-link button {
+        border: none;
+        background: transparent;
+        color: #60a5fa;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    @media (max-width: 900px) {
+        .user-login-card {
+            grid-template-columns: 1fr;
+            background: #0f172a;
+        }
+
+        .user-login-left {
+            display: none;
+        }
+    }
+</style>
+@endpush
+
+@section('content')
+<div class="user-login-wrapper">
+    <div class="user-login-card">
+
+        {{-- LADO IZQUIERDO: ILUSTRACIONES --}}
+        <div class="user-login-left">
+            <div class="user-login-illustration"
+                 style="background-image:url('{{ asset('imagenes/user-login-top.png') }}')"></div>
+            <div class="user-login-illustration bottom"
+                 style="background-image:url('{{ asset('imagenes/user-login-bottom.png') }}')"></div>
         </div>
 
-        <h1>Iniciar sesión</h1>
+        {{-- LADO DERECHO: FORMULARIO --}}
+        <div class="user-login-right">
+            <div class="user-login-title">Iniciar sesión</div>
+            <div class="user-login-subtitle">
+                Inicio de sesión para participantes / usuarios
+            </div>
 
-        <label class="field-label" for="control">Número de Control</label>
-        <div class="field">
-          <span class="field-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z"/>
-            </svg>
-          </span>
-          <input id="control" type="text" placeholder="Número de control">
+            {{-- SOLO DISEÑO: esta acción la puedes cambiar a la ruta real cuando tengas el login de usuarios --}}
+            <form method="POST" action="#">
+                @csrf
+
+                <div class="mb-2">
+                    <label class="user-login-label" for="control">Número de control</label>
+                    <input type="text" id="control" name="control"
+                           class="user-login-input" placeholder="Número de control">
+                </div>
+
+                <div class="mb-2">
+                    <label class="user-login-label" for="password">Contraseña</label>
+                    <input type="password" id="password" name="password"
+                           class="user-login-input" placeholder="Contraseña">
+                </div>
+
+                <button type="submit" class="user-login-btn">
+                    Iniciar sesión
+                </button>
+            </form>
+
+            <div class="user-login-link">
+                ¿Olvidaste tu contraseña?
+            </div>
+
+            <div class="user-login-link">
+                ¿Aún no tienes cuenta?
+                <a href="{{ route('public.register') }}">Regístrate</a>
+            </div>
+
+            {{-- 🔹 BOTÓN PARA IR AL LOGIN DE ADMINISTRADOR --}}
+            <div class="user-login-admin-link">
+                ¿Eres administrador?
+                <button type="button"
+                        onclick="window.location='{{ route('admin.login') }}'">
+                    Iniciar sesión como administrador
+                </button>
+            </div>
         </div>
 
-        <label class="field-label" for="password">Contraseña</label>
-        <div class="field">
-          <span class="field-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M17 10V7A5 5 0 0 0 7 7v3"/>
-              <rect x="5" y="10" width="14" height="11" rx="2" ry="2"/>
-            </svg>
-          </span>
-          <input id="password" type="password" placeholder="Contraseña">
-        </div>
+    </div>
+</div>
+@endsection
 
-        <button class="btn-primary" type="submit">Iniciar Sesión</button>
-
-        <a href="#" class="link-small">Olvidé mi contraseña</a>
-
-        <div class="register">
-          <span>Crear una cuenta</span>
-          <a href="#">Regístrate</a>
-        </div>
-
-      </div>
-    </main>
-
-  </div>
-</body>
-</html>
