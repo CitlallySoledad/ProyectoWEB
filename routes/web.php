@@ -30,6 +30,11 @@ Route::get('/panel', function () {
 
 use App\Http\Controllers\RegistroController;
 
+//Panel de Lista de equipos
+Route::get('/panel/lista-equipo', function () {
+    return view('pagPrincipal.listaEquipo');
+})->name('panel.lista-equipo');
+
 // Guardar registro (POST)
 Route::post('/registro', [RegistroController::class, 'store'])
     ->name('registro.store');
