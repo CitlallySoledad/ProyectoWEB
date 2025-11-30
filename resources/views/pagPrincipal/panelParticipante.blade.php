@@ -342,12 +342,13 @@
                             <span>Mi equipo</span>
                         </a>
                     </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="#">
-                            <i class="bi bi-list-task"></i>
-                            <span>Lista de equipo</span>
-                        </a>
-                    </li>
+                       {{-- Lista de equipo --}}
+            <li class="sidebar-item">
+    <a class="sidebar-link" href="{{ route('panel.lista-equipo') }}">
+        <i class="bi bi-list-task"></i>
+        <span class="link-text">Lista de equipo</span>
+    </a>
+</li>
                 </ul>
             </div>
 
