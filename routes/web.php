@@ -6,38 +6,47 @@ use App\Http\Controllers\AdminEventController;
 use App\Http\Controllers\AdminTeamController;
 use App\Http\Controllers\AdminEvaluationController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\RegistroController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 // Página principal
 Route::get('/', function () {
     return view('pagPrincipal.pagPrincipal');
 })->name('public.home');
 
-// Login de usuario normal (solo vista por ahora)
-Route::get('/login', function () {
+// Login de usuario normal
+// GET  -> muestra el formulario
+// POST -> procesa el login (por ahora solo redirige al panel del participante)
+Route::match(['get', 'post'], '/login', function (Request $request) {
+    if ($request->isMethod('post')) {
+        // 🔐 Aquí más adelante puedes validar usuario/contraseña de verdad.
+        // Por ahora solo simulamos un login correcto y mandamos al panel.
+        return redirect()->route('panel.participante');
+    }
+
+    // Si es GET, mostrar el formulario de login
     return view('pagPrincipal.loginPrin');
 })->name('public.login');
 
-// Registro usuario normal (solo vista por ahora)
+// Registro usuario normal (solo vista)
 Route::get('/registro', function () {
     return view('pagPrincipal.crearCuenta');
 })->name('public.register');
+
+// Guardar registro (POST)
+Route::post('/registro', [RegistroController::class, 'store'])
+    ->name('registro.store');
 
 // Panel del participante (el diseño nuevo)
 Route::get('/panel', function () {
     return view('pagPrincipal.panelParticipante');
 })->name('panel.participante');
 
-use App\Http\Controllers\RegistroController;
-
-//Panel de Lista de equipos
+// Panel de Lista de equipos
 Route::get('/panel/lista-equipo', function () {
     return view('pagPrincipal.listaEquipo');
 })->name('panel.lista-equipo');
-
-// Guardar registro (POST)
-Route::post('/registro', [RegistroController::class, 'store'])
-    ->name('registro.store');
 
 
 // LOGIN ADMIN
@@ -120,4 +129,3 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::post('/admin/usuarios', [AdminUserController::class, 'store'])
         ->name('admin.users.store');
 });
-

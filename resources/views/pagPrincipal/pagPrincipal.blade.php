@@ -244,7 +244,7 @@
             {{-- BOTONES --}}
             <div class="landing-buttons">
                 <button class="landing-btn landing-btn-primary"
-                        onclick="window.location='{{ route('login') }}'">
+                        onclick="window.location='{{ route('public.login') }}'">
                     Iniciar Sesión
                 </button>
 
