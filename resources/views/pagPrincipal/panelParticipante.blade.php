@@ -299,67 +299,113 @@
     <div class="panel-card">
 
         {{-- SIDEBAR IZQUIERDA --}}
-        <aside class="panel-sidebar">
+        <aside class="panel-sidebar" id="sidebar">
 
-            <div class="sidebar-top">
-                <button class="sidebar-back" type="button">
-                    <i class="bi bi-arrow-left"></i>
-                </button>
-                <div class="sidebar-logo">
-                    {{-- Cambia la ruta de la imagen por tu logo real --}}
-                    <img src="{{ asset('imagenes/logo-ito.png') }}" alt="Logo">
-                </div>
-            </div>
+    {{-- FLECHA ATRÁS + LOGO --}}
+    <div class="sidebar-top">
+        <button class="sidebar-back" type="button">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <div class="sidebar-logo">
+            {{-- Cambia la ruta de la imagen por tu logo real --}}
+            <img src="{{ asset('imagenes/logo-ito.png') }}" alt="Logo">
+        </div>
+    </div>
 
-            <div class="sidebar-middle">
-                <p class="sidebar-section-title">Menú</p>
-                <ul class="sidebar-menu">
-                    <li class="sidebar-item">
-                        <a class="sidebar-link active" href="#">
-                            <i class="bi bi-house-door-fill"></i>
-                            <span>Inicio</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="#">
-                            <i class="bi bi-calendar-event"></i>
-                            <span>Eventos</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="#">
-                            <i class="bi bi-calendar2-week"></i>
-                            <span>Eventos</span>
-                        </a>
-                    </li>
-                </ul>
+    {{-- MENÚ PRINCIPAL + EQUIPO --}}
+    <div class="sidebar-middle">
+        {{-- SECCIÓN MENÚ --}}
+        <p class="sidebar-section-title">Menú</p>
+        <ul class="sidebar-menu">
+            {{-- Inicio --}}
+            <li class="sidebar-item">
+                <a class="sidebar-link active" href="#">
+                    <i class="bi bi-house-door-fill"></i>
+                    <span>Inicio</span>
+                </a>
+            </li>
 
-                <p class="sidebar-section-title">Equipo</p>
-                <ul class="sidebar-menu">
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="#">
-                            <i class="bi bi-people"></i>
-                            <span>Mi equipo</span>
-                        </a>
-                    </li>
-                       {{-- Lista de equipo --}}
+            {{-- Eventos --}}
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="#">
+                    <i class="bi bi-search"></i>
+                    <span>Eventos</span>
+                </a>
+            </li>
+
+            {{-- Mi perfil --}}
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="#">
+                    <i class="bi bi-person"></i>
+                    <span>Mi perfil</span>
+                </a>
+            </li>
+        </ul>
+
+        {{-- SECCIÓN EQUIPO --}}
+        <p class="sidebar-section-title">Equipo</p>
+        <ul class="sidebar-menu">
+            {{-- Mi equipo --}}
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="#">
+                    <i class="bi bi-people"></i>
+                    <span>Mi equipo</span>
+                </a>
+            </li>
+
+            {{-- Lista de equipo --}}
             <li class="sidebar-item">
     <a class="sidebar-link" href="{{ route('panel.lista-equipo') }}">
         <i class="bi bi-list-task"></i>
         <span class="link-text">Lista de equipo</span>
     </a>
 </li>
-                </ul>
-            </div>
 
-            <div class="sidebar-bottom">
-                <div class="sidebar-logout">
-                    <i class="bi bi-box-arrow-right"></i>
-                    <span>Salir</span>
-                </div>
-            </div>
 
-        </aside>
+            {{-- Crear equipo --}}
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="#">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>Crear equipo</span>
+                </a>
+            </li>
+
+            {{-- Rol --}}
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="#">
+                    <i class="bi bi-person-badge"></i>
+                    <span>Rol</span>
+                </a>
+            </li>
+
+            {{-- Lista eventos --}}
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="#">
+                    <i class="bi bi-calendar2-week"></i>
+                    <span>Lista eventos</span>
+                </a>
+            </li>
+
+            {{-- Submision del proyecto --}}
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="#">
+                    <i class="bi bi-file-earmark-arrow-up"></i>
+                    <span>Submision del proyecto</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    {{-- BOTÓN SALIR --}}
+    <div class="sidebar-bottom">
+        <div class="sidebar-logout">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Salir</span>
+        </div>
+    </div>
+
+</aside>
+
 
         {{-- CONTENIDO PRINCIPAL --}}
         <main class="panel-main">
