@@ -23,6 +23,18 @@ Route::get('/registro', function () {
     return view('pagPrincipal.crearCuenta');
 })->name('public.register');
 
+// Panel del participante (el diseño nuevo)
+Route::get('/panel', function () {
+    return view('pagPrincipal.panelParticipante');
+})->name('panel.participante');
+
+use App\Http\Controllers\RegistroController;
+
+// Guardar registro (POST)
+Route::post('/registro', [RegistroController::class, 'store'])
+    ->name('registro.store');
+
+
 // LOGIN ADMIN
 Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])
     ->name('admin.login');

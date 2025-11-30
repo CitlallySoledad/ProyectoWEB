@@ -149,9 +149,9 @@
         {{-- LADO IZQUIERDO: ILUSTRACIONES --}}
         <div class="user-login-left">
             <div class="user-login-illustration"
-                 style="background-image:url('{{ asset('imagenes/user-login-top.png') }}')"></div>
+                 style="background-image:url('{{ asset('imagenes/user-login-top.jpg') }}')"></div>
             <div class="user-login-illustration bottom"
-                 style="background-image:url('{{ asset('imagenes/user-login-bottom.png') }}')"></div>
+                 style="background-image:url('{{ asset('imagenes/user-login-bottom.jpg') }}')"></div>
         </div>
 
         {{-- LADO DERECHO: FORMULARIO --}}
