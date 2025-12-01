@@ -325,22 +325,19 @@
                 </a>
             </li>
 
-            {{-- Eventos --}}
             <li class="sidebar-item">
-                <a class="sidebar-link" href="#">
-                    <i class="bi bi-search"></i>
-                    <span>Eventos</span>
-                </a>
+               <a class="sidebar-link" href="{{ route('panel.eventos') }}">
+                 <i class="bi bi-search"></i>
+                <span>Eventos</span>
+               </a>
             </li>
 
-            {{-- Mi perfil --}}
             <li class="sidebar-item">
-                <a class="sidebar-link" href="#">
-                    <i class="bi bi-person"></i>
-                    <span>Mi perfil</span>
+                <a class="sidebar-link" href="{{ route('panel.perfil') }}">
+                   <i class="bi bi-person"></i>
+                   <span>Mi perfil</span>
                 </a>
             </li>
-        </ul>
 
         {{-- SECCIÓN EQUIPO --}}
         <p class="sidebar-section-title">Equipo</p>
