@@ -28,11 +28,17 @@
 
         {{-- CONTENIDO PRINCIPAL --}}
         <div class="admin-page-main">
-            <div class="d-flex justify-content-end mb-2">
-                <div class="admin-page-user">
-                    <i class="bi bi-person-circle"></i>
-                    <span>Admin</span>
-                </div>
+            <div class="admin-page-user">
+    <i class="bi bi-person-circle"></i>
+    <span>
+        @if (request()->routeIs('panel.teams.*'))
+            {{ auth()->check() ? auth()->user()->name : 'Usuario' }}
+        @else
+            Admin
+        @endif
+    </span>
+</div>
+
             </div>
 
             <h1 class="admin-form-title">Crear equipo</h1>

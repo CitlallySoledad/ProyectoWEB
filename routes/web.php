@@ -7,8 +7,11 @@ use App\Http\Controllers\AdminTeamController;
 use App\Http\Controllers\AdminEvaluationController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\RegistroController;
+use App\Http\Controllers\ParticipantTeamController; 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Models\Team;
+
 
 // Página principal
 Route::get('/', function () {
@@ -29,6 +32,11 @@ Route::match(['get', 'post'], '/login', function (Request $request) {
     return view('pagPrincipal.loginPrin');
 })->name('public.login');
 
+// Pantalla "Mi equipo" (nueva pestaña)
+Route::get('/panel/mi-equipo', function () {
+    return view('pagPrincipal.miEquipo');
+})->name('panel.mi-equipo');
+
 // Registro usuario normal (solo vista)
 Route::get('/registro', function () {
     return view('pagPrincipal.crearCuenta');
@@ -45,10 +53,22 @@ Route::get('/panel', function () {
 
 // Panel de Lista de equipos
 Route::get('/panel/lista-equipo', function () {
-    return view('pagPrincipal.listaEquipo');
+    $teams = Team::orderBy('created_at', 'desc')->get();
+    return view('pagPrincipal.listaEquipo', compact('teams'));
 })->name('panel.lista-equipo');
 
+// USAMOS EL NUEVO CONTROLADOR ParticipantTeamController
+    Route::get('/panel/lista-equipo', [ParticipantTeamController::class, 'index'])
+        ->name('panel.lista-equipo');
 
+    Route::get('/panel/crear-equipo', [ParticipantTeamController::class, 'create'])
+        ->name('panel.teams.create');
+
+    Route::post('/panel/crear-equipo', [ParticipantTeamController::class, 'store'])
+        ->name('panel.teams.store');
+        
+    Route::post('/panel/unirse-equipo', [ParticipantTeamController::class, 'join'])
+        ->name('panel.teams.join');
 // LOGIN ADMIN
 Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])
     ->name('admin.login');
