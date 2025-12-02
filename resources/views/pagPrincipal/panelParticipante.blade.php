@@ -299,7 +299,7 @@
     <div class="panel-card">
 
         {{-- SIDEBAR IZQUIERDA --}}
-        <aside class="panel-sidebar" id="sidebar">
+<aside class="panel-sidebar" id="sidebar">
 
     {{-- FLECHA ATRÁS + LOGO --}}
     <div class="sidebar-top">
@@ -307,37 +307,38 @@
             <i class="bi bi-arrow-left"></i>
         </button>
         <div class="sidebar-logo">
-            {{-- Cambia la ruta de la imagen por tu logo real --}}
             <img src="{{ asset('imagenes/logo-ito.png') }}" alt="Logo">
         </div>
     </div>
 
-    {{-- MENÚ PRINCIPAL + EQUIPO --}}
     <div class="sidebar-middle">
         {{-- SECCIÓN MENÚ --}}
         <p class="sidebar-section-title">Menú</p>
         <ul class="sidebar-menu">
             {{-- Inicio --}}
             <li class="sidebar-item">
-                <a class="sidebar-link active" href="#">
+                <a class="sidebar-link active" href="{{ route('panel.participante') }}">
                     <i class="bi bi-house-door-fill"></i>
                     <span>Inicio</span>
                 </a>
             </li>
 
+            {{-- Eventos --}}
             <li class="sidebar-item">
-               <a class="sidebar-link" href="{{ route('panel.eventos') }}">
-                 <i class="bi bi-search"></i>
-                <span>Eventos</span>
-               </a>
-            </li>
-
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{{ route('panel.perfil') }}">
-                   <i class="bi bi-person"></i>
-                   <span>Mi perfil</span>
+                <a class="sidebar-link" href="{{ route('panel.eventos') }}">
+                    <i class="bi bi-calendar-event"></i>
+                    <span>Eventos</span>
                 </a>
             </li>
+
+            {{-- Mi perfil --}}
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="{{ route('panel.perfil') }}">
+                    <i class="bi bi-person"></i>
+                    <span>Mi perfil</span>
+                </a>
+            </li>
+        </ul>
 
         {{-- SECCIÓN EQUIPO --}}
         <p class="sidebar-section-title">Equipo</p>
@@ -352,16 +353,15 @@
 
             {{-- Lista de equipo --}}
             <li class="sidebar-item">
-    <a class="sidebar-link" href="{{ route('panel.lista-equipo') }}">
-        <i class="bi bi-list-task"></i>
-        <span class="link-text">Lista de equipo</span>
-    </a>
-</li>
-
+                <a class="sidebar-link" href="{{ route('panel.lista-equipo') }}">
+                    <i class="bi bi-list-task"></i>
+                    <span>Lista de equipo</span>
+                </a>
+            </li>
 
             {{-- Crear equipo --}}
             <li class="sidebar-item">
-                <a class="sidebar-link" href="#">
+                <a class="sidebar-link" href="{{ route('panel.teams.create') }}">
                     <i class="bi bi-plus-circle"></i>
                     <span>Crear equipo</span>
                 </a>
@@ -383,11 +383,11 @@
                 </a>
             </li>
 
-            {{-- Submision del proyecto --}}
+            {{-- Submisión del proyecto --}}
             <li class="sidebar-item">
                 <a class="sidebar-link" href="#">
                     <i class="bi bi-file-earmark-arrow-up"></i>
-                    <span>Submision del proyecto</span>
+                    <span>Submisión del proyecto</span>
                 </a>
             </li>
         </ul>
@@ -402,6 +402,7 @@
     </div>
 
 </aside>
+
 
 
         {{-- CONTENIDO PRINCIPAL --}}
