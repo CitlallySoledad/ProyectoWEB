@@ -45,6 +45,7 @@
             margin-bottom: 24px;
         }
 
+        /* Mueve la flecha a la izquierda para regresar */
         .sidebar-back {
             width: 32px;
             height: 32px;
@@ -60,6 +61,12 @@
         .sidebar-back i {
             font-size: 1rem;
             color: #f9fafb;
+        }
+
+        /* Mueve el logo a la derecha */
+        .sidebar-logo {
+            margin-left: auto;  /* Esto mueve el logo hacia la derecha */
+            padding-left: 20px; /* Espacio entre la flecha y el logo */
         }
 
         .sidebar-logo img {
@@ -112,7 +119,7 @@
 
         .panel-header {
             display: flex;
-            justify-content: flex-end; /* Move the "Participante" button to the right */
+            justify-content: flex-end; /* Mueve el "Participante" a la derecha */
             align-items: center;
             margin-bottom: 18px;
         }
@@ -187,7 +194,7 @@
             justify-content: center;
             align-items: center;
             gap: 32px;
-            margin-top: 20px; /* Move the image down */
+            margin-top: 20px; /* Baja la imagen */
         }
 
         .profile-image {
@@ -247,8 +254,8 @@
         {{-- SIDEBAR IZQUIERDA --}}
         <aside class="panel-sidebar">
             <div class="sidebar-top">
-                <a href="javascript:history.back()">
-                    <button class="sidebar-back" type="button">
+                <a href="javascript:void(0)">
+                    <button class="sidebar-back" type="button" onclick="window.history.back();">
                         <i class="bi bi-arrow-left"></i>
                     </button>
                 </a>
@@ -260,21 +267,33 @@
             <div class="sidebar-middle">
                 <ul class="sidebar-menu">
                     <li class="sidebar-item">
-                        <a class="sidebar-link active" href="{{ route('panel.participante') }}">
-                            <i class="bi bi-house-door-fill"></i>
-                            <span>Inicio</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('panel.eventos') }}">
-                            <i class="bi bi-calendar-event"></i>
-                            <span>Eventos</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ route('panel.perfil') }}">
+                        <a class="sidebar-link active" href="javascript:void(0)">
                             <i class="bi bi-person-fill"></i>
                             <span>Mi perfil</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="javascript:void(0)">
+                            <i class="bi bi-person-fill"></i>
+                            <span>Datos personales</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="javascript:void(0)">
+                            <i class="bi bi-person-fill"></i>
+                            <span>Mi equipo</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="javascript:void(0)">
+                            <i class="bi bi-lock-fill"></i>
+                            <span>Cambiar contraseña</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="javascript:void(0)">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Cerrar sesión</span>
                         </a>
                     </li>
                 </ul>
@@ -299,7 +318,7 @@
                 <h1>Detalles de Mi Perfil</h1>
                 <div class="profile-wrapper">
                     <div class="profile-image">
-                        <img src="{{ asset('imagenes/your-profile-image.jpg') }}" alt="Imagen de perfil">
+                        <img src="{{ asset('imagenes/foto-perfil.jpg') }}" alt="Imagen de perfil">
                     </div>
                     <div class="profile-details">
                         <div class="profile-info">
@@ -331,3 +350,4 @@
     </div>
 </div>
 @endsection
+

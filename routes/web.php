@@ -61,6 +61,7 @@ Route::get('/perfil', function () {
     return view('pagPrincipal.perfil'); // Cambia 'perfil' por el nombre del archivo blade que contiene el diseño de tu perfil
 })->name('panel.perfil');
 
+
 // Panel de Lista de equipos
 Route::get('/panel/lista-equipo', function () {
     $teams = Team::orderBy('created_at', 'desc')->get();
