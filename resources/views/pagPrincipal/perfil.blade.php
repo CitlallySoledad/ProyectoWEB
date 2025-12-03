@@ -45,7 +45,6 @@
             margin-bottom: 24px;
         }
 
-        /* Mueve la flecha a la izquierda para regresar */
         .sidebar-back {
             width: 32px;
             height: 32px;
@@ -63,10 +62,10 @@
             color: #f9fafb;
         }
 
-        /* Mueve el logo a la derecha */
+        /* Logo a la derecha */
         .sidebar-logo {
-            margin-left: auto;  /* Esto mueve el logo hacia la derecha */
-            padding-left: 20px; /* Espacio entre la flecha y el logo */
+            margin-left: auto;
+            padding-left: 20px;
         }
 
         .sidebar-logo img {
@@ -102,7 +101,6 @@
             color: #ffffff;
         }
 
-        /* Elemento activo */
         .sidebar-link.active {
             background-color: #2d2a61;
             color: #ffffff;
@@ -119,7 +117,7 @@
 
         .panel-header {
             display: flex;
-            justify-content: flex-end; /* Mueve el "Participante" a la derecha */
+            justify-content: flex-end;
             align-items: center;
             margin-bottom: 18px;
         }
@@ -156,53 +154,36 @@
             gap: 18px;
         }
 
-        .activity-card {
-            background: #0f3446;
-            border-radius: 18px;
-            padding: 16px 18px;
-            box-shadow: 0 8px 20px rgba(15,23,42,0.55);
-        }
-
-        .activity-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .activity-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            font-size: 0.9rem;
-        }
-
-        .activity-list li {
-            margin-bottom: 4px;
-            display: flex;
-            align-items: flex-start;
-            gap: 6px;
-        }
-
-        .activity-list span.emoji {
-            font-size: 1.1rem;
-            line-height: 1.1;
-        }
-
         /* Imagen de Perfil y Datos */
         .profile-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 32px;
-            margin-top: 20px; /* Baja la imagen */
+            margin-top: 20px;
         }
 
+        /* contenedor de imagen + profesión */
         .profile-image {
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .profile-image img {
             width: 160px;
             height: 160px;
             border-radius: 8px;
             background: #ddd;
             object-fit: cover;
+        }
+
+        .profile-profession {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            color: #e5e7eb;
         }
 
         .profile-details {
@@ -234,14 +215,13 @@
                 margin-left: auto;
             }
 
-            /* Baja la imagen de perfil y la centra */
             .profile-wrapper {
                 flex-direction: column;
                 align-items: center;
             }
 
-            .profile-image {
-                margin-top: 30px;
+            .profile-image img {
+                margin-top: 10px;
             }
         }
     </style>
@@ -285,16 +265,19 @@
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="javascript:void(0)">
+                        <a class="sidebar-link" href="{{ route('panel.cambiarContrasena') }}">
                             <i class="bi bi-lock-fill"></i>
                             <span>Cambiar contraseña</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="javascript:void(0)">
+                        <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                            <button type="submit" class="sidebar-link" style="background:none; border:none; width:100%; text-align:left;">
                             <i class="bi bi-box-arrow-right"></i>
                             <span>Cerrar sesión</span>
-                        </a>
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </div>
@@ -319,6 +302,9 @@
                 <div class="profile-wrapper">
                     <div class="profile-image">
                         <img src="{{ asset('imagenes/foto-perfil.jpg') }}" alt="Imagen de perfil">
+                        <p class="profile-profession">
+                            Ingeniero en Sistemas<br>Computacionales
+                        </p>
                     </div>
                     <div class="profile-details">
                         <div class="profile-info">
@@ -350,4 +336,3 @@
     </div>
 </div>
 @endsection
-

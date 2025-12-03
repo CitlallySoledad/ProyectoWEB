@@ -51,16 +51,49 @@ Route::get('/panel', function () {
     return view('pagPrincipal.panelParticipante');
 })->name('panel.participante');
 
+Route::post('/logout', function () {
+    Auth::logout();
+
+    return redirect()
+        ->route('pagPrincipal')
+        ->with('logout_success', 'Has cerrado sesión correctamente.');
+})->name('logout');
+
+
 // Página de eventos
 Route::get('/eventos', function () {
     return view('pagPrincipal.eventos');
 })->name('panel.eventos');
+
+Route::get('/perfil', function () {
+    return view('pagPrincipal.perfil');
+})->name('panel.perfil');
+
 
 // Ruta para el perfil
 Route::get('/perfil', function () {
     return view('pagPrincipal.perfil'); // Cambia 'perfil' por el nombre del archivo blade que contiene el diseño de tu perfil
 })->name('panel.perfil');
 
+// Ruta para la vista de cambiar contraseña
+Route::get('/cambiar-contrasena', function () {
+    return view('pagPrincipal.cambiarContrasena');
+})->name('panel.cambiarContrasena');
+
+Route::post('/cambiar-contrasena', [App\Http\Controllers\PasswordController::class, 'update'])
+    ->name('password.update');
+
+use Illuminate\Support\Facades\Auth;
+
+//Cerrar sesión
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect()->route('pagPrincipal'); 
+})->name('logout');
+
+Route::get('/pag-principal', function () {
+    return view('pagPrincipal.pagPrincipal');
+})->name('pagPrincipal');
 
 // Panel de Lista de equipos
 Route::get('/panel/lista-equipo', function () {

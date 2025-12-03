@@ -292,10 +292,10 @@
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="#">
+                        <a class="sidebar-link" href="{{ route('panel.perfil') }}">
                             <i class="bi bi-person"></i>
                             <span>Mi perfil</span>
-                        </a>
+                         </a>
                     </li>
                 </ul>
             </div>

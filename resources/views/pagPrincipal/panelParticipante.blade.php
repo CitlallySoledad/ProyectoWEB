@@ -395,10 +395,13 @@
 
     {{-- BOTÓN SALIR --}}
     <div class="sidebar-bottom">
-        <div class="sidebar-logout">
-            <i class="bi bi-box-arrow-right"></i>
-            <span>Salir</span>
-        </div>
+         <form method="POST" action="{{ route('logout') }}">
+        @csrf
+            <button type="submit" class="sidebar-logout" style="background:none;border:none;color:inherit;cursor:pointer;">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Salir</span>
+            </button>
+        </form>
     </div>
 
 </aside>
@@ -471,4 +474,20 @@
 
     </div>
 </div>
+
+@if(session('logout_success'))
+    {{-- SweetAlert2 desde CDN --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Sesión cerrada!',
+                text: "{{ session('logout_success') }}",
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#2563eb'
+            });
+        });
+    </script>
+@endif
 @endsection

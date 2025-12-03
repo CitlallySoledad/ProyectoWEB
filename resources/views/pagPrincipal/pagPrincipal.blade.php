@@ -7,40 +7,35 @@
     .landing-wrapper {
         min-height: 100vh;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
         background: radial-gradient(circle at top, #123c6b, #020617);
-        padding: 20px;
+        padding: 40px 20px;
     }
 
     .landing-card {
         width: 100%;
-        max-width: 960px;
+        max-width: 1200px;
+        min-height: 720px;
         background: #0f172a;
-        border-radius: 10px;
-        box-shadow: 0 20px 45px rgba(0,0,0,0.6);
+        border-radius: 14px;
+        box-shadow: 0 25px 55px rgba(0,0,0,0.6);
         overflow: hidden;
         color: #fff;
-        font-size: 0.92rem;
+        font-size: 0.95rem;
     }
 
+    /* -------- HEADER -------- */
     .landing-header {
         display: flex;
         align-items: center;
-        padding: 10px 20px;
+        padding: 14px 26px;
         background: #14557b;
-    }
-
-    .landing-header-left,
-    .landing-header-right {
-        display: flex;
-        align-items: center;
-        gap: 10px;
     }
 
     .landing-header-left img,
     .landing-header-right img {
-        height: 52px;
+        height: 60px;
         width: auto;
         object-fit: contain;
     }
@@ -51,31 +46,33 @@
     }
 
     .landing-header-center h1 {
-        font-size: 2rem;
+        font-size: 2.2rem;
         margin: 0;
     }
 
     .landing-header-center span {
-        font-size: 0.85rem;
+        font-size: 1rem;
         display: block;
-        margin-top: -4px;
+        margin-top: -6px;
     }
 
+    /* -------- NAV -------- */
     .landing-nav {
         display: flex;
         background: #166534;
-        padding: 6px 8px;
-        gap: 4px;
+        padding: 10px 12px;
+        gap: 6px;
     }
 
     .landing-nav button {
         border: none;
-        padding: 6px 16px;
+        padding: 8px 20px;
         border-radius: 4px;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         cursor: pointer;
         background: #22c55e;
         color: #022c22;
+        transition: 0.2s ease;
     }
 
     .landing-nav button.secondary {
@@ -83,72 +80,85 @@
         color: #e5e7eb;
     }
 
+    .landing-nav button:hover {
+        background: #4ade80;
+    }
+
+    /* -------- CUERPO PRINCIPAL -------- */
     .landing-body {
-        padding: 18px 24px 28px;
+        padding: 32px 38px 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        min-height: 520px;
     }
 
     .landing-title {
-        font-size: 1.3rem;
+        font-size: 1.7rem;
         font-weight: 700;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
     }
 
+    /* -------- COLUMNAS -------- */
     .landing-columns {
         display: grid;
-        grid-template-columns: 220px 1fr;
-        gap: 16px;
-        margin-bottom: 18px;
+        grid-template-columns: 300px 1fr;
+        gap: 40px;
+        align-items: flex-start;
     }
 
     .landing-social {
         display: flex;
         flex-direction: column;
-        gap: 6px;
-        font-size: 0.85rem;
+        gap: 10px;
+        font-size: 1rem;
     }
 
     .landing-social-item {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 10px;
     }
 
     .landing-social-item i {
-        font-size: 1.1rem;
+        font-size: 1.3rem;
     }
 
+    /* -------- GALERÍA -------- */
     .landing-gallery {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        margin-top: 8px;
+        gap: 14px;
+        margin-top: 14px;
     }
 
     .landing-gallery div {
-        height: 120px;
-        border-radius: 4px;
+        height: 190px;
+        border-radius: 6px;
         background-size: cover;
         background-position: center;
         background-color: #111827;
     }
 
+    /* -------- BOTONES -------- */
     .landing-buttons {
-        margin-top: 20px;
+        margin-top: 16px;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 14px;
         align-items: center;
     }
 
     .landing-btn {
-        width: 50%;
-        max-width: 380px;
+        width: 60%;
+        max-width: 420px;
         border-radius: 999px;
-        padding: 10px 20px;
+        padding: 14px 22px;
         border: none;
         cursor: pointer;
-        font-size: 0.95rem;
+        font-size: 1rem;
         font-weight: 600;
+        transition: .2s ease;
     }
 
     .landing-btn-primary {
@@ -156,21 +166,40 @@
         color: #fff;
     }
 
+    .landing-btn-primary:hover {
+        background: #1e3a8a;
+    }
+
     .landing-btn-secondary {
         background: #1d4ed8;
         color: #e5e7eb;
     }
 
+    .landing-btn-secondary:hover {
+        background: #1e40af;
+    }
+
+    /* -------- RESPONSIVE -------- */
     @media (max-width: 768px) {
         .landing-card {
             max-width: 100%;
         }
+
         .landing-columns {
             grid-template-columns: 1fr;
         }
+
         .landing-header {
             flex-direction: column;
-            gap: 6px;
+            gap: 10px;
+        }
+
+        .landing-gallery div {
+            height: 140px;
+        }
+
+        .landing-btn {
+            width: 80%;
         }
     }
 </style>
@@ -180,10 +209,9 @@
 <div class="landing-wrapper">
     <div class="landing-card">
 
-        {{-- ENCABEZADO --}}
+        {{-- HEADER --}}
         <div class="landing-header">
             <div class="landing-header-left">
-                {{-- logotipo izquierda (reemplaza src por tus imágenes reales) --}}
                 <img src="{{ asset('imagenes/logo-tec.png') }}" alt="TecNM">
             </div>
 
@@ -206,14 +234,15 @@
             <button class="secondary">Contáctanos</button>
         </div>
 
-        {{-- CUERPO --}}
+        {{-- CONTENIDO PRINCIPAL --}}
         <div class="landing-body">
             <div class="landing-title">
                 Únete a la comunidad que transforma ideas en algoritmos
             </div>
 
             <div class="landing-columns">
-                {{-- Columna izquierda: redes / contacto --}}
+
+                {{-- IZQUIERDA: REDES --}}
                 <div class="landing-social">
                     <div class="landing-social-item">
                         <i class="bi bi-facebook"></i> Big Programing
@@ -226,9 +255,9 @@
                     </div>
                 </div>
 
-                {{-- Columna derecha: texto + galería --}}
+                {{-- DERECHA: TEXTO + GALERÍA --}}
                 <div>
-                    <p>
+                    <p style="font-size: 1.05rem;">
                         Registra tu equipo, organiza tu código y demuestra tu talento
                         en los eventos de programación.
                     </p>
@@ -258,4 +287,3 @@
     </div>
 </div>
 @endsection
-
