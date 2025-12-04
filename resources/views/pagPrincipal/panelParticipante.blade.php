@@ -369,7 +369,7 @@
 
             {{-- Rol --}}
             <li class="sidebar-item">
-                <a class="sidebar-link" href="#">
+                <a class="sidebar-link" href="{{ route('roles') }}">
                     <i class="bi bi-person-badge"></i>
                     <span>Rol</span>
                 </a>

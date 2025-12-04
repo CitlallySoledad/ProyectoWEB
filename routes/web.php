@@ -130,6 +130,14 @@ Route::get('/cambiar-contrasena', function () {
 Route::post('/cambiar-contrasena', [App\Http\Controllers\PasswordController::class, 'update'])
     ->name('password.update');
 
+// Route to the page that displays roles and participants
+// Ruta para mostrar los roles del participante
+Route::get('/roles', function () {
+    return view('pagPrincipal.rolesParticipants');
+})->name('roles');
+
+
+
 // =======================
 // LOGOUT GENERAL
 // =======================

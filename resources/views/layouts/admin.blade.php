@@ -583,6 +583,42 @@
             text-align: center;
             font-size: 0.85rem;
         }
+
+        .roles-container {
+            display: flex;
+            gap: 20px;
+            margin: 20px;
+        }
+
+        .role-card {
+            background: #1d4ed8;
+            padding: 15px;
+            border-radius: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .role-card h3 {
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .role-info {
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .role-info i {
+            font-size: 2rem;
+            color: #1d4ed8;
+        }
     </style>
 
     @stack('styles')
