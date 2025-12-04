@@ -200,7 +200,7 @@
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.mi-equipo') }}"><i class="bi bi-people"></i> <span>Mi equipo</span></a></li>
                         <li class="sidebar-item"><a class="sidebar-link active" href="{{ route('panel.lista-equipo') }}"><i class="bi bi-list-ul"></i> <span>Lista de equipo</span></a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.teams.create') }}"><i class="bi bi-plus-circle"></i> <span>Crear equipo</span></a></li>
-                        <li class="sidebar-item"><a class="sidebar-link" href="#"><i class="bi bi-person-badge"></i> <span>Rol</span></a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('roles') }}"><i class="bi bi-person-badge"></i> <span>Rol</span></a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="#"><i class="bi bi-calendar-week"></i> <span>Lista eventos</span></a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="#"><i class="bi bi-file-earmark-arrow-up"></i> <span>Submision del proyecto</span></a></li>
                     </ul>
