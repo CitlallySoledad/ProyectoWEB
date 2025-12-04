@@ -12,7 +12,7 @@ class IsAdmin
     {
         if (!Auth::check() || !Auth::user()->is_admin) {
             return redirect()
-                ->route('admin.login')
+                ->route('login')
                 ->withErrors(['email' => 'Debes iniciar sesión como administrador.']);
         }
 

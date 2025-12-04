@@ -115,20 +115,6 @@
         text-decoration: underline;
     }
 
-    .user-login-admin-link {
-        margin-top: 12px;
-        font-size: 0.86rem;
-        text-align: center;
-    }
-
-    .user-login-admin-link button {
-        border: none;
-        background: transparent;
-        color: #60a5fa;
-        text-decoration: underline;
-        cursor: pointer;
-    }
-
     @media (max-width: 900px) {
         .user-login-card {
             grid-template-columns: 1fr;
@@ -161,20 +147,52 @@
                 Inicio de sesión para participantes / usuarios
             </div>
 
-            {{-- SOLO DISEÑO: esta acción la puedes cambiar a la ruta real cuando tengas el login de usuarios --}}
-            <form method="POST" action="#">
+            {{-- ERRORES --}}
+            @if ($errors->any())
+                <div class="alert alert-danger small mb-2">
+                    @foreach ($errors->all() as $error)
+                        <div>{{ $error }}</div>
+                    @endforeach
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('login') }}">
                 @csrf
 
                 <div class="mb-2">
-                    <label class="user-login-label" for="control">Número de control</label>
-                    <input type="text" id="control" name="control"
-                           class="user-login-input" placeholder="Número de control">
+                    <label class="user-login-label" for="email">
+                        Correo electrónico
+                    </label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="user-login-input"
+                        placeholder="tu@correo.com"
+                        value="{{ old('email') }}"
+                        required
+                    >
                 </div>
 
                 <div class="mb-2">
                     <label class="user-login-label" for="password">Contraseña</label>
-                    <input type="password" id="password" name="password"
-                           class="user-login-input" placeholder="Contraseña">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="user-login-input"
+                        placeholder="Contraseña"
+                        required
+                    >
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="remember" name="remember" value="1">
+                        <label class="form-check-label text-white-50" for="remember">
+                            Recordarme
+                        </label>
+                    </div>
                 </div>
 
                 <button type="submit" class="user-login-btn">
@@ -184,24 +202,17 @@
 
             <div class="user-login-link">
                 ¿Olvidaste tu contraseña?
+                {{-- Aquí podrías poner un enlace real cuando tengas la ruta --}}
             </div>
 
             <div class="user-login-link">
                 ¿Aún no tienes cuenta?
                 <a href="{{ route('public.register') }}">Regístrate</a>
             </div>
-
-            {{-- 🔹 BOTÓN PARA IR AL LOGIN DE ADMINISTRADOR --}}
-            <div class="user-login-admin-link">
-                ¿Eres administrador?
-                <button type="button"
-                        onclick="window.location='{{ route('admin.login') }}'">
-                    Iniciar sesión como administrador
-                </button>
-            </div>
         </div>
 
     </div>
 </div>
 @endsection
+
 

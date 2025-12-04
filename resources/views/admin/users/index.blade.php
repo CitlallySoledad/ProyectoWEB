@@ -24,6 +24,16 @@
             <div class="admin-sidebar-icon active">
                 <i class="bi bi-person-badge"></i>
             </div>
+            <!-- Icono de salir (Logout) -->
+                <div class="admin-sidebar-icon">
+                    <a href="{{ route('logout') }}"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="bi bi-box-arrow-left"></i>
+                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+                </div>
         </div>
 
         {{-- CONTENIDO PRINCIPAL --}}

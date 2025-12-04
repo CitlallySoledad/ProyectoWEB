@@ -210,15 +210,16 @@
 
 
         .admin-sidebar {
-            width: 90px;
+            width: 120px;
             height: 100%;
             background: linear-gradient(180deg, #a855f7, #3b82f6);
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 30px 0;
+            padding: 40px 0;
             border-radius: 0;
             /* pega al borde izquierdo */
+            justify-content: space-between;
         }
 
         .admin-sidebar-back {
@@ -235,19 +236,46 @@
         }
 
         .admin-sidebar-icon {
-            width: 40px;
-            height: 40px;
+            width: 70px;
+            height: 70px;
             border-radius: 999px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 24px;
-            color: #18181b;
+            color: #000 !important;
+            font-size: 1.5rem;
+            /* Aumentar tamaño del icono */
+            transition: all 0.3s ease;
+        }
+
+        /* Asegura que el ícono de logout tenga color negro */
+        .admin-sidebar-icon i {
+            color: #000 !important;
+            /* Asegura que se aplique el color negro */
+        }
+
+        .admin-sidebar-icon:hover i {
+            color: #fff !important;
+            /* Cambia a blanco cuando se pasa el cursor */
+        }
+
+
+        .admin-sidebar-icon:hover {
+            background: rgba(15, 23, 42, 0.3);
+            color: #fff !important;
+            transform: scale(1.1);
+            /* Aumentar al pasar el cursor */
         }
 
         .admin-sidebar-icon.active {
             background: rgba(15, 23, 42, 0.3);
             color: #fff;
+        }
+
+        .admin-sidebar .admin-sidebar-icon:last-child {
+            margin-top: auto;
+            /* Empuja el icono de 'Salir' hacia abajo */
         }
 
         .admin-page-main {
