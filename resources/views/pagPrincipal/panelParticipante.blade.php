@@ -8,18 +8,18 @@
 .panel-wrapper {
     min-height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 24px;
+    justify-content: stretch;
+    align-items: stretch;
+    padding: 0;
 }
 
 /* TARJETA PRINCIPAL (TODO EL PANEL) */
 .panel-card {
     width: 100%;
-    max-width: 1100px;
-    min-height: 540px;
+    max-width: none;
+    min-height: 100vh;
     background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
-    border-radius: 24px;
+    border-radius: 0;
     box-shadow: 0 20px 45px rgba(0,0,0,0.55);
     display: flex;
     overflow: hidden;

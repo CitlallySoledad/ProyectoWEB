@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\PanelProfileController;
 
 // =======================
 // PÁGINA PRINCIPAL
@@ -123,9 +124,16 @@ Route::get('/eventos', function () {
 })->name('panel.eventos');
 
 // Perfil
-Route::get('/perfil', function () {
-    return view('pagPrincipal.perfil');
-})->name('panel.perfil');
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/panel/perfil', [PanelProfileController::class, 'show'])
+        ->name('panel.perfil');
+
+    Route::patch('/panel/perfil/datos', [PanelProfileController::class, 'updateDatos'])
+        ->name('panel.perfil.updateDatos');
+
+});
 
 // Cambiar contraseña
 Route::get('/cambiar-contrasena', function () {

@@ -8,18 +8,20 @@
     .panel-wrapper {
         min-height: 100vh;
         display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        padding: 24px;
+        justify-content: stretch;
+        align-items: stretch;
+        padding: 0;
+        margin: 0;
+        background: #020617;
     }
 
     /* TARJETA PRINCIPAL */
     .panel-card {
         width: 100%;
-        max-width: 1100px;
-        min-height: 540px;
+        max-width: none;
+        min-height: 100vh;
         background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
-        border-radius: 24px;
+        border-radius: 0;
         box-shadow: 0 20px 45px rgba(0,0,0,0.55);
         display: flex;
         overflow: hidden;
@@ -34,7 +36,6 @@
         padding: 18px 14px;
         display: flex;
         flex-direction: column;
-        border-radius: 24px 0 0 24px;
     }
 
     .sidebar-top {
@@ -70,6 +71,12 @@
         height: 40px;
     }
 
+    .sidebar-middle {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
     .sidebar-menu {
         list-style: none;
         padding: 0;
@@ -88,37 +95,51 @@
         border-radius: 12px;
         font-size: 1rem;
         text-decoration: none;
-        color: #e5e7eb;
+        color: #ffffff;
         cursor: pointer;
-        transition: background-color 0.3s ease, color 0.3s ease;
+        transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    }
+
+    .sidebar-link span,
+    .sidebar-link i {
+        color: #ffffff !important;
     }
 
     .sidebar-link:hover {
-        background-color: #3b0a45;
-        color: #ffffff;
+        background-color: rgba(255,255,255,0.15);
+        transform: translateX(2px);
     }
 
     .sidebar-link.active {
-        background-color: #2d2a61;
-        color: #ffffff;
+        background-color: rgba(15,23,42,0.9);
+        box-shadow: 0 0 0 1px rgba(15,23,42,0.6);
     }
 
     /* icono salir abajo */
-    .sidebar-bottom {
-        margin-top: auto;
-        padding-top: 16px;
-    }
+.logout-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 12px; /* igual que los otros botones */
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: left;
+    transition: background-color 0.3s ease;
+}
 
-    .sidebar-exit {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        border-radius: 999px;
-        border: 1px solid rgba(255,255,255,0.6);
-        cursor: pointer;
-    }
+.logout-btn:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+
+.logout-btn i,
+.logout-btn span {
+    color: #ffffff !important;
+}
 
     /* ===== CONTENIDO PRINCIPAL ===== */
     .panel-main {
@@ -142,16 +163,17 @@
         gap: 8px;
         padding: 6px 14px;
         border-radius: 999px;
-        background: rgba(15,23,42,0.8);
-        border: 1px solid rgba(148,163,184,0.8);
+        background: rgba(15,23,42,0.9);
+        border: 1px solid rgba(148,163,184,0.9);
         font-size: 0.85rem;
+        color: #e5e7eb;
     }
 
     .user-avatar {
         width: 26px;
         height: 26px;
         border-radius: 999px;
-        background: #0f172a;
+        background: #020617;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -159,6 +181,7 @@
 
     .user-avatar i {
         font-size: 1rem;
+        color: #e5e7eb;
     }
 
     .panel-content {
@@ -184,7 +207,7 @@
 
     /* Imagen del candado */
     .password-hero {
-        background: rgba(15,23,42,0.35);
+        background: rgba(15,23,42,0.55);
         border-radius: 18px;
         padding: 24px 32px;
         display: flex;
@@ -199,12 +222,14 @@
 
     /* Banda de texto informativo */
     .password-info-banner {
-        background: #0f4b68;
+        background: #065f46;
         border-radius: 14px;
         padding: 10px 18px;
         text-align: center;
         font-size: 0.9rem;
         line-height: 1.4;
+        color: #e5f9f0;
+        margin-top: 4px;
     }
 
     /* Columna derecha: mensaje de éxito */
@@ -213,9 +238,9 @@
     }
 
     .status-card {
-        background: #cfe8f5;
+        background: #dbeafe;
         color: #111827;
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 12px 14px;
         font-size: 0.9rem;
         box-shadow: 0 4px 12px rgba(15,23,42,0.35);
@@ -233,9 +258,10 @@
     .password-label {
         display: block;
         font-weight: 700;
-        font-size: 1.05rem;
-        color: #0b1020;
+        font-size: 1.02rem;
+        color: #f9fafb;
         margin-bottom: 6px;
+        margin-top: 4px;
     }
 
     .password-input {
@@ -245,7 +271,7 @@
         padding: 10px 14px;
         font-size: 1rem;
         color: #111827;
-        margin-bottom: 18px;
+        margin-bottom: 14px;
     }
 
     .password-input:focus {
@@ -256,28 +282,31 @@
     .password-actions {
         display: flex;
         justify-content: flex-end;
-        margin-top: 8px;
+        margin-top: 10px;
     }
 
     .password-btn {
         border: none;
         border-radius: 8px;
         padding: 8px 28px;
-        background: #000000;
+        background: #020617;
         color: #f9fafb;
         font-size: 0.95rem;
         cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.25s ease, transform 0.15s ease, box-shadow 0.15s ease;
     }
 
     .password-btn:hover {
-        filter: brightness(1.1);
+        background: #0f172a;
+        box-shadow: 0 8px 18px rgba(15,23,42,0.4);
+        transform: translateY(-1px);
     }
 
     /* RESPONSIVO */
     @media (max-width: 960px) {
         .panel-card {
             flex-direction: column;
-            max-width: 720px;
         }
 
         .password-layout {
@@ -298,11 +327,10 @@
         {{-- SIDEBAR IZQUIERDA --}}
         <aside class="panel-sidebar">
             <div class="sidebar-top">
-                <a href="javascript:void(0)">
-                    <button class="sidebar-back" type="button" onclick="window.history.back();">
-                        <i class="bi bi-arrow-left"></i>
-                    </button>
-                </a>
+                <button class="sidebar-back" type="button" onclick="window.history.back();">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+
                 <div class="sidebar-logo">
                     <img src="{{ asset('imagenes/logo-ito.png') }}" alt="Logo">
                 </div>
@@ -314,12 +342,6 @@
                         <a class="sidebar-link" href="{{ route('panel.perfil') }}">
                             <i class="bi bi-person-fill"></i>
                             <span>Mi perfil</span>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="javascript:void(0)">
-                            <i class="bi bi-briefcase-fill"></i>
-                            <span>Carrera</span>
                         </a>
                     </li>
                     <li class="sidebar-item">
@@ -344,9 +366,13 @@
             </div>
 
             <div class="sidebar-bottom">
-                <button class="sidebar-exit" type="button">
-                    <i class="bi bi-box-arrow-right"></i>
-                </button>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="logout-btn">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Cerrar sesión</span>
+                    </button>
+                </form>
             </div>
         </aside>
 
@@ -369,7 +395,6 @@
                     {{-- COLUMNA IZQUIERDA: IMAGEN + TEXTO + FORM --}}
                     <div class="password-main">
                         <div class="password-hero">
-                            {{-- Cambia la ruta de la imagen por la tuya --}}
                             <img src="{{ asset('imagenes/candado-password.png') }}" alt="Cambiar contraseña">
                         </div>
 
@@ -398,9 +423,9 @@
                             </div>
                         </form>
 
-                        {{-- ERRORES DE VALIDACIÓN (OPCIONAL) --}}
+                        {{-- ERRORES DE VALIDACIÓN --}}
                         @if ($errors->any())
-                            <div class="status-card" style="margin-top: 10px; background:#ffe4e4; color:#111;">
+                            <div class="status-card" style="margin-top: 10px; background:#fee2e2; color:#111;">
                                 <ul style="margin:0; padding-left:18px;">
                                     @foreach ($errors->all() as $error)
                                         <li>{{ $error }}</li>
@@ -419,7 +444,7 @@
                         @endif
 
                         @if (session('error'))
-                            <div class="status-card" style="background:#ffcccc;">
+                            <div class="status-card" style="background:#fed7d7;">
                                 <p>{{ session('error') }}</p>
                             </div>
                         @endif
@@ -433,4 +458,3 @@
     </div>
 </div>
 @endsection
-

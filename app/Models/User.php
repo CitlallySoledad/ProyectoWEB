@@ -22,6 +22,14 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+
+        // 🔹 NUEVOS CAMPOS DE PERFIL
+        'curp',
+        'fecha_nacimiento',
+        'genero',
+        'estado_civil',
+        'telefono',
+        'profesion',
     ];
 
     /**
@@ -41,10 +49,17 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'is_admin'          => 'boolean',   // 👈 para tratarlo como bool
+        'is_admin'          => 'boolean',
+
+        // 🔹 FECHAS AUTOMÁTICAMENTE CONVERTIDAS A Carbon
+        'fecha_nacimiento'  => 'date',
     ];
+
+    /**
+     * Relación con equipos
+     */
     public function teams()
-{
-    return $this->belongsToMany(Team::class, 'team_user');
-}
+    {
+        return $this->belongsToMany(Team::class, 'team_user');
+    }
 }
