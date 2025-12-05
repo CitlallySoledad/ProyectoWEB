@@ -58,5 +58,33 @@ class AdminTeamController extends Controller
             ->route('admin.teams.index')
             ->with('success', 'Equipo eliminado.');
     }
-}
 
+    // 👇👇👋 AQUÍ EMPIEZA LO NUEVO 👋👇👇
+    public function join(Request $request)
+    {
+        // Validamos que venga el ID del equipo y exista
+        $request->validate([
+            'team_id' => ['required', 'exists:teams,id'],
+        ]);
+
+        $team = Team::findOrFail($request->team_id);
+        $user = auth()->user();
+
+        // 1. Revisar si YA es miembro
+        if ($team->members()->where('user_id', $user->id)->exists()) {
+            return back()->with('info', 'Ya eres miembro de este equipo.');
+        }
+
+        // 2. Revisar si el equipo está lleno (máximo 4, ajusta si quieres)
+        $maxMembers = 4;
+
+        if ($team->members()->count() >= $maxMembers) {
+            return back()->with('error', 'Este equipo ya está lleno.');
+        }
+
+        // 3. Agregar al usuario al equipo
+        $team->members()->attach($user->id);
+
+        return back()->with('success', 'Te has unido al equipo correctamente.');
+    }
+}

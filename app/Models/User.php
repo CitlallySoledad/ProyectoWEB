@@ -43,4 +43,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'is_admin'          => 'boolean',   // 👈 para tratarlo como bool
     ];
+    public function teams()
+{
+    return $this->belongsToMany(Team::class, 'team_user');
+}
 }

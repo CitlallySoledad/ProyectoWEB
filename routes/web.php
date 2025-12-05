@@ -33,6 +33,9 @@ Route::post('/logout', function (Request $request) {
     return redirect()->route('public.home')
         ->with('logout_success', 'Has cerrado sesión correctamente.');
 })->name('logout');
+Route::post('/panel/teams/join', [AdminTeamController::class, 'join'])
+    ->name('panel.teams.join')
+    ->middleware('auth');
 
 
 // =======================
@@ -94,13 +97,14 @@ Route::get('/panel', function () {
 })->name('panel.participante');
 
 // Mi equipo
-Route::get('/panel/mi-equipo', function () {
-    return view('pagPrincipal.miEquipo');
-})->name('panel.mi-equipo');
+Route::get('/panel/mi-equipo', [ParticipantTeamController::class, 'miEquipo'])
+    ->name('panel.mi-equipo')
+    ->middleware('auth');
 
 // Lista de equipos (usando controlador)
 Route::get('/panel/lista-equipo', [ParticipantTeamController::class, 'index'])
-    ->name('panel.lista-equipo');
+    ->name('panel.lista-equipo')
+    ->middleware('auth');
 
 // Crear equipo
 Route::get('/panel/crear-equipo', [ParticipantTeamController::class, 'create'])

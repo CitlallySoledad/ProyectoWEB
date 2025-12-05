@@ -5,26 +5,26 @@
 @push('styles')
 <style>
     /* ===== ESTILOS GENERALES Y LAYOUT ===== */
-    .panel-wrapper {
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 24px;
-        background-color: #0f172a;
-    }
+    .crear-equipo-fullscreen {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background: #020617;   /* o el fondo general de tu layout */
+}
+
 
     .panel-card {
-        width: 100%;
-        max-width: 1100px;
-        min-height: 600px;
-        background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
-        border-radius: 24px;
-        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
-        display: flex;
-        overflow: hidden;
-        color: #e5e7eb;
-    }
+    width: 100%;
+    max-width: 100%;        /* nada de 1100px */
+    min-height: 100vh;      /* ocupa el alto de la pantalla */
+    background: transparent;/* quitamos el fondo de tarjeta */
+    border-radius: 0;       /* sin esquinas redondeadas */
+    box-shadow: none;       /* sin sombra flotante */
+    display: flex;
+    overflow: hidden;
+    color: #e5e7eb;
+}
 
     /* ===== SIDEBAR (Idéntico a listaEquipo) ===== */
     .panel-sidebar {
@@ -173,7 +173,7 @@
 @endpush
 
 @section('content')
-<div class="panel-wrapper">
+<div class="crear-equipo-fullscreen">
     <div class="panel-card">
 
         {{-- ===== SIDEBAR COMPLETO ===== --}}

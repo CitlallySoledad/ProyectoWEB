@@ -4,7 +4,16 @@
 
 @push('styles')
 <style>
-/* ===== CONTENEDOR GENERAL ===== */
+/* ===== CONTENEDOR GENERAL PANTALLA COMPLETA ===== */
+.lista-equipo-fullscreen {
+    width: 100%;
+    min-height: 100vh;
+    padding: 0;              /* Sin márgenes internos extra */
+    margin: 0;
+    background: #020617;     /* O transparente, según tu layout */
+}
+
+/* Ya no usamos panel-wrapper, lo puedes borrar si quieres */
 .panel-wrapper {
     min-height: 100vh;
     display: flex;
@@ -12,16 +21,17 @@
     align-items: center;
     padding: 24px;
     background-color: #0f172a; 
-    position: relative; /* Necesario para el overlay */
+    position: relative;
 }
 
+/* ===== CONTENEDOR PRINCIPAL SIN TARJETA, FULL WIDTH ===== */
 .panel-card {
     width: 100%;
-    max-width: 1100px;
-    min-height: 540px;
-    background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
-    border-radius: 24px;
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
+    max-width: 100%;                 /* ❗ Quita límite de 1100px */
+    min-height: 100vh;               /* Ocupa toda la pantalla */
+    background: transparent;         /* ❗ Sin degradado */
+    border-radius: 0;                /* ❗ Sin bordes redondeados */
+    box-shadow: none;                /* ❗ Sin sombra de tarjeta */
     display: flex;
     overflow: hidden;
     color: #e5e7eb;
@@ -36,9 +46,11 @@
     padding: 18px 14px;
     display: flex;
     flex-direction: column;
-    border-radius: 24px 0 0 24px;
+    border-radius: 0;                /* ❗ para que se vea pegado al borde */
     flex-shrink: 0;
 }
+
+/* ... TODO LO DEMÁS IGUAL QUE YA TENÍAS ... */
 
 .sidebar-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .sidebar-back { width: 32px; height: 32px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.35); display: flex; align-items: center; justify-content: center; background: transparent; color: #f9fafb; cursor: pointer; }
@@ -85,22 +97,26 @@
 .btn-info { border-radius: 999px; border: none; padding: 6px 16px; font-size: 0.8rem; background: #e5e7eb; color: #111827; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
 
 /* ===== PANEL DE DETALLES (OVERLAY) ===== */
+/* Lo hacemos de pantalla completa también */
 .details-overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
+    position: fixed;              /* ❗ En vez de absolute */
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(4px);
-    z-index: 50;
-    display: none; /* Oculto por defecto */
+    z-index: 999;
+    display: none;
     justify-content: flex-end;
-    border-radius: 24px;
+    border-radius: 0;             /* ❗ Sin esquinas redondeadas */
 }
 .details-overlay.active { display: flex; }
 
 .details-panel {
     width: 320px;
     height: 100%;
-    background: #1e293b; /* Fondo oscuro panel */
+    background: #1e293b;
     border-left: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: -10px 0 30px rgba(0,0,0,0.5);
     padding: 24px;
@@ -113,11 +129,12 @@
     to { transform: translateX(0); }
 }
 
+/* ... resto de estilos tal cual los tenías ... */
+
 .details-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
 .details-title { font-size: 1.2rem; font-weight: 700; color: #fff; }
 .details-close { background: none; border: none; color: #9ca3af; font-size: 1.5rem; cursor: pointer; }
 
-/* Alerta de equipo lleno */
 .alert-full {
     background: linear-gradient(90deg, #7f1d1d, #991b1b);
     color: #fecaca; padding: 10px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 20px;
@@ -136,11 +153,10 @@
 .btn-join:hover { background: #1d4ed8; }
 .btn-join:disabled { background: #475569; cursor: not-allowed; color: #94a3b8; }
 
-
 /* RESPONSIVE */
 @media (max-width: 1024px) {
     .panel-card { flex-direction: column; min-height: auto; }
-    .panel-sidebar { width: 100%; border-radius: 24px 24px 0 0; }
+    .panel-sidebar { width: 100%; border-radius: 0; }
     .sidebar-top { margin-bottom: 10px; }
     .sidebar-middle { flex-direction: row; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
     .sidebar-nav { display: flex; gap: 8px; }
@@ -151,9 +167,6 @@
 }
 
 @media (max-width: 768px) {
-    .panel-wrapper { padding: 10px; }
-    .panel-card { border-radius: 16px; }
-    
     .team-table thead { display: none; }
     .team-table tbody, .team-table tr, .team-table td { display: block; width: 100%; }
     .team-table tr { margin-bottom: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); }
@@ -169,8 +182,9 @@
 </style>
 @endpush
 
+
 @section('content')
-<div class="panel-wrapper">
+<div class="lista-equipo-fullscreen">
     <div class="panel-card">
 
         {{-- ===== SIDEBAR ===== --}}
@@ -234,7 +248,7 @@
                 <section class="team-search">
                     <div class="team-search-input-wrapper">
                         <span class="search-icon"><i class="bi bi-search"></i></span>
-                        <input type="text" placeholder="Buscar equipo...">
+<input type="text" id="teamSearchInput" placeholder="Buscar equipo...">
                     </div>
                     <div class="team-filters">
                         <button class="btn-chip"><i class="bi bi-funnel"></i> Filtrar</button>
@@ -255,53 +269,67 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($teams ?? [] as $team)
-                                {{-- 
-                                    NOTA: Como no hay una relación real de miembros en tu base de datos todavía,
-                                    simulamos un conteo aleatorio (rand 1 a 4) para probar la función.
-                                    Cuando tengas la BD lista, cambia $simulatedCount por $team->members_count
-                                --}}
-                                @php 
-                                    $simulatedCount = rand(1, 4); 
-                                    $leaderName = $team->user_name ?? 'Lider';
-                                @endphp
+    @forelse ($teams ?? [] as $team)
+        @php
+            $membersCount = $team->members->count();
+    $leader       = $team->leader;                 // 👈 ahora viene directo de BD
+    $leaderName   = $leader?->name ?? 'Líder';
+    $yaEsMiembro  = $team->members->contains(auth()->id());
+    $esLider      = auth()->id() === optional($leader)->id;
+        @endphp
 
-                                <tr>
-                                    <td data-label="Nombre">{{ $team->name }}</td>
-                                    <td data-label="Fecha">{{ optional($team->created_at)->format('Y-m-d') }}</td>
-                                    
-                                    <td data-label="Miembros">
-                                        <div class="avatar-stack">
-                                            {{-- Mostramos avatares visuales --}}
-                                            @for($i = 0; $i < $simulatedCount; $i++)
-                                                <img src="https://ui-avatars.com/api/?name={{ $i==0 ? $leaderName : 'M'.$i }}&background=random" alt="User">
-                                            @endfor
-                                        </div>
-                                        <small style="color:#9ca3af; margin-left:5px;">({{ $simulatedCount }}/4)</small>
-                                    </td>
-                                    
-                                    <td data-label="Acción">
-                                        {{-- 
-                                            BOTÓN VER DETALLES:
-                                            Llama a la función JS pasando los datos del equipo 
-                                        --}}
-                                        <button class="btn-info" 
-                                            onclick="openTeamDetails('{{ $team->id }}', '{{ $team->name }}', '{{ $leaderName }}', {{ $simulatedCount }})">
-                                            Ver Detalles <i class="bi bi-chevron-right"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" style="text-align: center; padding: 24px; color: #9ca3af;">
-                                        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-                                            <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-                                            <span>No hay equipos creados aún.</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
+        <tr>
+            <td data-label="Nombre">{{ $team->name }}</td>
+            <td data-label="Fecha">{{ optional($team->created_at)->format('Y-m-d') }}</td>
+            
+            <td data-label="Miembros">
+                <div class="avatar-stack">
+                    {{-- Mostrar hasta 4 avatares de miembros reales --}}
+                    @foreach ($team->members->take(4) as $member)
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($member->name) }}&background=random" 
+                             alt="{{ $member->name }}">
+                    @endforeach
+                </div>
+                <small style="color:#9ca3af; margin-left:5px;">({{ $membersCount }}/4)</small>
+            </td>
+            
+            <td data-label="Acción">
+    <button class="btn-info"
+        onclick="openTeamDetails(this)"
+        data-team-id="{{ $team->id }}"
+        data-team-name="{{ $team->name }}"
+        data-leader-name="{{ $leaderName }}"
+        data-members-count="{{ $membersCount }}"
+        data-is-member="{{ $yaEsMiembro ? '1' : '0' }}"
+        data-is-leader="{{ $esLider ? '1' : '0' }}"
+        data-members='@json(
+            $team->members->map(function($m) use ($leader) {
+                return [
+                    "name" => $m->name,
+                    "role" => $m->id === optional($leader)->id ? "Líder" : "Miembro",
+                ];
+            })
+        )'
+    >
+        Ver Detalles <i class="bi bi-chevron-right"></i>
+    </button>
+</td>
+
+
+        </tr>
+    @empty
+        <tr>
+            <td colspan="4" style="text-align: center; padding: 24px; color: #9ca3af;">
+                <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                    <span>No hay equipos creados aún.</span>
+                </div>
+            </td>
+        </tr>
+    @endforelse
+</tbody>
+
+
                     </table>
                 </section>
 
@@ -355,75 +383,95 @@
 </div>
 
 {{-- ===== SCRIPTS PARA LA LÓGICA DEL PANEL ===== --}}
+{{-- ===== SCRIPTS PARA LA LÓGICA DEL PANEL ===== --}}
 <script>
-    function openTeamDetails(id, name, leaderName, count) {
-        // 1. Mostrar el overlay
-        const overlay = document.getElementById('detailsOverlay');
-        overlay.classList.add('active');
-
-        // 2. Poner el nombre del equipo
-        document.getElementById('panelTeamName').textContent = name;
-        
-        // 3. ACTUALIZACIÓN CRÍTICA: Poner el ID en el input oculto del formulario
-        document.getElementById('inputTeamId').value = id;
-
-        // 4. Lógica de Restricción (Máximo 4)
-        const alertBox = document.getElementById('panelAlertFull');
-        const joinBtn = document.getElementById('btnJoinTeam');
-
-        if (count >= 4) {
-            // ESTÁ LLENO
-            alertBox.style.display = 'flex';
-            joinBtn.disabled = true;
-            joinBtn.textContent = 'Equipo Completo';
-            joinBtn.style.background = '#475569';
-        } else {
-            // HAY CUPO
-            alertBox.style.display = 'none';
-            joinBtn.disabled = false;
-            joinBtn.innerHTML = '<i class="bi bi-person-plus-fill"></i> Unirme al equipo';
-            joinBtn.style.background = '#2563eb';
-        }
-
-        // 5. Generar lista de miembros (Simulación visual)
-        const list = document.getElementById('panelMembersList');
-        list.innerHTML = ''; 
-
-        // Agregar al Líder
-        addMemberToList(list, leaderName, 'Lider');
-
-        // Agregar miembros extra
-        for (let i = 1; i < count; i++) {
-            const dummyNames = ['Alfredo', 'Liz', 'Citlally', 'Juan', 'Maria']; 
-            const randomName = dummyNames[i % dummyNames.length];
-            addMemberToList(list, randomName, 'Participante');
-        }
-    }
-
-    // Función auxiliar para crear el HTML de un miembro en la lista
-    function addMemberToList(container, name, role) {
+    function addMemberToList(list, name, role) {
         const li = document.createElement('li');
         li.className = 'member-item';
         li.innerHTML = `
-            <img src="https://ui-avatars.com/api/?name=${name}&background=random" class="member-avatar" alt="${name}">
+            <img class="member-avatar"
+                 src="https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random"
+                 alt="${name}">
             <div class="member-info">
                 <span class="member-name">${name}</span>
                 <span class="member-role">${role}</span>
             </div>
         `;
-        container.appendChild(li);
+        list.appendChild(li);
+    }
+
+    // btn es el botón que se clicó
+    function openTeamDetails(btn) {
+        const id          = btn.dataset.teamId;
+        const name        = btn.dataset.teamName;
+        const leaderName  = btn.dataset.leaderName;
+        const count       = parseInt(btn.dataset.membersCount || '0', 10);
+        const isMember    = btn.dataset.isMember === '1';
+        const isLeader    = btn.dataset.isLeader === '1';
+        const members     = JSON.parse(btn.dataset.members || '[]');
+
+        const overlay = document.getElementById('detailsOverlay');
+        overlay.classList.add('active');
+
+        document.getElementById('panelTeamName').textContent = name;
+        document.getElementById('inputTeamId').value = id;
+
+        const alertBox = document.getElementById('panelAlertFull');
+        const joinBtn  = document.getElementById('btnJoinTeam');
+
+        const maxMembers  = 4;
+        const equipoLleno = count >= maxMembers;
+
+        alertBox.style.display = equipoLleno ? 'flex' : 'none';
+
+        if (equipoLleno) {
+            joinBtn.disabled         = true;
+            joinBtn.textContent      = 'Equipo completo';
+            joinBtn.style.background = '#475569';
+        } else if (isMember) {
+            joinBtn.disabled         = true;
+            joinBtn.textContent      = 'Ya eres miembro';
+            joinBtn.style.background = '#475569';
+        } else if (isLeader) {
+            joinBtn.disabled         = true;
+            joinBtn.textContent      = 'Eres líder de este equipo';
+            joinBtn.style.background = '#475569';
+        } else {
+            joinBtn.disabled         = false;
+            joinBtn.innerHTML        = '<i class="bi bi-person-plus-fill"></i> Unirme al equipo';
+            joinBtn.style.background = '#2563eb';
+        }
+
+        // Pintar miembros en la lista
+        const list = document.getElementById('panelMembersList');
+        list.innerHTML = '';
+
+        members.forEach(m => addMemberToList(list, m.name, m.role));
     }
 
     function closeTeamDetails() {
         document.getElementById('detailsOverlay').classList.remove('active');
     }
+     // --- BÚSQUEDA EN TIEMPO REAL ---
+    const searchInput = document.getElementById('teamSearchInput');
+    const tableRows   = document.querySelectorAll('.team-table tbody tr');
 
-    // Cerrar si se hace click fuera del panel (en la parte oscura)
-    document.getElementById('detailsOverlay').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeTeamDetails();
-        }
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            const term = this.value.toLowerCase().trim();
+
+            tableRows.forEach(row => {
+                const nameCell = row.querySelector('td[data-label="Nombre"]');
+                if (!nameCell) return; // filas de "sin equipos" se ignoran
+
+                const nameText = nameCell.textContent.toLowerCase();
+                if (term === '' || nameText.includes(term)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
 </script>
-
 @endsection

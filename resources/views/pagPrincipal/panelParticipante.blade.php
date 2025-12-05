@@ -345,11 +345,11 @@
         <ul class="sidebar-menu">
             {{-- Mi equipo --}}
             <li class="sidebar-item">
-                <a class="sidebar-link" href="#">
-                    <i class="bi bi-people"></i>
-                    <span>Mi equipo</span>
-                </a>
-            </li>
+    <a class="sidebar-link" href="{{ route('panel.mi-equipo') }}">
+        <i class="bi bi-people"></i> <span>Mi equipo</span>
+    </a>
+</li>
+
 
             {{-- Lista de equipo --}}
             <li class="sidebar-item">
