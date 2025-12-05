@@ -385,11 +385,12 @@
 
             {{-- Submisión del proyecto --}}
             <li class="sidebar-item">
-                <a class="sidebar-link" href="#">
+                <a class="sidebar-link" href="{{ route('panel.submission') }}">
                     <i class="bi bi-file-earmark-arrow-up"></i>
                     <span>Submisión del proyecto</span>
                 </a>
             </li>
+
         </ul>
     </div>
 

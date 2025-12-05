@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Team;
+use App\Http\Controllers\SubmissionController;
 
 // =======================
 // PÁGINA PRINCIPAL
@@ -135,6 +136,17 @@ Route::post('/cambiar-contrasena', [App\Http\Controllers\PasswordController::cla
 Route::get('/roles', function () {
     return view('pagPrincipal.rolesParticipants');
 })->name('roles');
+
+// Submisión del proyecto
+Route::get('/submision-proyecto', [SubmissionController::class, 'show'])
+    ->name('panel.submission');
+
+Route::post('/submision-proyecto', [SubmissionController::class, 'update'])
+    ->name('panel.submission.update');
+
+// Gestión de repositorios de la submisión
+Route::get('/submision-proyecto/repositorios', [SubmissionController::class, 'repositories'])
+    ->name('panel.submission.repositories');
 
 
 
