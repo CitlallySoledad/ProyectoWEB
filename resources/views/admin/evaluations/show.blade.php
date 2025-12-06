@@ -8,9 +8,10 @@
 
         {{-- SIDEBAR IZQUIERDA --}}
         <div class="admin-sidebar">
-            <a href="{{ route('admin.evaluations.index') }}" class="admin-sidebar-back">
+            <a href="{{ route('admin.evaluations.projects_list') }}" class="admin-sidebar-back">
                 <i class="bi bi-chevron-left"></i>
             </a>
+
 
             <div class="admin-sidebar-icon">
                 <i class="bi bi-calendar-event"></i>
@@ -98,9 +99,10 @@
 
                 {{-- BOTONES --}}
                 <div class="admin-form-footer">
-                    <a href="{{ route('admin.evaluations.index') }}" class="btn admin-btn-pill admin-btn-secondary">
+                    <a href="{{ route('admin.evaluations.projects_list') }}" class="btn admin-btn-pill admin-btn-secondary">
                         Cancelar
                     </a>
+
 
                     <button type="submit" class="admin-btn-pill admin-btn-primary">
                         Guardar

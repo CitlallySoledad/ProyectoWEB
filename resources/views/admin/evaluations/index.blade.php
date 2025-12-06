@@ -11,31 +11,38 @@
                 <a href="{{ route('admin.dashboard') }}" class="admin-sidebar-back">
                     <i class="bi bi-chevron-left"></i>
                 </a>
-
-                <div class="admin-sidebar-icon">
+                
+                {{-- Eventos --}}
+                <a href="{{ route('admin.events.index') }}" class="admin-sidebar-icon">
                     <i class="bi bi-calendar-event"></i>
-                </div>
-                <div class="admin-sidebar-icon active">
+                </a>
+                
+                {{-- Panel de evaluaciones (barras – vista actual) --}}
+                <a href="{{ route('admin.evaluations.index') }}" class="admin-sidebar-icon active">
                     <i class="bi bi-people-fill"></i>
-                </div>
-                <div class="admin-sidebar-icon">
+                </a>
+                
+                {{-- NUEVA VISTA: lista de proyectos a evaluar (icono rojo del mockup) --}}
+                <a href="{{ route('admin.evaluations.projects_list') }}" class="admin-sidebar-icon">
                     <i class="bi bi-grid-1x2"></i>
-                </div>
-                <div class="admin-sidebar-icon">
+                </a>
+                {{-- Usuarios admin --}}
+                <a href="{{ route('admin.users.index') }}" class="admin-sidebar-icon">
                     <i class="bi bi-person-badge"></i>
-                </div>
-               
-                <!-- Icono de salir (Logout) -->
+                </a>
+                
+                {{-- Logout --}}
                 <div class="admin-sidebar-icon">
                     <a href="{{ route('logout') }}"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="bi bi-box-arrow-left"></i>
-                    </a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </div>
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="bi bi-box-arrow-right"></i>
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
+                    @csrf
+                </form>
             </div>
+        </div>
+
 
             {{-- CONTENIDO PRINCIPAL --}}
             <div class="admin-page-main">

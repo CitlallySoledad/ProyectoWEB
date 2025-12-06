@@ -25,7 +25,7 @@
         color: #e5e7eb;
     }
 
-    /* Reutilizamos mismo sidebar que en la vista anterior */
+    /* SIDEBAR */
     .panel-sidebar {
         width: 250px;
         background: linear-gradient(180deg, #4c1d95, #7c3aed);
@@ -400,12 +400,14 @@
                         @endif
                     </div>
 
-                    <button type="button" class="btn-add-repo">
+                    {{-- AQUÍ LE DAMOS ACCIÓN AL BOTÓN --}}
+                    <button type="button" class="btn-add-repo" onclick="mostrarTablaRepos()">
                         Agregar repositorio
                     </button>
                 </div>
 
                 <div class="repo-table-card">
+                    {{-- SI HUBIERA REPOS EN BD, SE MUESTRAN COMO SIEMPRE --}}
                     @if(count($repositories))
                         <table class="repo-table">
                             <thead>
@@ -436,9 +438,58 @@
                             </tbody>
                         </table>
                     @else
-                        <p class="empty-text">
+                        {{-- ESTADO VACÍO (LO QUE VES AHORA) --}}
+                        <p id="mensaje-sin-repos" class="empty-text">
                             Aún no hay repositorios registrados para esta submisión.
                         </p>
+
+                        {{-- TABLA DE EJEMPLO, OCULTA HASTA QUE DES CLIC EN "AGREGAR REPOSITORIO" --}}
+                        <div id="tabla-ejemplo-repos" style="display:none;">
+                            <table class="repo-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>URL</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>EduTrack-Repo</td>
+                                        <td><a href="https://github.com/edutrack" target="_blank" style="color:#bfdbfe;">github.com/edutrack</a></td>
+                                        <td>
+                                            <div class="repo-actions">
+                                                <button type="button" class="btn-small btn-view">Ver</button>
+                                                <button type="button" class="btn-small btn-edit">Editar</button>
+                                                <button type="button" class="btn-small btn-delete">Eliminar</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>GreenTech-Core</td>
+                                        <td><a href="https://gitlab.com/gt/core" target="_blank" style="color:#bfdbfe;">gitlab.com/gt/core</a></td>
+                                        <td>
+                                            <div class="repo-actions">
+                                                <button type="button" class="btn-small btn-view">Ver</button>
+                                                <button type="button" class="btn-small btn-edit">Editar</button>
+                                                <button type="button" class="btn-small btn-delete">Eliminar</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>SafeRoute-Backend</td>
+                                        <td><a href="https://bitbucket.org/sr/back" target="_blank" style="color:#bfdbfe;">bitbucket.org/sr/back</a></td>
+                                        <td>
+                                            <div class="repo-actions">
+                                                <button type="button" class="btn-small btn-view">Ver</button>
+                                                <button type="button" class="btn-small btn-edit">Editar</button>
+                                                <button type="button" class="btn-small btn-delete">Eliminar</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     @endif
                 </div>
 
@@ -458,4 +509,16 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Cuando no hay repositorios en BD,
+    // este botón muestra la tabla de ejemplo (como en tu maqueta).
+    function mostrarTablaRepos() {
+        const msg = document.getElementById('mensaje-sin-repos');
+        const tabla = document.getElementById('tabla-ejemplo-repos');
+
+        if (msg) msg.style.display = 'none';
+        if (tabla) tabla.style.display = 'block';
+    }
+</script>
 @endsection

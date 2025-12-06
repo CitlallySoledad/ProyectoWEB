@@ -241,8 +241,25 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
 
     Route::post('/admin/evaluaciones/{evaluation}/juzgar', [AdminEvaluationController::class, 'saveJudgement'])
         ->name('admin.evaluations.judgement.store');
+        
+        // LISTA DE PROYECTOS A EVALUAR
+    Route::get('/admin/proyectos-evaluar', [AdminEvaluationController::class, 'projectsToEvaluate'])
+        ->name('admin.evaluations.projects_list');
 
-    // USUARIOS ADMIN
+        // 🔹 DETALLE / VER EVALUACIÓN
+    Route::get('/admin/evaluaciones/{evaluation}/detalle', [AdminEvaluationController::class, 'detail'])
+        ->name('admin.evaluations.detail');
+        
+        // 🔹 EDITAR EVALUACIÓN
+    Route::get('/admin/evaluaciones/{evaluation}/editar', [AdminEvaluationController::class, 'edit'])
+        ->name('admin.evaluations.edit');
+
+    Route::put('/admin/evaluaciones/{evaluation}', [AdminEvaluationController::class, 'update'])
+        ->name('admin.evaluations.update');
+
+    
+    
+        // USUARIOS ADMIN
     Route::get('/admin/usuarios', [AdminUserController::class, 'index'])
         ->name('admin.users.index');
 
@@ -251,4 +268,21 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
 
     Route::post('/admin/usuarios', [AdminUserController::class, 'store'])
         ->name('admin.users.store');
+    
+    Route::delete('/admin/evaluaciones/{evaluation}', [AdminEvaluationController::class, 'destroy'])
+        ->name('admin.evaluations.destroy');
+    
+    Route::get('/admin/proyectos-evaluar/crear', [AdminEvaluationController::class, 'createProject'])
+        ->name('admin.projects.create');
+
+    Route::post('/admin/proyectos-evaluar', [AdminEvaluationController::class, 'storeProject'])
+        ->name('admin.projects.store');
+
+
+
+            // LISTA DE EVALUACIONES DE UN PROYECTO
+    Route::get('/admin/proyectos-evaluar/{project}/evaluaciones', [AdminEvaluationController::class, 'projectEvaluations'])
+        ->name('admin.evaluations.project_evaluations');
+
+
 });
