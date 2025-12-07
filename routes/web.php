@@ -1,74 +1,45 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+
+use App\Http\Controllers\RegistroController;
+use App\Http\Controllers\ParticipantTeamController;
+use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\PanelProfileController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminEventController;
 use App\Http\Controllers\AdminTeamController;
 use App\Http\Controllers\AdminEvaluationController;
 use App\Http\Controllers\AdminUserController;
-use App\Http\Controllers\RegistroController;
-use App\Http\Controllers\ParticipantTeamController;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-use App\Models\Team;
-use App\Http\Controllers\SubmissionController;
-use App\Http\Controllers\PanelProfileController;
+use App\Http\Controllers\Judge\ProjectController;
+use App\Http\Controllers\Judge\RubricController;
+use App\Http\Controllers\Judge\EvaluationController;
 
-// =======================
+// ==========================================================
 // PÁGINA PRINCIPAL
-// =======================
-Route::get('/', function () {
-    return view('pagPrincipal.pagPrincipal');
-})->name('public.home');
+// ==========================================================
+Route::get('/', fn() => view('pagPrincipal.pagPrincipal'))->name('public.home');
+Route::get('/pag-principal', fn() => view('pagPrincipal.pagPrincipal'))->name('pagPrincipal');
 
-Route::get('/pag-principal', function () {
-    return view('pagPrincipal.pagPrincipal');
-})->name('pagPrincipal');
-
-// Ruta de logout
-Route::post('/logout', function (Request $request) {
-    Auth::logout();
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-    
-    return redirect()->route('public.home')
-        ->with('logout_success', 'Has cerrado sesión correctamente.');
-})->name('logout');
-Route::post('/panel/teams/join', [AdminTeamController::class, 'join'])
-    ->name('panel.teams.join')
-    ->middleware('auth');
-
-
-// =======================
-// LOGIN ÚNICO (USUARIOS + ADMIN)
-// =======================
+// ==========================================================
+// LOGIN UNIFICADO
+// ==========================================================
 Route::match(['get', 'post'], '/login', function (Request $request) {
-    // Si ya está logueado y entra a /login, lo mandamos a su panel
     if ($request->isMethod('get') && Auth::check()) {
-        $user = Auth::user();
-        return $user->is_admin
-            ? redirect()->route('admin.dashboard')
-            : redirect()->route('panel.participante');
+        return redirect()->route(getRedirectRouteByRole(Auth::user()));
     }
 
     if ($request->isMethod('post')) {
         $credentials = $request->validate([
-            'email'    => ['required', 'email'],
+            'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-
-            $user = Auth::user();
-
-            // ADMIN -> dashboard admin
-            if ($user->is_admin) {
-                return redirect()->route('admin.dashboard');
-            }
-
-            // USUARIO NORMAL -> panel participante
-            return redirect()->route('panel.participante');
+            return redirect()->route(getRedirectRouteByRole(Auth::user()));
         }
 
         return back()->withErrors([
@@ -76,213 +47,119 @@ Route::match(['get', 'post'], '/login', function (Request $request) {
         ])->withInput($request->only('email'));
     }
 
-    // GET: mostrar formulario de login (segunda pantalla)
     return view('pagPrincipal.loginPrin');
 })->name('login');
 
-// =======================
-// REGISTRO PARTICIPANTE
-// =======================
-Route::get('/registro', function () {
-    return view('pagPrincipal.crearCuenta');
-})->name('public.register');
+// Función auxiliar para redirigir según rol
+function getRedirectRouteByRole($user)
+{
+    if ($user->hasRole('admin')) return 'admin.dashboard';
+    if ($user->hasRole('judge')) return 'judge.projects.index';
+    return 'panel.participante';
+}
 
-Route::post('/registro', [RegistroController::class, 'store'])
-    ->name('registro.store');
-
-// =======================
-// PANEL PARTICIPANTE
-// =======================
-Route::get('/panel', function () {
-    return view('pagPrincipal.panelParticipante');
-})->name('panel.participante');
-
-// Mi equipo
-Route::get('/panel/mi-equipo', [ParticipantTeamController::class, 'miEquipo'])
-    ->name('panel.mi-equipo')
-    ->middleware('auth');
-
-// Lista de equipos (usando controlador)
-Route::get('/panel/lista-equipo', [ParticipantTeamController::class, 'index'])
-    ->name('panel.lista-equipo')
-    ->middleware('auth');
-
-// Crear equipo
-Route::get('/panel/crear-equipo', [ParticipantTeamController::class, 'create'])
-    ->name('panel.teams.create');
-
-Route::post('/panel/crear-equipo', [ParticipantTeamController::class, 'store'])
-    ->name('panel.teams.store');
-
-// Unirse a equipo
-Route::post('/panel/unirse-equipo', [ParticipantTeamController::class, 'join'])
-    ->name('panel.teams.join');
-
-// Eventos
-Route::get('/eventos', function () {
-    return view('pagPrincipal.eventos');
-})->name('panel.eventos');
-
-// Perfil
-
-Route::middleware(['auth'])->group(function () {
-
-    Route::get('/panel/perfil', [PanelProfileController::class, 'show'])
-        ->name('panel.perfil');
-
-    Route::patch('/panel/perfil/datos', [PanelProfileController::class, 'updateDatos'])
-        ->name('panel.perfil.updateDatos');
-
-});
-
-// Cambiar contraseña
-Route::get('/cambiar-contrasena', function () {
-    return view('pagPrincipal.cambiarContrasena');
-})->name('panel.cambiarContrasena');
-
-Route::post('/cambiar-contrasena', [App\Http\Controllers\PasswordController::class, 'update'])
-    ->name('password.update');
-
-// Route to the page that displays roles and participants
-// Ruta para mostrar los roles del participante
-Route::get('/roles', function () {
-    return view('pagPrincipal.rolesParticipants');
-})->name('roles');
-
-// Submisión del proyecto
-Route::get('/submision-proyecto', [SubmissionController::class, 'show'])
-    ->name('panel.submission');
-
-Route::post('/submision-proyecto', [SubmissionController::class, 'update'])
-    ->name('panel.submission.update');
-
-// Gestión de repositorios de la submisión
-Route::get('/submision-proyecto/repositorios', [SubmissionController::class, 'repositories'])
-    ->name('panel.submission.repositories');
-
-
-
-// =======================
+// ==========================================================
 // LOGOUT GENERAL
-// =======================
+// ==========================================================
 Route::post('/logout', function (Request $request) {
     Auth::logout();
     $request->session()->invalidate();
     $request->session()->regenerateToken();
-
-    return redirect()->route('public.home')
-        ->with('logout_success', 'Has cerrado sesión correctamente.');
+    return redirect()->route('public.home')->with('logout_success', 'Has cerrado sesión correctamente.');
 })->name('logout');
 
-// =======================
-// RUTAS ADMIN (PROTEGIDAS)
-// =======================
-Route::middleware(['auth', 'is_admin'])->group(function () {
-    // DASHBOARD
-    Route::get('/admin', [AdminDashboardController::class, 'index'])
-        ->name('admin.dashboard');
+// ==========================================================
+// REGISTRO
+// ==========================================================
+Route::get('/registro', fn() => view('pagPrincipal.crearCuenta'))->name('public.register');
+Route::post('/registro', [RegistroController::class, 'store'])->name('registro.store');
 
-    Route::post('/admin/logout', function (Request $request) {
+// ==========================================================
+// PANEL PARTICIPANTE (role:student)
+// ==========================================================
+Route::middleware(['auth', 'role:student'])->group(function () {
+    Route::get('/panel', fn() => view('pagPrincipal.panelParticipante'))->name('panel.participante');
+
+    Route::get('/panel/mi-equipo', [ParticipantTeamController::class, 'miEquipo'])->name('panel.mi-equipo');
+    Route::get('/panel/lista-equipo', [ParticipantTeamController::class, 'index'])->name('panel.lista-equipo');
+    Route::get('/panel/crear-equipo', [ParticipantTeamController::class, 'create'])->name('panel.teams.create');
+    Route::post('/panel/crear-equipo', [ParticipantTeamController::class, 'store'])->name('panel.teams.store');
+    Route::post('/panel/unirse-equipo', [ParticipantTeamController::class, 'join'])->name('panel.teams.join');
+
+    Route::get('/eventos', fn() => view('pagPrincipal.eventos'))->name('panel.eventos');
+
+    Route::get('/panel/perfil', [PanelProfileController::class, 'show'])->name('panel.perfil');
+    Route::patch('/panel/perfil/datos', [PanelProfileController::class, 'updateDatos'])->name('panel.perfil.updateDatos');
+
+    Route::get('/cambiar-contrasena', fn() => view('pagPrincipal.cambiarContrasena'))->name('panel.cambiarContrasena');
+    Route::post('/cambiar-contrasena', [App\Http\Controllers\PasswordController::class, 'update'])->name('password.update');
+
+    Route::get('/roles', fn() => view('pagPrincipal.rolesParticipants'))->name('roles');
+
+    Route::get('/submision-proyecto', [SubmissionController::class, 'show'])->name('panel.submission');
+    Route::post('/submision-proyecto', [SubmissionController::class, 'update'])->name('panel.submission.update');
+    Route::get('/submision-proyecto/repositorios', [SubmissionController::class, 'repositories'])->name('panel.submission.repositories');
+});
+
+// ==========================================================
+// RUTAS ADMIN (role:admin)
+// ==========================================================
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    Route::post('/logout', function (Request $request) {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect()->route('login');
-    })->name('admin.logout');
+    })->name('logout');
 
-    // EQUIPOS (CRUD)
-    Route::get('/admin/equipos', [AdminTeamController::class, 'index'])
-        ->name('admin.teams.index');
+    // Equipos
+    Route::get('equipos', [AdminTeamController::class, 'index'])->name('teams.index');
+    Route::get('equipos/crear', [AdminTeamController::class, 'create'])->name('teams.create');
+    Route::post('equipos', [AdminTeamController::class, 'store'])->name('teams.store');
+    Route::get('equipos/{team}/editar', [AdminTeamController::class, 'edit'])->name('teams.edit');
+    Route::put('equipos/{team}', [AdminTeamController::class, 'update'])->name('teams.update');
+    Route::delete('equipos/{team}', [AdminTeamController::class, 'destroy'])->name('teams.destroy');
 
-    Route::get('/admin/equipos/crear', [AdminTeamController::class, 'create'])
-        ->name('admin.teams.create');
-    Route::post('/admin/equipos', [AdminTeamController::class, 'store'])
-        ->name('admin.teams.store');
+    // Eventos
+    Route::get('eventos', [AdminEventController::class, 'index'])->name('events.index');
+    Route::get('eventos/crear', [AdminEventController::class, 'create'])->name('events.create');
+    Route::post('eventos', [AdminEventController::class, 'store'])->name('events.store');
+    Route::get('eventos/{event}/editar', [AdminEventController::class, 'edit'])->name('events.edit');
+    Route::put('eventos/{event}', [AdminEventController::class, 'update'])->name('events.update');
+    Route::delete('eventos/{event}', [AdminEventController::class, 'destroy'])->name('events.destroy');
 
-    Route::get('/admin/equipos/{team}/editar', [AdminTeamController::class, 'edit'])
-        ->name('admin.teams.edit');
+    // Evaluaciones
+    Route::get('evaluaciones', [AdminEvaluationController::class, 'index'])->name('evaluations.index');
+    Route::get('evaluaciones/{project}', [AdminEvaluationController::class, 'show'])->name('evaluations.show');
+    Route::post('evaluaciones/{project}', [AdminEvaluationController::class, 'store'])->name('evaluations.store');
+    Route::get('evaluaciones/{evaluation}/juzgar', [AdminEvaluationController::class, 'judgement'])->name('evaluations.judgement');
+    Route::post('evaluaciones/{evaluation}/juzgar', [AdminEvaluationController::class, 'saveJudgement'])->name('evaluations.judgement.store');
+    Route::get('evaluaciones/{evaluation}/detalle', [AdminEvaluationController::class, 'detail'])->name('evaluations.detail');
+    Route::get('evaluaciones/{evaluation}/editar', [AdminEvaluationController::class, 'edit'])->name('evaluations.edit');
+    Route::put('evaluaciones/{evaluation}', [AdminEvaluationController::class, 'update'])->name('evaluations.update');
+    Route::delete('evaluaciones/{evaluation}', [AdminEvaluationController::class, 'destroy'])->name('evaluations.destroy');
 
-    Route::put('/admin/equipos/{team}', [AdminTeamController::class, 'update'])
-        ->name('admin.teams.update');
+    // Proyectos a evaluar
+    Route::get('proyectos-evaluar', [AdminEvaluationController::class, 'projectsToEvaluate'])->name('evaluations.projects_list');
+    Route::get('proyectos-evaluar/crear', [AdminEvaluationController::class, 'createProject'])->name('projects.create');
+    Route::post('proyectos-evaluar', [AdminEvaluationController::class, 'storeProject'])->name('projects.store');
 
-    Route::delete('/admin/equipos/{team}', [AdminTeamController::class, 'destroy'])
-        ->name('admin.teams.destroy');
-
-    // EVENTOS (CRUD)
-    Route::get('/admin/eventos', [AdminEventController::class, 'index'])
-        ->name('admin.events.index');
-
-    Route::get('/admin/eventos/crear', [AdminEventController::class, 'create'])
-        ->name('admin.events.create');
-    Route::post('/admin/eventos', [AdminEventController::class, 'store'])
-        ->name('admin.events.store');
-
-    Route::get('/admin/eventos/{event}/editar', [AdminEventController::class, 'edit'])
-        ->name('admin.events.edit');
-
-    Route::put('/admin/eventos/{event}', [AdminEventController::class, 'update'])
-        ->name('admin.events.update');
-
-    Route::delete('/admin/eventos/{event}', [AdminEventController::class, 'destroy'])
-        ->name('admin.events.destroy');
-
-    // EVALUACIONES
-    Route::get('/admin/evaluaciones', [AdminEvaluationController::class, 'index'])
-        ->name('admin.evaluations.index');
-
-    Route::get('/admin/evaluaciones/{project}', [AdminEvaluationController::class, 'show'])
-        ->name('admin.evaluations.show');
-
-    Route::post('/admin/evaluaciones/{project}', [AdminEvaluationController::class, 'store'])
-        ->name('admin.evaluations.store');
-
-    Route::get('/admin/evaluaciones/{evaluation}/juzgar', [AdminEvaluationController::class, 'judgement'])
-        ->name('admin.evaluations.judgement');
-
-    Route::post('/admin/evaluaciones/{evaluation}/juzgar', [AdminEvaluationController::class, 'saveJudgement'])
-        ->name('admin.evaluations.judgement.store');
-        
-        // LISTA DE PROYECTOS A EVALUAR
-    Route::get('/admin/proyectos-evaluar', [AdminEvaluationController::class, 'projectsToEvaluate'])
-        ->name('admin.evaluations.projects_list');
-
-        // 🔹 DETALLE / VER EVALUACIÓN
-    Route::get('/admin/evaluaciones/{evaluation}/detalle', [AdminEvaluationController::class, 'detail'])
-        ->name('admin.evaluations.detail');
-        
-        // 🔹 EDITAR EVALUACIÓN
-    Route::get('/admin/evaluaciones/{evaluation}/editar', [AdminEvaluationController::class, 'edit'])
-        ->name('admin.evaluations.edit');
-
-    Route::put('/admin/evaluaciones/{evaluation}', [AdminEvaluationController::class, 'update'])
-        ->name('admin.evaluations.update');
-
-    
-    
-        // USUARIOS ADMIN
-    Route::get('/admin/usuarios', [AdminUserController::class, 'index'])
-        ->name('admin.users.index');
-
-    Route::get('/admin/usuarios/crear', [AdminUserController::class, 'create'])
-        ->name('admin.users.create');
-
-    Route::post('/admin/usuarios', [AdminUserController::class, 'store'])
-        ->name('admin.users.store');
-    
-    Route::delete('/admin/evaluaciones/{evaluation}', [AdminEvaluationController::class, 'destroy'])
-        ->name('admin.evaluations.destroy');
-    
-    Route::get('/admin/proyectos-evaluar/crear', [AdminEvaluationController::class, 'createProject'])
-        ->name('admin.projects.create');
-
-    Route::post('/admin/proyectos-evaluar', [AdminEvaluationController::class, 'storeProject'])
-        ->name('admin.projects.store');
-
-
-
-            // LISTA DE EVALUACIONES DE UN PROYECTO
-    Route::get('/admin/proyectos-evaluar/{project}/evaluaciones', [AdminEvaluationController::class, 'projectEvaluations'])
-        ->name('admin.evaluations.project_evaluations');
-
-
+    // Usuarios
+    Route::get('usuarios', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('usuarios/crear', [AdminUserController::class, 'create'])->name('users.create');
+    Route::post('usuarios', [AdminUserController::class, 'store'])->name('users.store');
 });
+
+// ==========================================================
+// RUTAS JUEZ (role:judge)
+// ==========================================================
+Route::middleware(['auth', 'role:judge'])->prefix('juez')->name('judge.')->group(function () {
+    Route::get('/proyectos', [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/proyectos/{project}', [EvaluationController::class, 'show'])->name('evaluations.show');
+    Route::post('/proyectos/{project}', [EvaluationController::class, 'store'])->name('evaluations.store');
+    Route::get('/evaluaciones', [EvaluationController::class, 'index'])->name('evaluations.index');
+    Route::get('/rubricas', [RubricController::class, 'index'])->name('rubrics.index');
+
+}); 

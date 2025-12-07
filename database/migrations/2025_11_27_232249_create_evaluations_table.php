@@ -16,7 +16,14 @@ return new class extends Migration
             $table->unsignedTinyInteger('functionality'); // 0-10
             $table->unsignedTinyInteger('innovation');    // 0-10
             $table->text('comments')->nullable();
+            $table->foreignId('project_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('rubric_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('judge_id')->constrained('users')->cascadeOnDelete();
+            $table->enum('status', ['pendiente','completada'])->default('pendiente');
+            $table->decimal('final_score', 5, 2)->nullable();
+            $table->text('general_comments')->nullable();
             $table->timestamps();
+
         });
     }
 
