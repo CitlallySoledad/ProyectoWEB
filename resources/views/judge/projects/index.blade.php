@@ -77,6 +77,7 @@
             <thead>
             <tr>
                 <th>Nombre</th>
+                <th>Rúbrica</th>
                 <th>Proyecto</th>
                 <th>Estado</th>
                 <th>Miembros</th>
@@ -87,17 +88,37 @@
             @forelse($projects as $project)
                 <tr>
                     <td>{{ $project->team?->name ?? '-' }}</td>
+                    <td>
+                        {{ $project->rubric?->name ?? '—' }}
+                    </td>
                     <td>{{ $project->name }}</td>
                     <td class="text-capitalize">{{ $project->status }}</td>
                     <td>
-                        {{-- aquí puedes imprimir avatars o nombres del equipo --}}
-                        {{ $project->team?->members?->pluck('name')->join(', ') ?? '-' }}
+                        @php
+                            $members = '-';
+                            if ($project->team) {
+                                if (method_exists($project->team, 'members') && $project->team->relationLoaded('members')) {
+                                    $members = $project->team->members->pluck('name')->join(', ');
+                                } elseif (is_array($project->team->members)) {
+                                    $members = implode(', ', $project->team->members);
+                                } else {
+                                    $members = $project->team->members ?? '-';
+                                }
+                            }
+                        @endphp
+                        {{ $members }}
                     </td>
                     <td>
-                        <button class="judge-pill-evaluate"
-                                onclick="window.location='{{ route('judge.evaluations.show', $project) }}'">
-                            Evaluar
-                        </button>
+                        @if($project->rubric_id)
+                            <button class="judge-pill-evaluate"
+                                    onclick="window.location='{{ route('judge.evaluations.show', $project) }}'">
+                                Evaluar
+                            </button>
+                        @else
+                            <button class="judge-pill-evaluate" disabled title="No hay rúbrica asignada">
+                                Evaluar
+                            </button>
+                        @endif
                     </td>
                 </tr>
             @empty
@@ -107,5 +128,8 @@
             @endforelse
             </tbody>
         </table>
+    </div>
+    <div class="mt-3">
+        {{ $projects->links() }}
     </div>
 @endsection

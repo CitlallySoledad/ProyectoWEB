@@ -15,7 +15,7 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate(
+        $admin = User::updateOrCreate(
             ['email' => 'admin@admin.com'], // puedes cambiarlo
             [
                 'name' => 'Administrador',
@@ -23,5 +23,8 @@ class AdminUserSeeder extends Seeder
                 'is_admin' => true,   // cámbialo luego
             ]
         );
+        
+        // Asignar rol admin
+        $admin->assignRole('admin');
     }
 }

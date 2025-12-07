@@ -41,6 +41,12 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Team::class, 'team_user');
     }
+
+    // Proyectos asignados a este usuario como juez
+    public function assignedProjects()
+    {
+        return $this->belongsToMany(Project::class, 'project_judge');
+    }
 }
 
 

@@ -160,6 +160,20 @@ Route::middleware(['auth', 'role:judge'])->prefix('juez')->name('judge.')->group
     Route::get('/proyectos/{project}', [EvaluationController::class, 'show'])->name('evaluations.show');
     Route::post('/proyectos/{project}', [EvaluationController::class, 'store'])->name('evaluations.store');
     Route::get('/evaluaciones', [EvaluationController::class, 'index'])->name('evaluations.index');
+    Route::get('/evaluaciones/{evaluation}/pdf', [EvaluationController::class, 'exportPdf'])->name('evaluations.export-pdf');
     Route::get('/rubricas', [RubricController::class, 'index'])->name('rubrics.index');
+    Route::get('/rubricas/crear', [RubricController::class, 'create'])->name('rubrics.create');
+    Route::post('/rubricas', [RubricController::class, 'store'])->name('rubrics.store');
+    Route::get('/rubricas/{rubric}/editar', [RubricController::class, 'edit'])->name('rubrics.edit');
+    Route::put('/rubricas/{rubric}', [RubricController::class, 'update'])->name('rubrics.update');
+    Route::delete('/rubricas/{rubric}', [RubricController::class, 'destroy'])->name('rubrics.destroy');
+
+    // Rubric criteria
+    Route::post('/rubricas/{rubric}/criterios', [RubricController::class, 'storeCriterion'])->name('rubrics.criteria.store');
+    Route::post('/rubricas/{rubric}/criterios/guardar', [RubricController::class, 'bulkUpdate'])->name('rubrics.criteria.bulkUpdate');
+    Route::post('/rubricas/{rubric}/aplicar', [RubricController::class, 'apply'])->name('rubrics.apply');
+    Route::get('/rubricas/criterios/{criterion}/editar', [RubricController::class, 'editCriterion'])->name('rubrics.criteria.edit');
+    Route::put('/rubricas/criterios/{criterion}', [RubricController::class, 'updateCriterion'])->name('rubrics.criteria.update');
+    Route::delete('/rubricas/criterios/{criterion}', [RubricController::class, 'destroyCriterion'])->name('rubrics.criteria.destroy');
 
 }); 

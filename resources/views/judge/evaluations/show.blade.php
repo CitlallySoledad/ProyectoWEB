@@ -36,9 +36,9 @@
             </thead>
             <tbody>
             <tr>
-                <td>{{ $evaluation->project_name }}</td>
-                <td>{{ $evaluation->rubric ?? '—' }}</td>
-                <td class="text-capitalize">{{ $evaluation->status }}</td>
+                <td>{{ $evaluation->project_name ?? $project->name }}</td>
+                <td>{{ $evaluation?->rubric?->name ?? $project->rubric?->name ?? '—' }}</td>
+                <td class="text-capitalize">{{ $evaluation->status ?? 'pendiente' }}</td>
                 <td>
                     {{ $evaluation->final_score ?? '—' }}
                 </td>
@@ -48,7 +48,7 @@
     </div>
 
     {{-- FORMULARIO DE PUNTAJES POR CRITERIO --}}
-    <form action="{{ route('judge.evaluation.store', $evaluation) }}" method="POST">
+    <form action="{{ route('judge.evaluations.store', $project) }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         {{-- Tabla de criterios --}}
@@ -58,6 +58,9 @@
                 <tr>
                     <th>Criterio</th>
                     <th>Descripción</th>
+                    <th style="width: 80px;">Peso</th>
+                    <th style="width: 80px;">Min</th>
+                    <th style="width: 80px;">Max</th>
                     <th style="width: 90px;">Puntaje</th>
                     <th>Comentario</th>
                 </tr>
@@ -65,13 +68,16 @@
                 <tbody>
                 @foreach($criteria as $criterion)
                     @php
-                        // Si ya existen scores, puedes cargarlos así si el controlador los pasa
-                        $currentScore = $evaluation->scores
-                            ->firstWhere('rubric_criterion_id', $criterion->id) ?? null;
+                        $existing = $existingScores->get($criterion->id);
+                        $prefillScore = old("scores.$loop->index.score", optional($existing)->score ?? '');
+                        $prefillComment = old("scores.$loop->index.comment", optional($existing)->comment ?? '');
                     @endphp
                     <tr>
                         <td>{{ $criterion->name }}</td>
                         <td>{{ $criterion->description }}</td>
+                        <td class="text-center">{{ $criterion->weight ?? $criterion->peso ?? '—' }}</td>
+                        <td class="text-center">{{ $criterion->min ?? 0 }}</td>
+                        <td class="text-center">{{ $criterion->max ?? 10 }}</td>
                         <td>
                             <input type="hidden"
                                    name="scores[{{ $loop->index }}][criterion_id]"
@@ -80,16 +86,16 @@
                             <input type="number"
                                    name="scores[{{ $loop->index }}][score]"
                                    class="form-control form-control-sm rounded-pill"
-                                   min="{{ $criterion->min_score }}"
-                                   max="{{ $criterion->max_score }}"
-                                   value="{{ old("scores.$loop->index.score", $currentScore->score ?? '') }}"
+                                   min="{{ $criterion->min ?? 0 }}"
+                                   max="{{ $criterion->max ?? 10 }}"
+                                   value="{{ $prefillScore }}"
                                    required>
                         </td>
                         <td>
                             <input type="text"
                                    name="scores[{{ $loop->index }}][comment]"
                                    class="form-control form-control-sm rounded-pill"
-                                   value="{{ old("scores.$loop->index.comment", $currentScore->comment ?? '') }}">
+                                   value="{{ $prefillComment }}">
                         </td>
                     </tr>
                 @endforeach
@@ -110,6 +116,39 @@
             </div>
         </div>
 
+        {{-- SECCIÓN DE EVIDENCIAS --}}
+        <div class="admin-card mb-3">
+            <div class="admin-card-title mb-3">Evidencias de Evaluación</div>
+            
+            <div id="evidence-container">
+                <div class="evidence-input-group mb-3">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Archivo (PDF, Imagen, Documento)</label>
+                            <input type="file"
+                                   name="evidence_files[]"
+                                   class="form-control"
+                                   accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                   placeholder="Selecciona un archivo">
+                            <small class="text-muted">Máx. 10 MB. Formatos: PDF, JPG, PNG, DOC, DOCX</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Descripción (opcional)</label>
+                            <input type="text"
+                                   name="evidence_descriptions[]"
+                                   class="form-control"
+                                   placeholder="Ej: Captura de pantalla del proyecto...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Botón para agregar más evidencias --}}
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="add-evidence-btn">
+                <i class="bi bi-plus me-1"></i> Añadir otra evidencia
+            </button>
+        </div>
+
         {{-- Botones inferiores --}}
         <div class="d-flex justify-content-between">
             <a href="{{ route('judge.projects.index') }}"
@@ -123,3 +162,43 @@
         </div>
     </form>
 @endsection
+
+@push('scripts')
+<script>
+    document.getElementById('add-evidence-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        const container = document.getElementById('evidence-container');
+        const newGroup = `
+            <div class="evidence-input-group mb-3">
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <input type="file"
+                               name="evidence_files[]"
+                               class="form-control"
+                               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                        <small class="text-muted">Máx. 10 MB</small>
+                    </div>
+                    <div class="col-md-6 d-flex gap-2 align-items-end">
+                        <input type="text"
+                               name="evidence_descriptions[]"
+                               class="form-control"
+                               placeholder="Descripción...">
+                        <button type="button" class="btn btn-sm btn-danger remove-evidence-btn">
+                            Quitar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', newGroup);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-evidence-btn')) {
+            e.preventDefault();
+            e.target.closest('.evidence-input-group').remove();
+        }
+    });
+</script>
+@endpush
+

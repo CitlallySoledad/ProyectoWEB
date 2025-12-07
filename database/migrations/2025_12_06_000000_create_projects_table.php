@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('projects', function (Blueprint $table) {
+        Schema::create('projects', function (Blueprint $table) {
            $table->id();
             $table->string('name');                     // nombre del proyecto
             $table->foreignId('team_id')->nullable()->constrained()->nullOnDelete();
