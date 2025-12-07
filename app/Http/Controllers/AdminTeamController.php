@@ -21,11 +21,15 @@ class AdminTeamController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+        $request->validate([
+            'name' => 'required|string|max:255',
+            // si quieres puedes validar también members
         ]);
 
-        Team::create($data);
+        $team = Team::create([
+            'name'    => $request->input('name'),
+            'members' => $request->input('members', []), // 👈 guarda todo el arreglo
+        ]);
 
         return redirect()
             ->route('admin.teams.index')
@@ -34,16 +38,20 @@ class AdminTeamController extends Controller
 
     public function edit(Team $team)
     {
-        return view('admin.teams.edit', compact('team'));
+        $members = [];
+        return view('admin.teams.edit', compact('team', 'members'));
     }
 
     public function update(Request $request, Team $team)
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+        $request->validate([
+            'name' => 'required|string|max:255',
         ]);
 
-        $team->update($data);
+        $team->update([
+            'name'    => $request->input('name'),
+            'members' => $request->input('members', []), // 👈 actualiza integrantes
+        ]);
 
         return redirect()
             ->route('admin.teams.index')

@@ -8,7 +8,8 @@ class Team extends Model
 {
     protected $fillable = [
         'name',
-        'leader_id', // líder del equipo
+        'leader_id',
+        'members',    // líder del equipo
     ];
 
     // Relación: líder/admin del equipo
@@ -22,4 +23,8 @@ class Team extends Model
     {
         return $this->belongsToMany(User::class, 'team_user');
     }
+
+    protected $casts = [
+        'members' => 'array', // 👈 para usarlo como arreglo en Blade
+    ];
 }

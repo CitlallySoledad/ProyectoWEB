@@ -1,159 +1,136 @@
-@extends('layouts.admin')
+@extends('layouts.admin-panel')
 
 @section('title', 'Crear equipo')
 
 @section('content')
-<div class="admin-page-wrapper">
-    <div class="admin-page-card">
 
-        {{-- SIDEBAR IZQUIERDA --}}
-        <div class="admin-sidebar">
-            <a href="{{ route('admin.teams.index') }}" class="admin-sidebar-back">
-                <i class="bi bi-chevron-left"></i>
-            </a>
+    <h1 class="h4 mb-3">Crear equipo</h1>
 
-            <div class="admin-sidebar-icon">
-                <i class="bi bi-calendar-event"></i>
-            </div>
-            <div class="admin-sidebar-icon active">
-                <i class="bi bi-people-fill"></i>
-            </div>
-            <div class="admin-sidebar-icon">
-                <i class="bi bi-grid-1x2"></i>
-            </div>
-            <div class="admin-sidebar-icon">
-                <i class="bi bi-person-badge"></i>
-            </div>
+    {{-- ERRORES DE VALIDACIÓN --}}
+    @if ($errors->any())
+        <div class="alert alert-danger rounded-3 py-2">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
+    @endif
 
-        {{-- CONTENIDO PRINCIPAL --}}
-        <div class="admin-page-main">
-            <div class="admin-page-user">
-    <i class="bi bi-person-circle"></i>
-    <span>
-        @if (request()->routeIs('panel.teams.*'))
-            {{ auth()->check() ? auth()->user()->name : 'Usuario' }}
-        @else
-            Admin
-        @endif
-    </span>
-</div>
+    <div class="admin-card">
+        <form action="{{ route('admin.teams.store') }}" method="POST">
+            @csrf
 
+            {{-- NOMBRE DEL EQUIPO --}}
+            <div class="mb-3">
+                <label class="form-label" for="name">Nombre del equipo</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    class="form-control rounded-pill"
+                    placeholder="Nombre del equipo"
+                    value="{{ old('name') }}"
+                    required
+                >
             </div>
 
-            <h1 class="admin-form-title">Crear equipo</h1>
+            {{-- INTEGRANTES / ROLES --}}
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-semibold small text-uppercase text-muted">Integrantes</span>
+                <span class="fw-semibold small text-uppercase text-muted">Rol</span>
+            </div>
 
-            <form action="{{ route('admin.teams.store') }}" method="POST">
-                @csrf
-
-                {{-- Nombre de equipo --}}
-                <div class="admin-form-row">
-                    <label class="admin-form-label" for="name">Nombre de equipo</label>
+            {{-- LÍDER --}}
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <div class="flex-grow-1">
                     <input
                         type="text"
-                        id="name"
-                        name="name"
-                        class="admin-form-input"
-                        placeholder="Nombre de equipo"
-                        value="{{ old('name') }}"
+                        name="members[0][name]"
+                        class="form-control rounded-pill"
+                        placeholder="Nombre del líder"
+                        value="{{ old('members.0.name') }}"
                     >
                 </div>
-
-                {{-- Integrantes / Roles --}}
-                <div class="admin-team-members-header">
-                    <span>Integrantes</span>
-                    <span>Rol</span>
+                <div style="width: 150px;">
+                    <span class="badge bg-danger w-100 py-2">Líder</span>
+                    <input type="hidden" name="members[0][role]" value="lider">
                 </div>
+            </div>
 
-                {{-- Líder --}}
-                <div class="admin-team-member-row">
-                    <div class="admin-team-member-name">
-                        <input
-                            type="text"
-                            name="members[0][name]"
-                            class="admin-form-input"
-                            placeholder="Nombre Usuario"
-                        >
-                    </div>
-                    <div class="admin-team-member-role">
-                        <div class="admin-role-label">Líder</div>
-                    </div>
+            {{-- PENDIENTE 1 --}}
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <div class="flex-grow-1">
+                    <input
+                        type="text"
+                        name="members[1][name]"
+                        class="form-control rounded-pill"
+                        placeholder="Integrante 2 (opcional)"
+                        value="{{ old('members.1.name') }}"
+                    >
                 </div>
-
-                {{-- Pendiente 1 --}}
-                <div class="admin-team-member-row">
-                    <div class="admin-team-member-name">
-                        <input
-                            type="text"
-                            name="members[1][name]"
-                            class="admin-form-input"
-                            placeholder="Pendiente"
-                        >
-                    </div>
-                    <div class="admin-team-member-role">
-                        <select name="members[1][role]" class="admin-form-select-small">
-                            <option value="">Sin asignar</option>
-                            <option value="participante">Participante</option>
-                            <option value="mentor">Mentor</option>
-                        </select>
-                    </div>
+                <div style="width: 150px;">
+                    <select name="members[1][role]" class="form-select form-select-sm rounded-pill">
+                        <option value="" {{ old('members.1.role')=='' ? 'selected' : '' }}>Sin asignar</option>
+                        <option value="participante" {{ old('members.1.role')=='participante' ? 'selected' : '' }}>Participante</option>
+                        <option value="mentor" {{ old('members.1.role')=='mentor' ? 'selected' : '' }}>Mentor</option>
+                    </select>
                 </div>
+            </div>
 
-                {{-- Pendiente 2 --}}
-                <div class="admin-team-member-row">
-                    <div class="admin-team-member-name">
-                        <input
-                            type="text"
-                            name="members[2][name]"
-                            class="admin-form-input"
-                            placeholder="Pendiente"
-                        >
-                    </div>
-                    <div class="admin-team-member-role">
-                        <select name="members[2][role]" class="admin-form-select-small">
-                            <option value="">Sin asignar</option>
-                            <option value="participante">Participante</option>
-                            <option value="mentor">Mentor</option>
-                        </select>
-                    </div>
+            {{-- PENDIENTE 2 --}}
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <div class="flex-grow-1">
+                    <input
+                        type="text"
+                        name="members[2][name]"
+                        class="form-control rounded-pill"
+                        placeholder="Integrante 3 (opcional)"
+                        value="{{ old('members.2.name') }}"
+                    >
                 </div>
-
-                {{-- Pendiente 3 --}}
-                <div class="admin-team-member-row">
-                    <div class="admin-team-member-name">
-                        <input
-                            type="text"
-                            name="members[3][name]"
-                            class="admin-form-input"
-                            placeholder="Pendiente"
-                        >
-                    </div>
-                    <div class="admin-team-member-role">
-                        <select name="members[3][role]" class="admin-form-select-small">
-                            <option value="">Sin asignar</option>
-                            <option value="participante">Participante</option>
-                            <option value="mentor">Mentor</option>
-                        </select>
-                    </div>
+                <div style="width: 150px;">
+                    <select name="members[2][role]" class="form-select form-select-sm rounded-pill">
+                        <option value="" {{ old('members.2.role')=='' ? 'selected' : '' }}>Sin asignar</option>
+                        <option value="participante" {{ old('members.2.role')=='participante' ? 'selected' : '' }}>Participante</option>
+                        <option value="mentor" {{ old('members.2.role')=='mentor' ? 'selected' : '' }}>Mentor</option>
+                    </select>
                 </div>
+            </div>
 
-                {{-- Botones inferiores --}}
-                <div class="admin-form-footer">
-                    <a href="{{ route('admin.teams.index') }}" class="btn admin-btn-pill admin-btn-secondary">
-                        Cancelar
-                    </a>
-
-                    <button type="submit" class="admin-btn-pill admin-btn-primary">
-                        Crear equipo
-                    </button>
-
-                    <button type="button" class="admin-btn-pill admin-btn-disabled" disabled>
-                        Guardar cambios
-                    </button>
+            {{-- PENDIENTE 3 --}}
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="flex-grow-1">
+                    <input
+                        type="text"
+                        name="members[3][name]"
+                        class="form-control rounded-pill"
+                        placeholder="Integrante 4 (opcional)"
+                        value="{{ old('members.3.name') }}"
+                    >
                 </div>
-            </form>
-        </div>
+                <div style="width: 150px;">
+                    <select name="members[3][role]" class="form-select form-select-sm rounded-pill">
+                        <option value="" {{ old('members.3.role')=='' ? 'selected' : '' }}>Sin asignar</option>
+                        <option value="participante" {{ old('members.3.role')=='participante' ? 'selected' : '' }}>Participante</option>
+                        <option value="mentor" {{ old('members.3.role')=='mentor' ? 'selected' : '' }}>Mentor</option>
+                    </select>
+                </div>
+            </div>
 
+            {{-- BOTONES --}}
+            <div class="mt-3 d-flex justify-content-between">
+                <a href="{{ route('admin.teams.index') }}"
+                   class="admin-btn-secondary text-decoration-none">
+                    Cancelar
+                </a>
+
+                <button type="submit" class="admin-btn-primary">
+                    Crear equipo
+                </button>
+            </div>
+        </form>
     </div>
-</div>
+
 @endsection
+

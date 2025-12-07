@@ -1,111 +1,87 @@
-@extends('layouts.admin')
+@extends('layouts.admin-panel')
 
 @section('title', 'Equipos')
 
 @section('content')
-<div class="admin-page-wrapper">
-    <div class="admin-page-card">
 
-        {{-- SIDEBAR IZQUIERDA --}}
-        <div class="admin-sidebar">
-            <a href="{{ route('admin.dashboard') }}" class="admin-sidebar-back">
-                <i class="bi bi-chevron-left"></i>
-            </a>
-
-            <div class="admin-sidebar-icon">
-                <i class="bi bi-calendar-event"></i>
-            </div>
-            <div class="admin-sidebar-icon active">
-                <i class="bi bi-people-fill"></i>
-            </div>
-            <div class="admin-sidebar-icon">
-                <i class="bi bi-grid-1x2"></i>
-            </div>
-            <div class="admin-sidebar-icon">
-                <i class="bi bi-person-badge"></i>
-            </div>
-            <!-- Icono de salir (Logout) -->
-                <div class="admin-sidebar-icon">
-                    <a href="{{ route('logout') }}"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="bi bi-box-arrow-left"></i>
-                    </a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </div>
-        </div>
-
-        {{-- CONTENIDO PRINCIPAL --}}
-        <div class="admin-page-main">
-
-            <div class="admin-page-header">
-                <h1 class="admin-page-title">Lista de Equipos</h1>
-
-                <div class="admin-page-user">
-                    <i class="bi bi-person-circle"></i>
-                    <span>Admin</span>
-                </div>
-            </div>
-
-            <div class="admin-page-search-row">
-                <div class="admin-page-search-input-wrapper">
-                    <i class="bi bi-search me-2 text-muted"></i>
-                    <input type="text" placeholder="Buscar Equipo">
-                </div>
-
-                <button class="admin-page-create-btn"
-                        onclick="window.location='{{ route('admin.teams.create') }}'">
-                    Crear Equipo
-                </button>
-            </div>
-
-            {{-- LISTA DE EQUIPOS DESDE BASE DE DATOS --}}
-            <div class="admin-list">
-
-                @forelse ($teams as $team)
-                    <div class="admin-list-item">
-
-                        {{-- NOMBRE DEL EQUIPO --}}
-                        <div class="admin-list-item-title">
-                            {{ $team->name }}
-                        </div>
-
-                        <div class="admin-list-item-right">
-
-                            {{-- AQUI LLEVARÁ LA CANTIDAD DE MIEMBROS EN EL FUTURO --}}
-                            <span class="me-3">-</span>
-
-                            {{-- BOTÓN EDITAR --}}
-                            <button class="admin-list-edit-btn"
-                                onclick="window.location='{{ route('admin.teams.edit', $team->id) }}'">
-                                Editar
-                            </button>
-
-                            {{-- BOTÓN ELIMINAR --}}
-                            <form action="{{ route('admin.teams.destroy', $team->id) }}"
-                                  method="POST"
-                                  style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-
-                                <button class="admin-list-edit-btn"
-                                        onclick="return confirm('¿Eliminar este equipo?')">
-                                    Eliminar
-                                </button>
-                            </form>
-
-                        </div>
-
-                    </div>
-                @empty
-                    <p class="text-muted">No hay equipos registrados.</p>
-                @endforelse
-            </div>
-
-        </div>
-
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4 mb-0">Equipos</h1>
+        <a href="{{ route('admin.teams.create') }}" class="admin-btn-primary text-decoration-none">
+            <i class="bi bi-plus-circle me-1"></i> Crear equipo
+        </a>
     </div>
-</div>
+
+    <div class="admin-card">
+        <div class="admin-card-title">Lista de equipos</div>
+
+        @if($teams->isEmpty())
+            <p class="mb-0">No hay equipos registrados.</p>
+        @else
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Integrantes</th>
+                        <th style="width: 180px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($teams as $team)
+                        <tr>
+                            <td>{{ $team->name }}</td>
+
+                            {{-- 🔹 Mostrar integrantes reales --}}
+                            <td>
+                                @php
+                                    $members = $team->members ?? [];
+
+                                    $printMembers = [];
+
+                                    if (is_array($members)) {
+                                        foreach ($members as $m) {
+                                            if (!empty($m['name'])) {
+                                                $label = $m['name'];
+
+                                                // si tiene rol y no es "Sin asignar"
+                                                if (!empty($m['role']) && $m['role'] !== 'Sin asignar') {
+                                                    $label .= " ({$m['role']})";
+                                                }
+
+                                                $printMembers[] = $label;
+                                            }
+                                        }
+                                    }
+                                @endphp
+
+                                {{ count($printMembers) ? implode(', ', $printMembers) : '-' }}
+                            </td>
+
+                            <td>
+                                <a href="{{ route('admin.teams.edit', $team) }}"
+                                   class="btn btn-sm btn-light rounded-pill me-1">
+                                    Editar
+                                </a>
+
+                                <form action="{{ route('admin.teams.destroy', $team) }}"
+                                      method="POST"
+                                      class="d-inline"
+                                      onsubmit="return confirm('¿Eliminar este equipo?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="btn btn-sm btn-danger rounded-pill">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+    </div>
+
 @endsection
+
+
 

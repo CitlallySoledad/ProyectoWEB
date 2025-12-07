@@ -1,128 +1,109 @@
-@extends('layouts.admin')
+@extends('layouts.admin-panel')
 
 @section('title', 'Evaluación de proyecto')
 
 @section('content')
-<div class="admin-page-wrapper">
-    <div class="admin-page-card">
 
-        {{-- SIDEBAR IZQUIERDA --}}
-        <div class="admin-sidebar">
-            <a href="{{ route('admin.evaluations.index') }}" class="admin-sidebar-back">
-                <i class="bi bi-chevron-left"></i>
-            </a>
+    <h1 class="h4 mb-3">Evaluación de {{ $projectName }}</h1>
 
-            <div class="admin-sidebar-icon">
-                <i class="bi bi-calendar-event"></i>
-            </div>
-            <div class="admin-sidebar-icon active">
-                <i class="bi bi-people-fill"></i>
-            </div>
-            <div class="admin-sidebar-icon">
-                <i class="bi bi-grid-1x2"></i>
-            </div>
-            <div class="admin-sidebar-icon">
-                <i class="bi bi-person-badge"></i>
-            </div>
+    {{-- ERRORES DE VALIDACIÓN --}}
+    @if ($errors->any())
+        <div class="alert alert-danger rounded-3 py-2">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
+    @endif
 
-        {{-- CONTENIDO PRINCIPAL --}}
-        <div class="admin-page-main">
-            <div class="d-flex justify-content-between mb-2">
-                <h1 class="admin-page-title">
-                    Evaluación de {{ $projectName }}
-                </h1>
+    <div class="admin-card">
+        <form action="{{ route('admin.evaluations.judgement.store', $evaluation->id) }}" method="POST">
+            @csrf
 
-                <div class="admin-page-user">
-                    <i class="bi bi-person-circle"></i>
-                    <span>Admin</span>
-                </div>
-            </div>
-
-            <form action="{{ route('admin.evaluations.judgement.store', $evaluation->id) }}" method="POST">
-                @csrf
-
-                <div class="admin-form-grid">
-                    <div class="admin-form-col">
-
-                        {{-- Juez --}}
-                        <div class="admin-form-row">
-                            <label class="admin-form-label" for="judge">Juez</label>
-                            <input
-                                type="text"
-                                id="judge"
-                                name="judge"
-                                class="admin-form-input"
-                                value="{{ old('judge', $judge) }}"
-                            >
-                        </div>
-
-                        {{-- Fecha --}}
-                        <div class="admin-form-row">
-                            <label class="admin-form-label" for="evaluated_at">Fecha</label>
-                            <input
-                                type="date"
-                                id="evaluated_at"
-                                name="evaluated_at"
-                                class="admin-form-input"
-                                value="{{ old('evaluated_at', $date->format('Y-m-d')) }}"
-                            >
-                        </div>
-
-                        {{-- Equipo --}}
-                        <div class="admin-form-row">
-                            <label class="admin-form-label" for="team">Equipo</label>
-                            <input
-                                type="text"
-                                id="team"
-                                name="team"
-                                class="admin-form-input"
-                                value="{{ old('team', $team) }}"
-                            >
-                        </div>
-
-                        {{-- Total calculado --}}
-                        <div class="admin-form-row">
-                            <label class="admin-form-label" for="total_score">Total calculado</label>
-                            <input
-                                type="number"
-                                id="total_score"
-                                name="total_score"
-                                class="admin-form-input"
-                                value="{{ old('total_score', $total) }}"
-                                min="0"
-                            >
-                        </div>
+            <div class="row g-3">
+                {{-- COLUMNA IZQUIERDA --}}
+                <div class="col-md-6">
+                    {{-- Juez --}}
+                    <div class="mb-3">
+                        <label class="form-label" for="judge">Juez</label>
+                        <input
+                            type="text"
+                            id="judge"
+                            name="judge"
+                            class="form-control rounded-pill"
+                            value="{{ old('judge', $judge) }}"
+                            placeholder="Nombre del juez"
+                        >
                     </div>
 
-                    <div class="admin-form-col">
-                        {{-- Comentarios --}}
-                        <div class="admin-form-row" style="margin-top: 24px;">
-                            <label class="admin-form-label" for="comments">Comentarios</label>
-                            <textarea
-                                id="comments"
-                                name="comments"
-                                class="admin-form-textarea"
-                                placeholder="Comentarios"
-                            >{{ old('comments', $evaluation->comments) }}</textarea>
-                        </div>
+                    {{-- Fecha --}}
+                    <div class="mb-3">
+                        <label class="form-label" for="evaluated_at">Fecha</label>
+                        <input
+                            type="date"
+                            id="evaluated_at"
+                            name="evaluated_at"
+                            class="form-control rounded-pill"
+                            value="{{ old('evaluated_at', $date->format('Y-m-d')) }}"
+                        >
+                    </div>
+
+                    {{-- Equipo --}}
+                    <div class="mb-3">
+                        <label class="form-label" for="team">Equipo</label>
+                        <input
+                            type="text"
+                            id="team"
+                            name="team"
+                            class="form-control rounded-pill"
+                            value="{{ old('team', $team) }}"
+                            placeholder="Nombre del equipo"
+                        >
+                    </div>
+
+                    {{-- Total calculado --}}
+                    <div class="mb-3">
+                        <label class="form-label" for="total_score">Total calculado</label>
+                        <input
+                            type="number"
+                            id="total_score"
+                            name="total_score"
+                            class="form-control rounded-pill"
+                            value="{{ old('total_score', $total) }}"
+                            min="0"
+                        >
                     </div>
                 </div>
 
-                {{-- BOTONES --}}
-                <div class="admin-form-footer">
-                    <a href="{{ route('admin.evaluations.index') }}" class="btn admin-btn-pill admin-btn-secondary">
-                        Cancelar
-                    </a>
-
-                    <button type="submit" class="admin-btn-pill admin-btn-primary">
-                        Guardar
-                    </button>
+                {{-- COLUMNA DERECHA --}}
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="comments">Comentarios</label>
+                        <textarea
+                            id="comments"
+                            name="comments"
+                            class="form-control"
+                            rows="6"
+                            style="border-radius: 18px;"
+                            placeholder="Comentarios del juez"
+                        >{{ old('comments', $evaluation->comments) }}</textarea>
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
 
+            {{-- BOTONES --}}
+            <div class="mt-3 d-flex justify-content-between">
+                <a href="{{ route('admin.evaluations.index') }}"
+                   class="admin-btn-secondary text-decoration-none">
+                    Cancelar
+                </a>
+
+                <button type="submit" class="admin-btn-primary">
+                    Guardar
+                </button>
+            </div>
+        </form>
     </div>
-</div>
-@endsection
 
+@endsection
