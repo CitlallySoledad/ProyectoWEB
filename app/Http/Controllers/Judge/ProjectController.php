@@ -16,7 +16,7 @@ class ProjectController extends Controller
         $q = request('q');
 
         // Mostrar proyectos asignados a este juez y pendientes de evaluación por él
-        $projects = Project::with(['team','event', 'rubric'])
+        $projects = Project::with(['team.members','event', 'rubric', 'documents'])
             ->whereHas('judges', function ($jb) use ($judge) {
                 $jb->where('users.id', $judge->id);
             })

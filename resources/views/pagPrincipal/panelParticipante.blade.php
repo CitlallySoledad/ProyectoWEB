@@ -367,17 +367,9 @@
                 </a>
             </li>
 
-            {{-- Rol --}}
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{{ route('roles') }}">
-                    <i class="bi bi-person-badge"></i>
-                    <span>Rol</span>
-                </a>
-            </li>
-
             {{-- Lista eventos --}}
             <li class="sidebar-item">
-                <a class="sidebar-link" href="#">
+                <a class="sidebar-link" href="{{ route('panel.lista-eventos') }}">
                     <i class="bi bi-calendar2-week"></i>
                     <span>Lista eventos</span>
                 </a>

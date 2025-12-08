@@ -47,6 +47,32 @@
         </table>
     </div>
 
+    {{-- Documentos del proyecto --}}
+    @if($project->documents->isNotEmpty())
+        <div class="admin-card mb-3">
+            <div class="admin-card-title mb-3">
+                <i class="bi bi-file-pdf"></i> Documentos del Proyecto
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                @foreach($project->documents as $doc)
+                    <a href="{{ asset('storage/' . $doc->file_path) }}" 
+                       target="_blank" 
+                       class="btn btn-sm"
+                       style="background: rgba(139,92,246,0.2); border: 1px solid #8b5cf6; color: #e5e7eb; padding: 8px 16px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="bi bi-file-pdf-fill" style="font-size: 1.2rem; color: #c084fc;"></i>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 600; font-size: 0.9rem;">{{ $doc->original_name }}</div>
+                            @if($doc->description)
+                                <div style="font-size: 0.75rem; color: #cbd5e1; margin-top: 2px;">{{ Str::limit($doc->description, 50) }}</div>
+                            @endif
+                            <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">{{ number_format($doc->file_size / 1024, 2) }} KB</div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     {{-- FORMULARIO DE PUNTAJES POR CRITERIO --}}
     <form action="{{ route('judge.evaluations.store', $project) }}" method="POST" enctype="multipart/form-data">
         @csrf

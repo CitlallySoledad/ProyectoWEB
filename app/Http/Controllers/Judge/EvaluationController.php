@@ -30,6 +30,9 @@ class EvaluationController extends Controller
     {
         $judgeId = Auth::id();
 
+        // Cargar documentos del proyecto
+        $project->load('documents');
+
         // Buscar si ya existe evaluación para este juez y proyecto
         $evaluation = Evaluation::where('project_id', $project->id)
             ->where('judge_id', $judgeId)

@@ -70,9 +70,14 @@
                         <label class="form-label" for="status">Estado</label>
                         <select id="status" name="status" class="form-select rounded-pill">
                             <option value="borrador" {{ old('status', $event->status) == 'borrador' ? 'selected' : '' }}>Borrador</option>
+                            <option value="publicado" {{ old('status', $event->status) == 'publicado' ? 'selected' : '' }}>Publicado</option>
                             <option value="activo"   {{ old('status', $event->status) == 'activo'   ? 'selected' : '' }}>Activo</option>
                             <option value="cerrado"  {{ old('status', $event->status) == 'cerrado'  ? 'selected' : '' }}>Cerrado</option>
                         </select>
+                        <small class="text-muted d-block mt-1">
+                            <strong>Publicado:</strong> acepta inscripciones de equipos<br>
+                            <strong>Activo:</strong> evento en curso, no acepta más inscripciones
+                        </small>
                     </div>
                 </div>
 

@@ -197,12 +197,12 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="#">
+                            <a class="sidebar-link" href="{{ route('panel.eventos') }}">
                                 <i class="bi bi-calendar-event"></i> <span>Eventos</span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="#">
+                            <a class="sidebar-link" href="{{ route('panel.perfil') }}">
                                 <i class="bi bi-person"></i> <span>Mi perfil</span>
                             </a>
                         </li>
@@ -228,17 +228,12 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('roles') }}">
-                                <i class="bi bi-person-badge"></i> <span>Rol</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="#">
+                            <a class="sidebar-link" href="{{ route('panel.lista-eventos') }}">
                                 <i class="bi bi-calendar-week"></i> <span>Lista eventos</span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="#">
+                            <a class="sidebar-link" href="{{ route('panel.submission') }}">
                                 <i class="bi bi-file-earmark-arrow-up"></i> <span>Submision del proyecto</span>
                             </a>
                         </li>
@@ -247,9 +242,12 @@
             </div>
 
             <div class="sidebar-bottom">
-                <div class="sidebar-logout">
-                    <i class="bi bi-box-arrow-right"></i> <span>Salir</span>
-                </div>
+                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                    @csrf
+                    <button type="submit" class="sidebar-logout" style="background: none; border: none; width: 100%; text-align: left; font: inherit; cursor: pointer;">
+                        <i class="bi bi-box-arrow-right"></i> <span>Salir</span>
+                    </button>
+                </form>
             </div>
         </aside>
 

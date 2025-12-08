@@ -313,6 +313,14 @@
                         <span>Usuarios</span>
                     </a>
                 </li>
+
+                <li class="sidebar-item">
+                    <a class="sidebar-link {{ str_starts_with($routeName, 'admin.judge-assignment.') ? 'active' : '' }}"
+                       href="{{ route('admin.judge-assignment.index') }}">
+                        <i class="bi bi-person-check"></i>
+                        <span>Asignar Jurados</span>
+                    </a>
+                </li>
             </ul>
 
             <div class="sidebar-bottom">

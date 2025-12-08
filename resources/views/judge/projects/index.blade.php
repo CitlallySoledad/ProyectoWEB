@@ -81,6 +81,7 @@
                 <th>Proyecto</th>
                 <th>Estado</th>
                 <th>Miembros</th>
+                <th>Documentos</th>
                 <th style="width: 150px;">Acciones</th>
             </tr>
             </thead>
@@ -94,19 +95,25 @@
                     <td>{{ $project->name }}</td>
                     <td class="text-capitalize">{{ $project->status }}</td>
                     <td>
-                        @php
-                            $members = '-';
-                            if ($project->team) {
-                                if (method_exists($project->team, 'members') && $project->team->relationLoaded('members')) {
-                                    $members = $project->team->members->pluck('name')->join(', ');
-                                } elseif (is_array($project->team->members)) {
-                                    $members = implode(', ', $project->team->members);
-                                } else {
-                                    $members = $project->team->members ?? '-';
-                                }
-                            }
-                        @endphp
-                        {{ $members }}
+                        @if($project->team && $project->team->members->isNotEmpty())
+                            {{ $project->team->members->pluck('name')->join(', ') }}
+                        @else
+                            <span style="color: #94a3b8; font-style: italic;">Sin miembros</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($project->documents->isNotEmpty())
+                            @foreach($project->documents as $doc)
+                                <a href="{{ asset('storage/' . $doc->file_path) }}" 
+                                   target="_blank" 
+                                   class="judge-pill-evaluate" 
+                                   style="display: inline-block; margin: 2px; padding: 4px 10px; font-size: 0.85rem; text-decoration: none;">
+                                    <i class="bi bi-file-pdf"></i> {{ $doc->original_name }}
+                                </a>
+                            @endforeach
+                        @else
+                            <span style="color: #94a3b8; font-style: italic; font-size: 0.85rem;">Sin documentos</span>
+                        @endif
                     </td>
                     <td>
                         @if($project->rubric_id)

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
-    protected $fillable = ['name', 'team_id', 'event_id', 'status', 'rubric_id'];
+    protected $fillable = ['name', 'team_id', 'event_id', 'status', 'rubric_id', 'visibility'];
 
     // Relación con el equipo
     public function team()
@@ -36,6 +36,12 @@ class Project extends Model
     public function rubric()
     {
         return $this->belongsTo(Rubric::class);
+    }
+
+    // Relación con los documentos (PDFs)
+    public function documents()
+    {
+        return $this->hasMany(ProjectDocument::class);
     }
 }
 

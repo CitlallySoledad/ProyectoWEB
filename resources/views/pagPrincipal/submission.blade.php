@@ -4,22 +4,22 @@
 
 @push('styles')
 <style>
-    .panel-wrapper {
+    /* ===== CONTENEDOR FULLSCREEN ===== */
+    .submission-fullscreen {
+        width: 100%;
         min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 24px;
-        background-color: #0f172a;
+        margin: 0;
+        padding: 0;
+        background: #020617;
     }
 
     .panel-card {
         width: 100%;
-        max-width: 1100px;
-        min-height: 540px;
-        background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
-        border-radius: 24px;
-        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
+        max-width: 100%;
+        min-height: 100vh;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
         display: flex;
         overflow: hidden;
         color: #e5e7eb;
@@ -32,7 +32,6 @@
         padding: 18px 14px;
         display: flex;
         flex-direction: column;
-        border-radius: 24px 0 0 24px;
         flex-shrink: 0;
     }
 
@@ -307,6 +306,37 @@
         margin-top: 2px;
     }
 
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+        .panel-card {
+            flex-direction: column;
+        }
+
+        .panel-sidebar {
+            width: 100%;
+        }
+
+        .sidebar-middle {
+            flex-direction: row;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            gap: 8px;
+        }
+
+        .sidebar-section-title {
+            display: none;
+        }
+
+        .panel-main {
+            padding: 16px;
+        }
+    }
+
     @media (max-width: 900px) {
         .submission-layout {
             grid-template-columns: 1fr;
@@ -316,11 +346,24 @@
             order: -1;
         }
     }
+
+    @media (max-width: 768px) {
+        .panel-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .user-badge {
+            width: 100%;
+            justify-content: center;
+        }
+    }
 </style>
 @endpush
 
 @section('content')
-<div class="panel-wrapper">
+<div class="submission-fullscreen">
     <div class="panel-card">
 
         {{-- ========== SIDEBAR ========== --}}
@@ -370,7 +413,7 @@
                     <p class="sidebar-section-title">Equipo</p>
                     <ul class="sidebar-menu">
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="#">
+                            <a class="sidebar-link" href="{{ route('panel.mi-equipo') }}">
                                 <i class="bi bi-people"></i>
                                 <span>Mi equipo</span>
                             </a>
@@ -391,14 +434,7 @@
                         </li>
 
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="#">
-                                <i class="bi bi-person-badge"></i>
-                                <span>Rol</span>
-                            </a>
-                        </li>
-
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="#">
+                            <a class="sidebar-link" href="{{ route('panel.lista-eventos') }}">
                                 <i class="bi bi-calendar2-week"></i>
                                 <span>Lista eventos</span>
                             </a>
@@ -446,8 +482,9 @@
                 @endif
 
                 @php
-                    $projectName = $project['name'] ?? '';
-                    $visibility  = old('visibility', $project['visibility'] ?? 'privado');
+                    $projectName = $project ? $project->name : '';
+                    $visibility  = old('visibility', $project ? $project->visibility : 'privado');
+                    $selectedTeamId = old('team_id', $project ? $project->team_id : null);
                 @endphp
 
                 <div class="submission-layout">
@@ -455,6 +492,38 @@
                     <div class="submission-left">
                         <form action="{{ route('panel.submission.update') }}" method="POST">
                             @csrf
+
+                            {{-- Selección de equipo --}}
+                            <div class="mb-2">
+                                <div class="submission-label">Equipo <span style="color: #dc3545;">*</span></div>
+                                
+                                @if($eligibleTeams->isEmpty())
+                                    <div class="alert alert-warning" style="padding: 12px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; margin-bottom: 1rem;">
+                                        <strong>⚠️ No tienes equipos elegibles</strong>
+                                        <p style="margin: 8px 0 0 0; font-size: 14px;">
+                                            Para enviar un proyecto debes:
+                                            <br>• Ser líder de un equipo
+                                            <br>• El equipo debe estar inscrito en un evento activo
+                                        </p>
+                                    </div>
+                                @else
+                                    <select name="team_id" class="submission-input" required>
+                                        <option value="">Selecciona un equipo</option>
+                                        @foreach($eligibleTeams as $team)
+                                            <option value="{{ $team->id }}" 
+                                                    {{ $selectedTeamId == $team->id ? 'selected' : '' }}>
+                                                {{ $team->name }} 
+                                                ({{ $team->members_count }} miembros) 
+                                                - Evento: {{ $team->events->first()->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                                
+                                @error('team_id')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
 
                             {{-- Nombre del proyecto --}}
                             <div class="mb-2">
@@ -465,6 +534,7 @@
                                     class="submission-input"
                                     placeholder="Nombre de proyecto"
                                     value="{{ old('project_name', $projectName) }}"
+                                    {{ $eligibleTeams->isEmpty() ? 'disabled' : '' }}
                                 >
                                 @error('project_name')
                                     <small class="text-danger">{{ $message }}</small>
@@ -472,8 +542,7 @@
 
                                 @if(!$projectName)
                                     <div class="submission-hint">
-                                        Aún no se ha detectado un proyecto de equipo. Puedes escribir el nombre
-                                        manualmente o crearlo desde la sección de equipos.
+                                        Escribe el nombre del proyecto que tu equipo está desarrollando para el evento.
                                     </div>
                                 @endif
                             </div>
@@ -485,12 +554,14 @@
                                 <div class="visibility-options">
                                     <button type="button"
                                             class="visibility-pill {{ $visibility === 'privado' ? 'active' : 'inactive' }}"
-                                            onclick="document.getElementById('visibility-privado').checked = true; toggleVisibilityPills();">
+                                            onclick="document.getElementById('visibility-privado').checked = true; toggleVisibilityPills();"
+                                            {{ $eligibleTeams->isEmpty() ? 'disabled' : '' }}>
                                         Privado
                                     </button>
                                     <button type="button"
                                             class="visibility-pill {{ $visibility === 'publico' ? 'active' : 'inactive' }}"
-                                            onclick="document.getElementById('visibility-publico').checked = true; toggleVisibilityPills();">
+                                            onclick="document.getElementById('visibility-publico').checked = true; toggleVisibilityPills();"
+                                            {{ $eligibleTeams->isEmpty() ? 'disabled' : '' }}>
                                         Público
                                     </button>
                                 </div>
@@ -515,11 +586,12 @@
                         <div class="submission-right-title">Acciones de la submisión</div>
 
                         <p class="submission-right-small">
-                            Guarda los cambios del nombre del proyecto y su visibilidad.
+                            Selecciona tu equipo, nombra tu proyecto y guarda los cambios.
                         </p>
 
                         <button class="btn-rounded btn-save" type="button"
-                                onclick="document.getElementById('submit-hidden').click();">
+                                onclick="document.getElementById('submit-hidden').click();"
+                                {{ $eligibleTeams->isEmpty() ? 'disabled style=opacity:0.5;cursor:not-allowed;' : '' }}>
                             Guardar cambios
                         </button>
 
@@ -533,9 +605,9 @@
                         <p class="submission-right-small">
                             Gestiona los repositorios asociados a esta submisión.
                         </p>
-                        <a href="{{ route('panel.submission.repositories') }}" class="btn-rounded btn-repo">
+                        <button type="button" class="btn-rounded btn-repo" onclick="openPdfModal()">
                             Gestionar / ver repositorios
-                        </a>
+                        </button>
                     </div>
                 </div>
 
@@ -543,6 +615,184 @@
         </div>
     </div>
 </div>
+
+{{-- Modal para subir PDF --}}
+<div id="pdfModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3 style="margin: 0; color: #1e293b; font-size: 20px; font-weight: 600;">
+                📄 Subir Documento PDF
+            </h3>
+            <button type="button" class="modal-close" onclick="closePdfModal()">&times;</button>
+        </div>
+        
+        <div class="modal-body" style="padding: 24px;">
+            <form id="pdfUploadForm" action="{{ route('panel.submission.upload-pdf') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #334155;">
+                        Selecciona el archivo PDF
+                    </label>
+                    
+                    <div class="file-upload-area" id="fileUploadArea">
+                        <input type="file" 
+                               id="pdfFile" 
+                               name="pdf_file" 
+                               accept=".pdf"
+                               required
+                               style="display: none;"
+                               onchange="handleFileSelect(event)">
+                        
+                        <div class="file-upload-content" onclick="document.getElementById('pdfFile').click()">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="margin: 0 auto 12px; color: #8b5cf6;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                            <p style="margin: 0; font-weight: 500; color: #1e293b;">Haz clic para seleccionar un PDF</p>
+                            <p style="margin: 8px 0 0 0; font-size: 14px; color: #64748b;">o arrastra y suelta aquí</p>
+                        </div>
+                        
+                        <div class="file-selected" id="fileSelected" style="display: none;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color: #8b5cf6;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <div style="flex: 1;">
+                                <p id="fileName" style="margin: 0; font-weight: 500; color: #1e293b;"></p>
+                                <p id="fileSize" style="margin: 4px 0 0 0; font-size: 14px; color: #64748b;"></p>
+                            </div>
+                            <button type="button" onclick="clearFile()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 20px;">×</button>
+                        </div>
+                    </div>
+                    
+                    <p style="margin: 8px 0 0 0; font-size: 13px; color: #64748b;">
+                        Tamaño máximo: 10MB
+                    </p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label for="pdfDescription" style="display: block; margin-bottom: 8px; font-weight: 500; color: #334155;">
+                        Descripción (opcional)
+                    </label>
+                    <textarea 
+                        id="pdfDescription" 
+                        name="description" 
+                        rows="3" 
+                        class="submission-input"
+                        placeholder="Describe brevemente el contenido del documento..."
+                        style="resize: vertical; min-height: 80px;"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" class="btn-rounded btn-cancel" onclick="closePdfModal()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-rounded btn-save">
+                        📤 Subir PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #94a3b8;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.file-upload-area {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    transition: all 0.3s;
+}
+
+.file-upload-area:hover {
+    border-color: #8b5cf6;
+    background: #f9f5ff;
+}
+
+.file-upload-content {
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.file-selected {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #f9f5ff;
+    border-radius: 10px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+</style>
 
 <script>
     function toggleVisibilityPills() {
@@ -555,6 +805,101 @@
         pills[1].classList.toggle('active', !privadoChecked);
         pills[1].classList.toggle('inactive', privadoChecked);
     }
+
+    function openPdfModal() {
+        document.getElementById('pdfModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePdfModal() {
+        document.getElementById('pdfModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        clearFile();
+    }
+
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            if (file.type !== 'application/pdf') {
+                alert('Por favor selecciona un archivo PDF válido');
+                event.target.value = '';
+                return;
+            }
+            
+            if (file.size > 10 * 1024 * 1024) { // 10MB
+                alert('El archivo es demasiado grande. Tamaño máximo: 10MB');
+                event.target.value = '';
+                return;
+            }
+            
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            document.querySelector('.file-upload-content').style.display = 'none';
+            document.getElementById('fileSelected').style.display = 'flex';
+        }
+    }
+
+    function clearFile() {
+        document.getElementById('pdfFile').value = '';
+        document.querySelector('.file-upload-content').style.display = 'block';
+        document.getElementById('fileSelected').style.display = 'none';
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    // Drag and drop functionality
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        fileUploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        fileUploadArea.addEventListener(eventName, () => {
+            fileUploadArea.style.borderColor = '#8b5cf6';
+            fileUploadArea.style.background = '#f9f5ff';
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        fileUploadArea.addEventListener(eventName, () => {
+            fileUploadArea.style.borderColor = '#cbd5e1';
+            fileUploadArea.style.background = 'transparent';
+        }, false);
+    });
+
+    fileUploadArea.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            document.getElementById('pdfFile').files = files;
+            handleFileSelect({ target: { files: files } });
+        }
+    }, false);
+
+    // Close modal on ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.getElementById('pdfModal').style.display === 'flex') {
+            closePdfModal();
+        }
+    });
+
+    // Close modal on overlay click
+    document.getElementById('pdfModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'pdfModal') {
+            closePdfModal();
+        }
+    });
 
     document.addEventListener('DOMContentLoaded', toggleVisibilityPills);
 </script>

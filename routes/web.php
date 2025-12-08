@@ -51,11 +51,13 @@ Route::match(['get', 'post'], '/login', function (Request $request) {
 })->name('login');
 
 // Función auxiliar para redirigir según rol
-function getRedirectRouteByRole($user)
-{
-    if ($user->hasRole('admin')) return 'admin.dashboard';
-    if ($user->hasRole('judge')) return 'judge.projects.index';
-    return 'panel.participante';
+if (!function_exists('getRedirectRouteByRole')) {
+    function getRedirectRouteByRole($user)
+    {
+        if ($user->hasRole('admin')) return 'admin.dashboard';
+        if ($user->hasRole('judge')) return 'judge.projects.index';
+        return 'panel.participante';
+    }
 }
 
 // ==========================================================
@@ -75,6 +77,21 @@ Route::get('/registro', fn() => view('pagPrincipal.crearCuenta'))->name('public.
 Route::post('/registro', [RegistroController::class, 'store'])->name('registro.store');
 
 // ==========================================================
+// RECUPERACIÓN DE CONTRASEÑA
+// ==========================================================
+use App\Http\Controllers\PasswordResetController;
+
+Route::get('/forgot-password', [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
+
+// ==========================================================
+// INVITACIONES DE EQUIPO (sin autenticación requerida)
+// ==========================================================
+Route::get('/invitacion/{token}', [ParticipantTeamController::class, 'acceptInvitation'])->name('team-invitation.accept');
+
+// ==========================================================
 // PANEL PARTICIPANTE (role:student)
 // ==========================================================
 Route::middleware(['auth', 'role:student'])->group(function () {
@@ -85,8 +102,32 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/panel/crear-equipo', [ParticipantTeamController::class, 'create'])->name('panel.teams.create');
     Route::post('/panel/crear-equipo', [ParticipantTeamController::class, 'store'])->name('panel.teams.store');
     Route::post('/panel/unirse-equipo', [ParticipantTeamController::class, 'join'])->name('panel.teams.join');
+    
+    // Rutas para solicitudes de unirse a equipos
+    Route::post('/panel/solicitudes/{requestId}/aceptar', [ParticipantTeamController::class, 'acceptJoinRequest'])->name('panel.requests.accept');
+    Route::post('/panel/solicitudes/{requestId}/rechazar', [ParticipantTeamController::class, 'rejectJoinRequest'])->name('panel.requests.reject');
+    
+    // Ruta para eliminar miembros del equipo
+    Route::post('/panel/equipo/{teamId}/miembro/{userId}/eliminar', [ParticipantTeamController::class, 'removeMember'])->name('panel.members.remove');
+
+    // Rutas para invitaciones de líder
+    Route::post('/panel/equipo/invitar', [ParticipantTeamController::class, 'sendInvitation'])->name('panel.invitations.send');
 
     Route::get('/eventos', fn() => view('pagPrincipal.eventos'))->name('panel.eventos');
+    
+    Route::get('/lista-eventos', function() {
+        // Mostrar eventos disponibles (publicados y activos) ordenados por fecha
+        $events = \App\Models\Event::available()
+            ->with('teams')
+            ->orderBy('start_date', 'asc')
+            ->get();
+        return view('pagPrincipal.listaEventos', compact('events'));
+    })->name('panel.lista-eventos');
+
+    Route::get('/api/user/leader-teams', [App\Http\Controllers\EventParticipantController::class, 'getUserLeaderTeams'])->name('api.user.leader-teams');
+    Route::get('/api/user/eligible-teams', [SubmissionController::class, 'getEligibleTeams'])->name('api.user.eligible-teams');
+    Route::post('/eventos/{event}/join', [App\Http\Controllers\EventParticipantController::class, 'joinEvent'])->name('panel.events.join');
+    Route::delete('/eventos/{event}/leave/{team}', [App\Http\Controllers\EventParticipantController::class, 'leaveEvent'])->name('panel.events.leave');
 
     Route::get('/panel/perfil', [PanelProfileController::class, 'show'])->name('panel.perfil');
     Route::patch('/panel/perfil/datos', [PanelProfileController::class, 'updateDatos'])->name('panel.perfil.updateDatos');
@@ -98,6 +139,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
     Route::get('/submision-proyecto', [SubmissionController::class, 'show'])->name('panel.submission');
     Route::post('/submision-proyecto', [SubmissionController::class, 'update'])->name('panel.submission.update');
+    Route::post('/submision-proyecto/upload-pdf', [SubmissionController::class, 'uploadPdf'])->name('panel.submission.upload-pdf');
     Route::get('/submision-proyecto/repositorios', [SubmissionController::class, 'repositories'])->name('panel.submission.repositories');
 });
 
@@ -121,6 +163,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('equipos/{team}/editar', [AdminTeamController::class, 'edit'])->name('teams.edit');
     Route::put('equipos/{team}', [AdminTeamController::class, 'update'])->name('teams.update');
     Route::delete('equipos/{team}', [AdminTeamController::class, 'destroy'])->name('teams.destroy');
+    Route::post('/equipo/{team}/join', [ParticipantTeamController::class, 'join'])
+    ->name('panel.equipo.join');
 
     // Eventos
     Route::get('eventos', [AdminEventController::class, 'index'])->name('events.index');
@@ -150,6 +194,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('usuarios', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('usuarios/crear', [AdminUserController::class, 'create'])->name('users.create');
     Route::post('usuarios', [AdminUserController::class, 'store'])->name('users.store');
+
+    // Asignación de Jurados
+    Route::get('asignacion-jurados', [App\Http\Controllers\Admin\JudgeAssignmentController::class, 'index'])->name('judge-assignment.index');
+    Route::post('asignacion-jurados/asignar', [App\Http\Controllers\Admin\JudgeAssignmentController::class, 'assign'])->name('judge-assignment.assign');
+    Route::post('asignacion-jurados/remover', [App\Http\Controllers\Admin\JudgeAssignmentController::class, 'remove'])->name('judge-assignment.remove');
+    Route::post('asignacion-jurados/auto-asignar', [App\Http\Controllers\Admin\JudgeAssignmentController::class, 'autoAssign'])->name('judge-assignment.auto-assign');
 });
 
 // ==========================================================

@@ -9,7 +9,6 @@ class Team extends Model
     protected $fillable = [
         'name',
         'leader_id',
-        'members',    // líder del equipo
     ];
 
     // Relación: líder/admin del equipo
@@ -21,10 +20,29 @@ class Team extends Model
     // Relación: miembros del equipo (usuarios)
     public function members()
     {
-        return $this->belongsToMany(User::class, 'team_user');
+        return $this->belongsToMany(User::class, 'team_user')
+            ->withPivot('role')
+            ->withTimestamps();
     }
 
-    protected $casts = [
-        'members' => 'array', // 👈 para usarlo como arreglo en Blade
-    ];
+    // Relación: solicitudes de unirse al equipo
+    public function joinRequests()
+    {
+        return $this->hasMany(TeamJoinRequest::class);
+    }
+
+    // Relación: invitaciones enviadas por el líder
+    public function invitations()
+    {
+        return $this->hasMany(TeamInvitation::class);
+    }
+
+    // Relación: eventos en los que está inscrito el equipo
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_team')
+            ->withTimestamps();
+    }
+
+    // No castear ni exponer 'members' como atributo: usamos la relación belongsToMany
 }

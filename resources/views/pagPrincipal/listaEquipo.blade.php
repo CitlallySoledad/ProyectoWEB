@@ -112,6 +112,44 @@
     border-radius: 0;             /* ❗ Sin esquinas redondeadas */
 }
 .details-overlay.active { display: flex; }
+.join-btn-modern {
+    width: 100%;
+    padding: 14px 22px;
+    border-radius: 14px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #4c1d95, #7c3aed);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.25s ease-in-out;
+    box-shadow: 0 0 12px rgba(124, 58, 237, 0.35);
+}
+
+.join-btn-modern i {
+    font-size: 1.2rem;
+}
+
+.join-btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 22px rgba(167, 139, 250, 0.65);
+    background: linear-gradient(135deg, #5b21b6, #8b5cf6);
+}
+
+.join-btn-modern:active {
+    transform: scale(0.97);
+}
+
+.join-btn-modern:disabled {
+    background: #6b7280 !important;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.7;
+}
 
 .details-panel {
     width: 320px;
@@ -144,14 +182,328 @@
 .members-list { list-style: none; padding: 0; margin: 0; flex: 1; overflow-y: auto; }
 .member-item { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 .member-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
-.member-info { display: flex; flex-direction: column; }
+.member-info { display: flex; flex-direction: column; gap: 4px; }
 .member-name { color: #f3f4f6; font-weight: 600; font-size: 0.95rem; }
-.member-role { color: #9ca3af; font-size: 0.75rem; }
+.member-role { color: #94a3b8; font-size: 0.75rem; font-weight: 400; }
 
 .join-btn-container { margin-top: auto; padding-top: 20px; }
 .btn-join { width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 600; cursor: pointer; background: #2563eb; color: white; display: flex; justify-content: center; align-items: center; gap: 8px; }
 .btn-join:hover { background: #1d4ed8; }
 .btn-join:disabled { background: #475569; cursor: not-allowed; color: #94a3b8; }
+
+/* ===== PAGINACIÓN COMPACTA ===== */
+.pagination-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.pagination-info {
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.pagination {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    align-items: center;
+}
+
+.pagination .page-item {
+    display: inline-block;
+}
+
+.pagination .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 6px;
+    color: #cbd5e1;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.pagination .page-link:hover {
+    background: rgba(79, 70, 229, 0.2);
+    border-color: #6366f1;
+    color: #fff;
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    border-color: transparent;
+    color: #fff;
+    font-weight: 600;
+}
+
+.pagination .page-item.disabled .page-link {
+    background: rgba(15, 23, 42, 0.3);
+    border-color: rgba(148, 163, 184, 0.15);
+    color: #475569;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.pagination .page-item.disabled .page-link:hover {
+    background: rgba(15, 23, 42, 0.3);
+    border-color: rgba(148, 163, 184, 0.15);
+}
+
+/* Puntos suspensivos */
+.pagination .page-item span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    color: #64748b;
+    font-size: 0.8rem;
+}
+
+/* ===== MODAL DE SELECCIÓN DE ROL ===== */
+.role-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    z-index: 2000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.role-modal-overlay.active {
+    display: flex;
+}
+
+.role-modal-content {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 20px;
+    padding: 32px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.role-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.role-modal-header h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin: 0;
+}
+
+.role-modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #94a3af;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+/* ===== PAGINACIÓN COMPACTA LISTA EQUIPO ===== */
+.teams-pagination {
+    margin: 24px auto 8px;              /* centrado y separado del contenido */
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.95); /* azul oscuro */
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    width: auto;                        /* NO ocupar todo el ancho */
+    max-width: 100%;
+    font-size: 0.85rem;
+    color: #e5e7eb;
+}
+
+.teams-pagination-info {
+    white-space: nowrap;
+    opacity: 0.85;
+}
+
+.teams-pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Botones de página */
+.page-number,
+.page-arrow {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid #1d4ed8;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: #e5e7eb;
+    background: transparent;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+    cursor: pointer;
+}
+
+.page-number:hover,
+.page-arrow:hover {
+    background: #1d4ed8;
+    color: #f9fafb;
+    transform: translateY(-1px);
+}
+
+/* Página actual */
+.page-number.active {
+    background: #1d4ed8;
+    color: #f9fafb;
+    border-color: #2563eb;
+    font-weight: 600;
+}
+
+/* Deshabilitados */
+.page-arrow.disabled {
+    opacity: 0.35;
+    border-color: #4b5563;
+    cursor: default;
+    pointer-events: none;
+}
+
+.role-modal-close:hover {
+    background: rgba(148, 163, 184, 0.15);
+    color: #e2e8f0;
+}
+
+.role-modal-body {
+    padding: 0;
+}
+
+.role-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.role-option {
+    cursor: pointer;
+}
+
+.role-option input[type="radio"] {
+    display: none;
+}
+
+.role-option input[type="radio"]:checked + .role-card {
+    background: linear-gradient(135deg, #4c1d95, #7c3aed);
+    border-color: #a78bfa;
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+    transform: translateY(-2px);
+}
+
+.role-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    border-radius: 14px;
+    transition: all 0.3s ease;
+    color: #cbd5e1;
+}
+
+.role-card:hover {
+    background: rgba(15, 23, 42, 0.9);
+    border-color: rgba(148, 163, 184, 0.5);
+}
+
+.role-card i {
+    font-size: 2.5rem;
+    color: #a78bfa;
+}
+
+.role-card span {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.role-submit-btn {
+    width: 100%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #4c1d95, #7c3aed);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+}
+
+.role-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(124, 58, 237, 0.5);
+    background: linear-gradient(135deg, #5b21b6, #8b5cf6);
+}
+
+.role-submit-btn:active {
+    transform: scale(0.98);
+}
+
+.role-submit-btn i {
+    font-size: 1.2rem;
+}
 
 /* RESPONSIVE */
 @media (max-width: 1024px) {
@@ -178,6 +530,23 @@
     .team-filters { flex-direction: column; }
     .panel-header { flex-direction: column; align-items: flex-start; gap: 10px; }
     .user-badge { width: 100%; justify-content: center; }
+    
+    /* Paginación responsive */
+    .pagination-wrapper {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    
+    .pagination-info {
+        font-size: 0.7rem;
+    }
+    
+    .pagination .page-link {
+        min-width: 30px;
+        height: 30px;
+        font-size: 0.75rem;
+        padding: 0 6px;
+    }
 }
 </style>
 @endpush
@@ -203,8 +572,8 @@
                     <div class="sidebar-section-title">Menú</div>
                     <ul class="sidebar-nav">
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.participante') }}"><i class="bi bi-house-door"></i> <span>Inicio</span></a></li>
-                        <li class="sidebar-item"><a class="sidebar-link" href="#"><i class="bi bi-calendar-event"></i> <span>Eventos</span></a></li>
-                        <li class="sidebar-item"><a class="sidebar-link" href="#"><i class="bi bi-person"></i> <span>Mi perfil</span></a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.eventos') }}"><i class="bi bi-calendar-event"></i> <span>Eventos</span></a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.perfil') }}"><i class="bi bi-person"></i> <span>Mi perfil</span></a></li>
                     </ul>
                 </div>
 
@@ -214,17 +583,19 @@
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.mi-equipo') }}"><i class="bi bi-people"></i> <span>Mi equipo</span></a></li>
                         <li class="sidebar-item"><a class="sidebar-link active" href="{{ route('panel.lista-equipo') }}"><i class="bi bi-list-ul"></i> <span>Lista de equipo</span></a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.teams.create') }}"><i class="bi bi-plus-circle"></i> <span>Crear equipo</span></a></li>
-                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('roles') }}"><i class="bi bi-person-badge"></i> <span>Rol</span></a></li>
-                        <li class="sidebar-item"><a class="sidebar-link" href="#"><i class="bi bi-calendar-week"></i> <span>Lista eventos</span></a></li>
-                        <li class="sidebar-item"><a class="sidebar-link" href="#"><i class="bi bi-file-earmark-arrow-up"></i> <span>Submision del proyecto</span></a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.lista-eventos') }}"><i class="bi bi-calendar-week"></i> <span>Lista eventos</span></a></li>
+                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.submission') }}"><i class="bi bi-file-earmark-arrow-up"></i> <span>Submision del proyecto</span></a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="sidebar-bottom">
-                <div class="sidebar-logout">
-                    <i class="bi bi-box-arrow-right"></i> <span>Salir</span>
-                </div>
+                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                    @csrf
+                    <button type="submit" class="sidebar-logout" style="background: none; border: none; width: 100%; text-align: left; font: inherit; cursor: pointer;">
+                        <i class="bi bi-box-arrow-right"></i> <span>Salir</span>
+                    </button>
+                </form>
             </div>
         </aside>
 
@@ -271,11 +642,11 @@
                         <tbody>
     @forelse ($teams ?? [] as $team)
         @php
-            $membersCount = $team->members->count();
-    $leader       = $team->leader;                 // 👈 ahora viene directo de BD
-    $leaderName   = $leader?->name ?? 'Líder';
-    $yaEsMiembro  = $team->members->contains(auth()->id());
-    $esLider      = auth()->id() === optional($leader)->id;
+        $membersCount = $team->members ? $team->members->count() : 0;
+        $leader       = $team->leader;                 // 👈 ahora viene directo de BD
+        $leaderName   = $leader?->name ?? 'Líder';
+        $yaEsMiembro  = $team->members ? $team->members->contains(auth()->id()) : false;
+        $esLider      = auth()->id() === optional($leader)->id;
         @endphp
 
         <tr>
@@ -285,7 +656,7 @@
             <td data-label="Miembros">
                 <div class="avatar-stack">
                     {{-- Mostrar hasta 4 avatares de miembros reales --}}
-                    @foreach ($team->members->take(4) as $member)
+                    @foreach (($team->members ?? collect())->take(4) as $member)
                         <img src="https://ui-avatars.com/api/?name={{ urlencode($member->name) }}&background=random" 
                              alt="{{ $member->name }}">
                     @endforeach
@@ -303,10 +674,11 @@
         data-is-member="{{ $yaEsMiembro ? '1' : '0' }}"
         data-is-leader="{{ $esLider ? '1' : '0' }}"
         data-members='@json(
-            $team->members->map(function($m) use ($leader) {
+            ($team->members ?? collect())->map(function($m) use ($leader) {
+                $roleText = $m->id === optional($leader)->id ? "Líder" : ($m->pivot->role ?? "");
                 return [
                     "name" => $m->name,
-                    "role" => $m->id === optional($leader)->id ? "Líder" : "Miembro",
+                    "role" => $roleText,
                 ];
             })
         )'
@@ -328,9 +700,42 @@
         </tr>
     @endforelse
 </tbody>
-
-
                     </table>
+
+                    {{-- PAGINACIÓN COMPACTA --}}
+@if ($teams->hasPages())
+    <div class="teams-pagination">
+        <span class="teams-pagination-info">
+            Mostrando {{ $teams->firstItem() }} - {{ $teams->lastItem() }} de {{ $teams->total() }} equipos
+        </span>
+
+        <div class="teams-pagination-pages">
+            {{-- Flecha Anterior --}}
+            @if ($teams->onFirstPage())
+                <span class="page-arrow disabled">&laquo;</span>
+            @else
+                <a href="{{ $teams->previousPageUrl() }}" class="page-arrow">&laquo;</a>
+            @endif
+
+            {{-- Números de página --}}
+            @foreach ($teams->getUrlRange(1, $teams->lastPage()) as $page => $url)
+                @if ($page == $teams->currentPage())
+                    <span class="page-number active">{{ $page }}</span>
+                @else
+                    <a href="{{ $url }}" class="page-number">{{ $page }}</a>
+                @endif
+            @endforeach
+
+            {{-- Flecha Siguiente --}}
+            @if ($teams->hasMorePages())
+                <a href="{{ $teams->nextPageUrl() }}" class="page-arrow">&raquo;</a>
+            @else
+                <span class="page-arrow disabled">&raquo;</span>
+            @endif
+        </div>
+    </div>
+@endif
+
                 </section>
 
             </div>
@@ -363,19 +768,61 @@
 
               {{-- Botón Unirse --}}
                 <div class="join-btn-container">
-                    {{-- 1. Actualizamos el action a la nueva ruta --}}
-                    <form action="{{ route('panel.teams.join') }}" method="POST" id="joinTeamForm">
-                        @csrf
-                        
-                        {{-- 2. Agregamos un input oculto para enviar el ID del equipo --}}
-                        <input type="hidden" name="team_id" id="inputTeamId" value="">
+                    {{-- Botón que abre el modal de selección de rol --}}
+                    <button id="btnJoinTeam" class="join-btn-modern" type="button" onclick="openRoleModal()">
+                        <i class="bi bi-person-plus-fill"></i> Unirme al equipo
+                    </button>
+                </div>
 
-                        <button type="submit" class="btn-join" id="btnJoinTeam">
-                            <i class="bi bi-person-plus-fill"></i> Unirme al equipo
+            </div>
+        </div>
+
+        {{-- ===== MODAL DE SELECCIÓN DE ROL ===== --}}
+        <div class="role-modal-overlay" id="roleModalOverlay">
+            <div class="role-modal-content">
+                <div class="role-modal-header">
+                    <h3>Selecciona tu rol en el equipo</h3>
+                    <button class="role-modal-close" onclick="closeRoleModal()">&times;</button>
+                </div>
+
+                <div class="role-modal-body">
+                    <p style="color: #cbd5e1; margin-bottom: 20px;">¿Qué rol deseas desempeñar en este equipo?</p>
+                    
+                    <form id="roleSelectionForm" action="{{ route('panel.teams.join') }}" method="POST">
+                        @csrf
+                        <input type="hidden" id="roleTeamId" name="team_id" value="">
+                        
+                        <div class="role-options">
+                            <label class="role-option">
+                                <input type="radio" name="role" value="Back" required>
+                                <div class="role-card">
+                                    <i class="bi bi-cpu"></i>
+                                    <span>Back-end</span>
+                                </div>
+                            </label>
+
+                            <label class="role-option">
+                                <input type="radio" name="role" value="Front" required>
+                                <div class="role-card">
+                                    <i class="bi bi-palette"></i>
+                                    <span>Front-end</span>
+                                </div>
+                            </label>
+
+                            <label class="role-option">
+                                <input type="radio" name="role" value="Diseñador" required>
+                                <div class="role-card">
+                                    <i class="bi bi-pencil-square"></i>
+                                    <span>Diseñador</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="role-submit-btn">
+                            <i class="bi bi-check-circle"></i> Confirmar rol
                         </button>
                     </form>
                 </div>
-
             </div>
         </div>
 
@@ -385,6 +832,8 @@
 {{-- ===== SCRIPTS PARA LA LÓGICA DEL PANEL ===== --}}
 {{-- ===== SCRIPTS PARA LA LÓGICA DEL PANEL ===== --}}
 <script>
+    let currentTeamIdForRole = null;
+
     function addMemberToList(list, name, role) {
         const li = document.createElement('li');
         li.className = 'member-item';
@@ -414,7 +863,6 @@
         overlay.classList.add('active');
 
         document.getElementById('panelTeamName').textContent = name;
-        document.getElementById('inputTeamId').value = id;
 
         const alertBox = document.getElementById('panelAlertFull');
         const joinBtn  = document.getElementById('btnJoinTeam');
@@ -439,7 +887,9 @@
         } else {
             joinBtn.disabled         = false;
             joinBtn.innerHTML        = '<i class="bi bi-person-plus-fill"></i> Unirme al equipo';
-            joinBtn.style.background = '#2563eb';
+            joinBtn.style.background = 'linear-gradient(135deg, #4c1d95, #7c3aed)';
+            // Guardar el team_id para usar en openRoleModal
+            currentTeamIdForRole = id;
         }
 
         // Pintar miembros en la lista
@@ -452,6 +902,39 @@
     function closeTeamDetails() {
         document.getElementById('detailsOverlay').classList.remove('active');
     }
+
+    // Abre el modal de selección de rol
+    function openRoleModal() {
+        const joinBtn = document.getElementById('btnJoinTeam');
+        
+        // Solo permitir si el botón no está deshabilitado
+        if (joinBtn.disabled) {
+            return;
+        }
+
+        // Establecer el team_id en el form
+        document.getElementById('roleTeamId').value = currentTeamIdForRole;
+        
+        // Mostrar modal
+        document.getElementById('roleModalOverlay').classList.add('active');
+        
+        // Resetear selección de rol
+        document.querySelectorAll('input[name="role"]').forEach(input => {
+            input.checked = false;
+        });
+    }
+
+    function closeRoleModal() {
+        document.getElementById('roleModalOverlay').classList.remove('active');
+    }
+
+    // Cerrar modal si se hace click fuera
+    document.getElementById('roleModalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeRoleModal();
+        }
+    });
+
      // --- BÚSQUEDA EN TIEMPO REAL ---
     const searchInput = document.getElementById('teamSearchInput');
     const tableRows   = document.querySelectorAll('.team-table tbody tr');

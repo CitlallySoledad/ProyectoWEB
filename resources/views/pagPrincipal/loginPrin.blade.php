@@ -147,6 +147,13 @@
                 Inicio de sesión para participantes / usuarios
             </div>
 
+            {{-- MENSAJE DE ÉXITO --}}
+            @if (session('status'))
+                <div class="alert alert-success small mb-2">
+                    {{ session('status') }}
+                </div>
+            @endif
+
             {{-- ERRORES --}}
             @if ($errors->any())
                 <div class="alert alert-danger small mb-2">
@@ -201,8 +208,7 @@
             </form>
 
             <div class="user-login-link">
-                ¿Olvidaste tu contraseña?
-                {{-- Aquí podrías poner un enlace real cuando tengas la ruta --}}
+                <a href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
             </div>
 
             <div class="user-login-link">
