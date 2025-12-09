@@ -266,21 +266,11 @@ class ParticipantTeamController extends Controller
             return back()->with('error', 'Este usuario ya es miembro del equipo.');
         }
 
-        // Verificar si hay invitación pendiente y cancelarla si el rol es diferente
+        // Buscar cualquier invitación existente (pendiente, rechazada, expirada)
         $existingInvitation = TeamInvitation::where('team_id', $team->id)
             ->where('email', $email)
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending', 'rejected', 'expired'])
             ->first();
-
-        if ($existingInvitation) {
-            // Si existe una invitación pendiente con el mismo rol, no hacer nada
-            if ($existingInvitation->role === $role) {
-                return back()->with('error', 'Ya existe una invitación pendiente para este email con el mismo rol.');
-            }
-            
-            // Si el rol es diferente, cancelar la invitación anterior y crear una nueva
-            $existingInvitation->update(['status' => 'cancelled']);
-        }
 
         // Verificar que no haya invitación ya aceptada
         if (TeamInvitation::where('team_id', $team->id)
@@ -290,20 +280,34 @@ class ParticipantTeamController extends Controller
             return back()->with('error', 'Este email ya ha aceptado una invitación previa.');
         }
 
-        // NOTA: Ya no bloqueamos si el rol está ocupado o hay invitaciones pendientes
-        // Permitimos que el líder envíe la invitación y decida después
-        // La validación se hará al momento de aceptar la invitación
-
-        // Crear la invitación
+        // Generar nuevo token
         $token = Str::random(64);
-        $invitation = TeamInvitation::create([
-            'team_id' => $team->id,
-            'inviter_id' => auth()->id(),
-            'email' => $email,
-            'role' => $role,
-            'token' => $token,
-            'status' => 'pending',
-        ]);
+
+        if ($existingInvitation) {
+            // Si existe una invitación pendiente con el mismo rol, no hacer nada
+            if ($existingInvitation->status === 'pending' && $existingInvitation->role === $role) {
+                return back()->with('error', 'Ya existe una invitación pendiente para este email con el mismo rol.');
+            }
+            
+            // Actualizar la invitación existente con el nuevo rol y token
+            $existingInvitation->update([
+                'role' => $role,
+                'token' => $token,
+                'status' => 'pending',
+                'inviter_id' => auth()->id(),
+            ]);
+            $invitation = $existingInvitation;
+        } else {
+            // Crear una nueva invitación
+            $invitation = TeamInvitation::create([
+                'team_id' => $team->id,
+                'inviter_id' => auth()->id(),
+                'email' => $email,
+                'role' => $role,
+                'token' => $token,
+                'status' => 'pending',
+            ]);
+        }
 
         // Enviar correo de invitación
         try {
