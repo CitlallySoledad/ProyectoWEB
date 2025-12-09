@@ -1,3 +1,5 @@
+create_rubrics_table
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;

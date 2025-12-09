@@ -1,3 +1,4 @@
+add_rubric_id_to_proijects
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -16,7 +17,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('projects', function (Blueprint $table) {
-            $table->dropForeignIdFor('Rubric');
+            $table->dropConstrainedForeignId('rubric_id');
         });
     }
 };

@@ -243,11 +243,24 @@
             <h1 class="results-title">📊 {{ $event->title }}</h1>
             <p class="results-subtitle">Equipos Inscritos y Calificaciones</p>
         </div>
-        <a href="{{ route('admin.events.index') }}" class="btn btn-light">
-            <i class="bi bi-arrow-left me-2"></i>Volver a Eventos
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.events.index') }}" class="btn btn-light">
+                <i class="bi bi-arrow-left me-2"></i>Volver a Eventos
+            </a>
+
+            {{-- Constancias 1°, 2° y 3° --}}
+            <a href="{{ route('admin.events.certificates', $event) }}" class="btn btn-primary">
+                <i class="bi bi-award me-2"></i>Constancias (Top 3)
+            </a>
+
+            {{-- Reporte Excel (CSV) de todos los eventos --}}
+            <a href="{{ route('admin.events.export_excel') }}" class="btn btn-success">
+                <i class="bi bi-file-earmark-excel me-2"></i>Reporte Excel
+            </a>
+        </div>
     </div>
 </div>
+
 
 <!-- Estadísticas -->
 <div class="row mb-4">

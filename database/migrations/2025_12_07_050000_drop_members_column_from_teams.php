@@ -6,24 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        // Eliminar la columna 'members' que conflictúa con la relación belongsToMany
-        Schema::table('teams', function (Blueprint $table) {
-            $table->dropColumn('members');
-        });
+        // Solo intentamos borrar la columna si realmente existe
+        if (Schema::hasColumn('teams', 'members')) {
+            Schema::table('teams', function (Blueprint $table) {
+                $table->dropColumn('members');
+            });
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('teams', function (Blueprint $table) {
-            $table->text('members')->nullable();
-        });
+        // Si alguna vez quieres revertir la migración,
+        // solo vuelve a crear la columna (ajusta el tipo si era otro)
+        if (! Schema::hasColumn('teams', 'members')) {
+            Schema::table('teams', function (Blueprint $table) {
+                $table->unsignedInteger('members')->default(0);
+            });
+        }
     }
 };

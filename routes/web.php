@@ -228,6 +228,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('rubricas/{rubric}/criterios/guardar', [App\Http\Controllers\Admin\RubricController::class, 'bulkUpdate'])->name('rubrics.criteria.bulkUpdate');
     Route::put('rubricas/criterios/{criterion}', [App\Http\Controllers\Admin\RubricController::class, 'updateCriterion'])->name('rubrics.criteria.update');
     Route::delete('rubricas/criterios/{criterion}', [App\Http\Controllers\Admin\RubricController::class, 'destroyCriterion'])->name('rubrics.criteria.destroy');
+
+    // 👉 NUEVAS RUTAS
+    Route::get('eventos/{event}/constancias', [AdminEventController::class, 'generateCertificates'])
+        ->name('events.certificates');
+
+    Route::get('eventos/reporte/excel', [AdminEventController::class, 'exportExcel'])
+        ->name('events.export_excel');
+
+    Route::put('eventos/{event}', [AdminEventController::class, 'update'])->name('events.update');
+    Route::delete('eventos/{event}', [AdminEventController::class, 'destroy'])->name('events.destroy');
+
+    // ...
 });
 
 // ==========================================================

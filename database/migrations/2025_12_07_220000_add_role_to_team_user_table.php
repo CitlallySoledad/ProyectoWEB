@@ -8,19 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 👇 Solo agregar la columna si NO existe
+        // Solo agregar la columna si NO existe
         if (! Schema::hasColumn('team_user', 'role')) {
             Schema::table('team_user', function (Blueprint $table) {
                 $table->string('role')
-                    ->default('Miembro')
-                    ->after('user_id');
+                      ->default('Miembro')
+                      ->after('user_id');
             });
         }
     }
 
     public function down(): void
     {
-        // 👇 Solo eliminar la columna si SÍ existe
+        // Solo quitarla si SÍ existe
         if (Schema::hasColumn('team_user', 'role')) {
             Schema::table('team_user', function (Blueprint $table) {
                 $table->dropColumn('role');

@@ -12,13 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Solo ejecutamos si la tabla y la columna existen
-        if (Schema::hasTable('team_user') && Schema::hasColumn('team_user', 'role')) {
-            DB::table('team_user')
-                ->whereNull('role')
-                ->update(['role' => 'Miembro']);
-        }
-        // Si no existe la columna 'role', no hacemos nada
+        // Actualizar roles NULL a 'Miembro' por defecto
+        DB::table('team_user')
+            ->whereNull('role')
+            ->update(['role' => 'Miembro']);
     }
 
     /**
@@ -26,7 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // No es necesario revertir nada aquí
+        // Revertir los cambios (opcional)
+        //DB::table('team_user')
+          //  ->where('role', 'Miembro')
+            //->update(['role' => null]);
     }
 };
 

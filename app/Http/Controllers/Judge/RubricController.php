@@ -49,7 +49,7 @@ class RubricController extends Controller
                     ->with('error', 'No se puede aplicar una rúbrica inactiva.');
             }
 
-            $judge = auth()->user();
+            $judge = $request->user();
 
             // Buscar proyectos asignados a este juez
             $projectsQuery = \App\Models\Project::whereHas('judges', function ($q) use ($judge) {
@@ -100,7 +100,7 @@ class RubricController extends Controller
                     ->with('error', 'No se puede aplicar una rúbrica inactiva.');
             }
 
-            $judge = auth()->user();
+            $judge = $request->user();
 
             // Buscar proyectos asignados a este juez
             $projectsQuery = \App\Models\Project::whereHas('judges', function ($q) use ($judge) {
@@ -173,7 +173,7 @@ class RubricController extends Controller
                 return back()->with('error', 'No se puede aplicar una rúbrica inactiva.');
             }
 
-            $judge = auth()->user();
+            $judge = $request->user();
 
             // Buscar proyectos asignados a este juez
             $projectsQuery = \App\Models\Project::whereHas('judges', function ($q) use ($judge) {
@@ -262,7 +262,7 @@ class RubricController extends Controller
                 ->with('error', 'No se puede aplicar una rúbrica inactiva.');
         }
 
-        $judge = auth()->user();
+        $judge = $request->user();
 
         // Buscar proyectos asignados a este juez
         $projectsQuery = \App\Models\Project::whereHas('judges', function ($q) use ($judge) {

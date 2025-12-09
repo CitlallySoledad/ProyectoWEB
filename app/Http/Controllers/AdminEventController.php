@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminEventController extends Controller
 {
@@ -141,5 +142,132 @@ class AdminEventController extends Controller
         
         return view('admin.events.results', compact('event', 'teams', 'totalTeams', 'teamsWithProjects', 'totalEvaluations', 'rankings'));
     }
+
+        /**
+     * Generar constancias en PDF para 1er, 2do y 3er lugar de un evento.
+     */
+    public function generateCertificates(Event $event)
+    {
+        // Cargar equipos con sus proyectos y evaluaciones
+        $teams = $event->teams()->with([
+            'members',
+            'projects' => function ($query) use ($event) {
+                $query->where('event_id', $event->id)
+                    ->with('evaluations');
+            },
+        ])->get();
+
+        // Calcular promedio por equipo
+        $teamsWithScores = $teams->map(function ($team) {
+            $project = $team->projects->first();
+
+            if ($project && $project->evaluations->isNotEmpty()) {
+                $avgScore = $project->evaluations->avg('final_score');
+                $team->avg_score = $avgScore;
+                $team->has_score = true;
+            } else {
+                $team->avg_score = 0;
+                $team->has_score = false;
+            }
+
+            return $team;
+        });
+
+        // Top 3
+        $rankings = $teamsWithScores
+            ->filter(fn($team) => $team->has_score)
+            ->sortByDesc('avg_score')
+            ->values()
+            ->take(3)
+            ->map(function ($team, $index) {
+                return [
+                    'place' => $index + 1,
+                    'team'  => $team,
+                    'score' => $team->avg_score,
+                ];
+            });
+
+        if ($rankings->isEmpty()) {
+            return redirect()
+                ->route('admin.events.results', $event)
+                ->with('error', 'No hay evaluaciones suficientes para generar constancias.');
+        }
+
+        $today = now()->locale('es')->isoFormat('D [de] MMMM [de] YYYY');
+
+        $pdf = Pdf::loadView('admin.events.certificates', [
+            'event'    => $event,
+            'rankings' => $rankings,
+            'today'    => $today,
+        ])->setPaper('letter', 'landscape');
+
+        $fileName = 'constancias_evento_' . $event->id . '.pdf';
+
+        return $pdf->download($fileName);
+    }
+
+    /**
+     * Exportar reporte de eventos y equipos a CSV (Excel lo abre sin problema).
+     */
+    public function exportExcel()
+    {
+        $events = Event::with('teams')->orderBy('start_date', 'asc')->get();
+
+        $fileName = 'reporte_eventos_' . now()->format('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"$fileName\"",
+        ];
+
+        $callback = function () use ($events) {
+            $handle = fopen('php://output', 'w');
+
+            // BOM para que Excel respete acentos
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // Encabezados
+            fputcsv($handle, [
+                'Evento ID',
+                'Evento',
+                'Fecha inicio',
+                'Fecha fin',
+                'Estado',
+                'Equipo ID',
+                'Equipo',
+            ]);
+
+            foreach ($events as $event) {
+                if ($event->teams->isEmpty()) {
+                    fputcsv($handle, [
+                        $event->id,
+                        $event->title,
+                        optional($event->start_date)->format('Y-m-d'),
+                        optional($event->end_date)->format('Y-m-d'),
+                        $event->status,
+                        '',
+                        '',
+                    ]);
+                } else {
+                    foreach ($event->teams as $team) {
+                        fputcsv($handle, [
+                            $event->id,
+                            $event->title,
+                            optional($event->start_date)->format('Y-m-d'),
+                            optional($event->end_date)->format('Y-m-d'),
+                            $event->status,
+                            $team->id,
+                            $team->name,
+                        ]);
+                    }
+                }
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
 }
 
