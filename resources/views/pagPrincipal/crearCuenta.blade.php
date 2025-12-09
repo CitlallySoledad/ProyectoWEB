@@ -258,6 +258,14 @@ body {
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label>Rol</label>
+                    <select name="role">
+                        <option value="student">Estudiante</option>
+                        <option value="judge">Juez</option>
+                    </select>
+                </div>
+
                 <div class="form-actions">
                     <button type="submit" class="btn-submit">Registrarse</button>
                 </div>

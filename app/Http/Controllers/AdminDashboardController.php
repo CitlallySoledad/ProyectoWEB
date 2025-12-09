@@ -2,12 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Event;
+use App\Models\Team;
+use App\Models\User;
 
 class AdminDashboardController extends Controller
 {
     public function index()
     {
-        return view('admin.dashboard');
+        $eventsCount = Event::where('status', 'activo')->count();
+        $teamsCount  = Team::count();
+        $usersCount  = User::count();
+
+        $recentTeams = Team::with('leader')
+            ->latest('created_at')
+            ->take(5)
+            ->get();
+
+        return view('admin.dashboard', compact('eventsCount', 'teamsCount', 'usersCount', 'recentTeams'));
     }
 }

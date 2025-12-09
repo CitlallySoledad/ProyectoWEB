@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class AdminUserController extends Controller
 {
@@ -31,12 +32,16 @@ class AdminUserController extends Controller
         'password' => 'required|string|min:8|confirmed',
     ]);
 
-    User::create([
+    $user = User::create([
         'name'     => $data['name'],
         'email'    => $data['email'],
         'password' => Hash::make($data['password']),
         'is_admin' => true,   
     ]);
+
+    // Asegurar rol admin (spatie)
+    $adminRole = Role::firstOrCreate(['name' => 'admin'], ['guard_name' => 'web']);
+    $user->assignRole($adminRole);
 
     return redirect()
         ->route('admin.users.index')

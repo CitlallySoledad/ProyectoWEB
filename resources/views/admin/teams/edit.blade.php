@@ -162,16 +162,6 @@
         </div>
     @endif
 
-    @php
-        // Normalizamos el array de miembros para tener siempre 4 posiciones
-        $members = $team->members ?? [];
-        for ($i = 0; $i < 4; $i++) {
-            if (!isset($members[$i])) {
-                $members[$i] = ['name' => '', 'role' => ''];
-            }
-        }
-    @endphp
-
     <div class="team-edit-card">
         <form action="{{ route('admin.teams.update', $team->id) }}" method="POST">
             @csrf
@@ -191,91 +181,53 @@
                 >
             </div>
 
-            {{-- Encabezado Integrantes / Rol --}}
-            <div class="team-edit-members-header">
-                <span>Integrantes</span>
-                <span>ROL</span>
+            {{-- Roles con usuarios existentes --}}
+            <div class="mb-3">
+                <label class="team-edit-label">Líder</label>
+                <select name="leader_id" class="team-edit-select" required>
+                    <option value="">Selecciona líder</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ old('leader_id', $team->leader_id) == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }} ({{ $user->email }})
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
-            {{-- Integrante 1 (Líder) --}}
-            <div class="team-edit-member-row">
-                <div>
-                    <input
-                        type="text"
-                        name="members[0][name]"
-                        class="team-edit-input"
-                        placeholder="Nombre del líder"
-                        value="{{ old('members.0.name', $members[0]['name'] ?? '') }}"
-                    >
-                </div>
-                <div>
-                    <div class="team-edit-role-leader">Líder</div>
-                    {{-- rol fijo para el líder --}}
-                    <input type="hidden" name="members[0][role]" value="lider">
-                </div>
+            <div class="mb-3">
+                <label class="team-edit-label">Backend</label>
+                <select name="backend_id" class="team-edit-select">
+                    <option value="">Selecciona backend (opcional)</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ old('backend_id', $backendId ?? null) == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }} ({{ $user->email }})
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
-            {{-- Integrante 2 --}}
-            <div class="team-edit-member-row">
-                <div>
-                    <input
-                        type="text"
-                        name="members[1][name]"
-                        class="team-edit-input"
-                        placeholder="Integrante 2 (opcional)"
-                        value="{{ old('members.1.name', $members[1]['name'] ?? '') }}"
-                    >
-                </div>
-                <div>
-                    @php $role1 = old('members.1.role', $members[1]['role'] ?? ''); @endphp
-                    <select name="members[1][role]" class="team-edit-select">
-                        <option value="" {{ $role1=='' ? 'selected' : '' }}>Sin asignar</option>
-                        <option value="participante" {{ $role1=='participante' ? 'selected' : '' }}>Participante</option>
-                        <option value="mentor"       {{ $role1=='mentor' ? 'selected' : '' }}>Mentor</option>
-                    </select>
-                </div>
+            <div class="mb-3">
+                <label class="team-edit-label">Front-end</label>
+                <select name="frontend_id" class="team-edit-select">
+                    <option value="">Selecciona front-end (opcional)</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ old('frontend_id', $frontendId ?? null) == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }} ({{ $user->email }})
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
-            {{-- Integrante 3 --}}
-            <div class="team-edit-member-row">
-                <div>
-                    <input
-                        type="text"
-                        name="members[2][name]"
-                        class="team-edit-input"
-                        placeholder="Integrante 3 (opcional)"
-                        value="{{ old('members.2.name', $members[2]['name'] ?? '') }}"
-                    >
-                </div>
-                <div>
-                    @php $role2 = old('members.2.role', $members[2]['role'] ?? ''); @endphp
-                    <select name="members[2][role]" class="team-edit-select">
-                        <option value="" {{ $role2=='' ? 'selected' : '' }}>Sin asignar</option>
-                        <option value="participante" {{ $role2=='participante' ? 'selected' : '' }}>Participante</option>
-                        <option value="mentor"       {{ $role2=='mentor' ? 'selected' : '' }}>Mentor</option>
-                    </select>
-                </div>
-            </div>
-
-            {{-- Integrante 4 --}}
-            <div class="team-edit-member-row">
-                <div>
-                    <input
-                        type="text"
-                        name="members[3][name]"
-                        class="team-edit-input"
-                        placeholder="Integrante 4 (opcional)"
-                        value="{{ old('members.3.name', $members[3]['name'] ?? '') }}"
-                    >
-                </div>
-                <div>
-                    @php $role3 = old('members.3.role', $members[3]['role'] ?? ''); @endphp
-                    <select name="members[3][role]" class="team-edit-select">
-                        <option value="" {{ $role3=='' ? 'selected' : '' }}>Sin asignar</option>
-                        <option value="participante" {{ $role3=='participante' ? 'selected' : '' }}>Participante</option>
-                        <option value="mentor"       {{ $role3=='mentor' ? 'selected' : '' }}>Mentor</option>
-                    </select>
-                </div>
+            <div class="mb-3">
+                <label class="team-edit-label">Diseñador</label>
+                <select name="designer_id" class="team-edit-select">
+                    <option value="">Selecciona diseñador (opcional)</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ old('designer_id', $designerId ?? null) == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }} ({{ $user->email }})
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
             {{-- Botones inferiores --}}

@@ -3,33 +3,58 @@
 namespace App\Http\Controllers;
 
 use App\Models\Team;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AdminTeamController extends Controller
 {
     public function index()
     {
-        $teams = Team::orderBy('name')->get();
+        $teams = Team::with(['members', 'leader'])->orderBy('name')->get();
 
         return view('admin.teams.index', compact('teams'));
     }
 
     public function create()
     {
-        return view('admin.teams.create');
+        $users = User::orderBy('name')->get();
+        return view('admin.teams.create', compact('users'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            // si quieres puedes validar también members
+        $data = $request->validate([
+            'name'         => ['required', 'string', 'max:255'],
+            'leader_id'    => ['required', 'exists:users,id'],
+            'backend_id'   => ['nullable', 'exists:users,id', 'different:leader_id'],
+            'frontend_id'  => ['nullable', 'exists:users,id', 'different:leader_id', 'different:backend_id'],
+            'designer_id'  => ['nullable', 'exists:users,id', 'different:leader_id', 'different:backend_id', 'different:frontend_id'],
         ]);
 
         $team = Team::create([
-            'name'    => $request->input('name'),
-            'members' => $request->input('members', []), // 👈 guarda todo el arreglo
+            'name'      => $data['name'],
+            'leader_id' => $data['leader_id'],
         ]);
+
+        // Construir miembros con roles (pivot team_user.role)
+        $members = [];
+        $members[$data['leader_id']] = ['role' => 'lider'];
+
+        if (!empty($data['backend_id'])) {
+            $members[$data['backend_id']] = ['role' => 'backend'];
+        }
+
+        if (!empty($data['frontend_id'])) {
+            $members[$data['frontend_id']] = ['role' => 'frontend'];
+        }
+
+        if (!empty($data['designer_id'])) {
+            $members[$data['designer_id']] = ['role' => 'disenador'];
+        }
+
+        if ($members) {
+            $team->members()->sync($members);
+        }
 
         return redirect()
             ->route('admin.teams.index')
@@ -38,20 +63,54 @@ class AdminTeamController extends Controller
 
     public function edit(Team $team)
     {
-        $members = [];
-        return view('admin.teams.edit', compact('team', 'members'));
+        $team->load('members', 'leader');
+
+        $backend   = $team->members->firstWhere('pivot.role', 'backend');
+        $frontend  = $team->members->firstWhere('pivot.role', 'frontend');
+        $designer  = $team->members->firstWhere('pivot.role', 'disenador');
+
+        $users = User::orderBy('name')->get();
+
+        return view('admin.teams.edit', [
+            'team'       => $team,
+            'users'      => $users,
+            'backendId'  => $backend?->id,
+            'frontendId' => $frontend?->id,
+            'designerId' => $designer?->id,
+        ]);
     }
 
     public function update(Request $request, Team $team)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $data = $request->validate([
+            'name'         => ['required', 'string', 'max:255'],
+            'leader_id'    => ['required', 'exists:users,id'],
+            'backend_id'   => ['nullable', 'exists:users,id', 'different:leader_id'],
+            'frontend_id'  => ['nullable', 'exists:users,id', 'different:leader_id', 'different:backend_id'],
+            'designer_id'  => ['nullable', 'exists:users,id', 'different:leader_id', 'different:backend_id', 'different:frontend_id'],
         ]);
 
         $team->update([
-            'name'    => $request->input('name'),
-            'members' => $request->input('members', []), // 👈 actualiza integrantes
+            'name'      => $data['name'],
+            'leader_id' => $data['leader_id'],
         ]);
+
+        $members = [];
+        $members[$data['leader_id']] = ['role' => 'lider'];
+
+        if (!empty($data['backend_id'])) {
+            $members[$data['backend_id']] = ['role' => 'backend'];
+        }
+
+        if (!empty($data['frontend_id'])) {
+            $members[$data['frontend_id']] = ['role' => 'frontend'];
+        }
+
+        if (!empty($data['designer_id'])) {
+            $members[$data['designer_id']] = ['role' => 'disenador'];
+        }
+
+        $team->members()->sync($members);
 
         return redirect()
             ->route('admin.teams.index')
@@ -67,10 +126,8 @@ class AdminTeamController extends Controller
             ->with('success', 'Equipo eliminado.');
     }
 
-    // 👇👇👋 AQUÍ EMPIEZA LO NUEVO 👋👇👇
     public function join(Request $request)
     {
-        // Validamos que venga el ID del equipo y exista
         $request->validate([
             'team_id' => ['required', 'exists:teams,id'],
         ]);
@@ -78,19 +135,16 @@ class AdminTeamController extends Controller
         $team = Team::findOrFail($request->team_id);
         $user = auth()->user();
 
-        // 1. Revisar si YA es miembro
         if ($team->members()->where('user_id', $user->id)->exists()) {
             return back()->with('info', 'Ya eres miembro de este equipo.');
         }
 
-        // 2. Revisar si el equipo está lleno (máximo 4, ajusta si quieres)
         $maxMembers = 4;
 
         if ($team->members()->count() >= $maxMembers) {
             return back()->with('error', 'Este equipo ya está lleno.');
         }
 
-        // 3. Agregar al usuario al equipo
         $team->members()->attach($user->id);
 
         return back()->with('success', 'Te has unido al equipo correctamente.');

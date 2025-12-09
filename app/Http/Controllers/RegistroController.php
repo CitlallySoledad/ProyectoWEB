@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class RegistroController extends Controller
 {
     public function store(Request $request)
     {
-        // 1. Validar datos del formulario
         $request->validate([
             'control'    => 'required',
             'nombre'     => 'required',
@@ -21,20 +21,29 @@ class RegistroController extends Controller
             'password'   => 'required|confirmed|min:6',
             'telefono'   => 'nullable',
             'carrera'    => 'nullable',
+            'role'       => 'required|in:student,judge',
         ]);
 
-        // 2. Crear usuario en la tabla users
-        //    (de momento solo guardamos name, email y password)
+        // Crear rol si no existe (evita error cuando faltan seeds)
+        $role = Role::firstOrCreate(['name' => $request->role], ['guard_name' => 'web']);
+
         $user = User::create([
             'name'     => $request->nombre.' '.$request->ap_paterno,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
+            'telefono' => $request->telefono,
         ]);
 
-        // 3. Iniciar sesión automáticamente con ese usuario
+        // Asignar rol seleccionado
+        $user->assignRole($role);
+
         Auth::login($user);
 
-        // 4. Redirigir al panel del participante
+        // Redirigir segun rol
+        if ($user->hasRole('judge')) {
+            return redirect()->route('judge.projects.index');
+        }
+
         return redirect()->route('panel.participante');
     }
 }

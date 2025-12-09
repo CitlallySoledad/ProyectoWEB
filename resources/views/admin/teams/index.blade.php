@@ -33,24 +33,18 @@
                             {{-- 🔹 Mostrar integrantes reales --}}
                             <td>
                                 @php
-                                    $members = $team->members ?? [];
+                                    $members = $team->members ?? collect();
+                                    $printMembers = $members->map(function($m) {
+                                        $role = $m->pivot->role ?? null;
+                                        $labelRole = null;
+                                        if ($role === 'lider') $labelRole = 'Líder';
+                                        elseif ($role === 'backend') $labelRole = 'Backend';
+                                        elseif ($role === 'frontend') $labelRole = 'Front-end';
+                                        elseif ($role === 'disenador') $labelRole = 'Diseñador';
+                                        elseif ($role) $labelRole = ucfirst(str_replace('_',' ',$role));
 
-                                    $printMembers = [];
-
-                                    if (is_array($members)) {
-                                        foreach ($members as $m) {
-                                            if (!empty($m['name'])) {
-                                                $label = $m['name'];
-
-                                                // si tiene rol y no es "Sin asignar"
-                                                if (!empty($m['role']) && $m['role'] !== 'Sin asignar') {
-                                                    $label .= " ({$m['role']})";
-                                                }
-
-                                                $printMembers[] = $label;
-                                            }
-                                        }
-                                    }
+                                        return trim($m->name . ($labelRole ? " ({$labelRole})" : ''));
+                                    })->filter()->toArray();
                                 @endphp
 
                                 {{ count($printMembers) ? implode(', ', $printMembers) : '-' }}

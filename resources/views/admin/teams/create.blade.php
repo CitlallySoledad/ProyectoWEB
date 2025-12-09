@@ -35,87 +35,53 @@
                 >
             </div>
 
-            {{-- INTEGRANTES / ROLES --}}
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="fw-semibold small text-uppercase text-muted">Integrantes</span>
-                <span class="fw-semibold small text-uppercase text-muted">Rol</span>
+            {{-- INTEGRANTES / ROLES (usuarios existentes) --}}
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-uppercase text-muted">Líder</label>
+                <select name="leader_id" class="form-select rounded-pill" required>
+                    <option value="">Selecciona líder</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ old('leader_id') == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }} ({{ $user->email }})
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
-            {{-- LÍDER --}}
-            <div class="d-flex align-items-center gap-3 mb-2">
-                <div class="flex-grow-1">
-                    <input
-                        type="text"
-                        name="members[0][name]"
-                        class="form-control rounded-pill"
-                        placeholder="Nombre del líder"
-                        value="{{ old('members.0.name') }}"
-                    >
-                </div>
-                <div style="width: 150px;">
-                    <span class="badge bg-danger w-100 py-2">Líder</span>
-                    <input type="hidden" name="members[0][role]" value="lider">
-                </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-uppercase text-muted">Backend</label>
+                <select name="backend_id" class="form-select rounded-pill">
+                    <option value="">Selecciona integrante backend (opcional)</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ old('backend_id') == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }} ({{ $user->email }})
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
-            {{-- PENDIENTE 1 --}}
-            <div class="d-flex align-items-center gap-3 mb-2">
-                <div class="flex-grow-1">
-                    <input
-                        type="text"
-                        name="members[1][name]"
-                        class="form-control rounded-pill"
-                        placeholder="Integrante 2 (opcional)"
-                        value="{{ old('members.1.name') }}"
-                    >
-                </div>
-                <div style="width: 150px;">
-                    <select name="members[1][role]" class="form-select form-select-sm rounded-pill">
-                        <option value="" {{ old('members.1.role')=='' ? 'selected' : '' }}>Sin asignar</option>
-                        <option value="participante" {{ old('members.1.role')=='participante' ? 'selected' : '' }}>Participante</option>
-                        <option value="mentor" {{ old('members.1.role')=='mentor' ? 'selected' : '' }}>Mentor</option>
-                    </select>
-                </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-uppercase text-muted">Front-end</label>
+                <select name="frontend_id" class="form-select rounded-pill">
+                    <option value="">Selecciona integrante front-end (opcional)</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ old('frontend_id') == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }} ({{ $user->email }})
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
-            {{-- PENDIENTE 2 --}}
-            <div class="d-flex align-items-center gap-3 mb-2">
-                <div class="flex-grow-1">
-                    <input
-                        type="text"
-                        name="members[2][name]"
-                        class="form-control rounded-pill"
-                        placeholder="Integrante 3 (opcional)"
-                        value="{{ old('members.2.name') }}"
-                    >
-                </div>
-                <div style="width: 150px;">
-                    <select name="members[2][role]" class="form-select form-select-sm rounded-pill">
-                        <option value="" {{ old('members.2.role')=='' ? 'selected' : '' }}>Sin asignar</option>
-                        <option value="participante" {{ old('members.2.role')=='participante' ? 'selected' : '' }}>Participante</option>
-                        <option value="mentor" {{ old('members.2.role')=='mentor' ? 'selected' : '' }}>Mentor</option>
-                    </select>
-                </div>
-            </div>
-
-            {{-- PENDIENTE 3 --}}
-            <div class="d-flex align-items-center gap-3 mb-3">
-                <div class="flex-grow-1">
-                    <input
-                        type="text"
-                        name="members[3][name]"
-                        class="form-control rounded-pill"
-                        placeholder="Integrante 4 (opcional)"
-                        value="{{ old('members.3.name') }}"
-                    >
-                </div>
-                <div style="width: 150px;">
-                    <select name="members[3][role]" class="form-select form-select-sm rounded-pill">
-                        <option value="" {{ old('members.3.role')=='' ? 'selected' : '' }}>Sin asignar</option>
-                        <option value="participante" {{ old('members.3.role')=='participante' ? 'selected' : '' }}>Participante</option>
-                        <option value="mentor" {{ old('members.3.role')=='mentor' ? 'selected' : '' }}>Mentor</option>
-                    </select>
-                </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-uppercase text-muted">Diseñador</label>
+                <select name="designer_id" class="form-select rounded-pill">
+                    <option value="">Selecciona diseñador (opcional)</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}" {{ old('designer_id') == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }} ({{ $user->email }})
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
             {{-- BOTONES --}}
@@ -133,4 +99,3 @@
     </div>
 
 @endsection
-
