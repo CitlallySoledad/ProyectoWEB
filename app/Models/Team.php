@@ -44,5 +44,11 @@ class Team extends Model
             ->withTimestamps();
     }
 
+    // Relación: proyectos del equipo
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+
     // No castear ni exponer 'members' como atributo: usamos la relación belongsToMany
 }

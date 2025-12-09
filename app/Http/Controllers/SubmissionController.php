@@ -16,38 +16,36 @@ class SubmissionController extends Controller
     {
         $user = auth()->user();
         
-        // Obtener equipos donde el usuario es líder Y están en eventos activos
-        // Usamos lógica de fechas porque 'status' es un accessor, no una columna
-        $now = now()->startOfDay();
+        // Obtener equipos donde el usuario es líder
         $eligibleTeams = Team::where('leader_id', $user->id)
-            ->whereHas('events', function ($query) use ($now) {
-                $query->where('status', '!=', 'borrador')
-                    ->where('start_date', '<=', $now)
-                    ->where(function($q) use ($now) {
-                        $q->whereNull('end_date')
-                          ->orWhere('end_date', '>=', $now);
-                    });
-            })
             ->withCount('members')
-            ->with(['events' => function ($query) use ($now) {
-                $query->where('status', '!=', 'borrador')
-                    ->where('start_date', '<=', $now)
-                    ->where(function($q) use ($now) {
-                        $q->whereNull('end_date')
-                          ->orWhere('end_date', '>=', $now);
-                    });
-            }])
+            ->with('events')
             ->get();
 
-        // Buscar proyecto existente del usuario
-        $project = Project::where('team_id', function ($query) use ($user) {
-            $query->select('id')
-                ->from('teams')
-                ->where('leader_id', $user->id)
-                ->limit(1);
-        })->first();
+        // Obtener eventos activos en los que los equipos del usuario están inscritos
+        $teamIds = $eligibleTeams->pluck('id');
+        $now = now()->startOfDay();
+        $activeEvents = Event::where('status', '!=', 'borrador')
+            ->where('start_date', '<=', $now)
+            ->where(function($q) use ($now) {
+                $q->whereNull('end_date')
+                  ->orWhere('end_date', '>=', $now);
+            })
+            ->whereHas('teams', function($query) use ($teamIds) {
+                $query->whereIn('teams.id', $teamIds);
+            })
+            ->get();
 
-        return view('pagPrincipal.submission', compact('project', 'eligibleTeams'));
+        // Buscar proyecto existente del usuario con documentos y evento
+        $project = Project::with(['documents', 'team', 'event'])
+            ->where('team_id', function ($query) use ($user) {
+                $query->select('id')
+                    ->from('teams')
+                    ->where('leader_id', $user->id)
+                    ->limit(1);
+            })->first();
+
+        return view('pagPrincipal.submission', compact('project', 'eligibleTeams', 'activeEvents'));
     }
     
     /**
@@ -103,6 +101,7 @@ class SubmissionController extends Controller
             'project_name' => 'required|string|max:255',
             'visibility'   => 'required|in:privado,publico',
             'team_id'      => 'required|exists:teams,id',
+            'event_id'     => 'required|exists:events,id',
         ]);
 
         // Validar que el usuario es líder del equipo
@@ -112,21 +111,33 @@ class SubmissionController extends Controller
                 ->route('panel.submission')
                 ->with('error', 'No eres el líder de este equipo.');
         }
-
-        // Validar que el equipo está en un evento activo (usando lógica de fechas)
-        $now = now()->startOfDay();
-        $activeEvent = $team->events()
-            ->where('status', '!=', 'borrador')
-            ->where('start_date', '<=', $now)
-            ->where(function($q) use ($now) {
-                $q->whereNull('end_date')
-                  ->orWhere('end_date', '>=', $now);
-            })
-            ->first();
-        if (!$activeEvent) {
+        
+        // Verificar si el proyecto ya está enviado
+        $existingProject = Project::where('team_id', $request->team_id)->first();
+        if ($existingProject && $existingProject->status === 'enviado') {
             return redirect()
                 ->route('panel.submission')
-                ->with('error', 'El equipo debe estar inscrito en un evento activo.');
+                ->with('error', 'No puedes editar un proyecto que ya ha sido enviado.');
+        }
+
+        // Validar que el equipo está inscrito en el evento seleccionado
+        $event = Event::findOrFail($request->event_id);
+        $isEnrolled = $team->events()->where('events.id', $event->id)->exists();
+        
+        if (!$isEnrolled) {
+            return redirect()
+                ->route('panel.submission')
+                ->with('error', 'El equipo no está inscrito en el evento seleccionado.');
+        }
+
+        // Validar que el evento está activo
+        $now = now()->startOfDay();
+        if ($event->status === 'borrador' || 
+            $event->start_date > $now || 
+            ($event->end_date && $event->end_date < $now)) {
+            return redirect()
+                ->route('panel.submission')
+                ->with('error', 'El evento seleccionado no está activo.');
         }
 
         // Crear o actualizar el proyecto
@@ -135,7 +146,7 @@ class SubmissionController extends Controller
             [
                 'name' => $request->project_name,
                 'visibility' => $request->visibility,
-                'event_id' => $activeEvent->id,
+                'event_id' => $request->event_id,
                 'status' => 'pendiente',
             ]
         );
@@ -190,6 +201,13 @@ class SubmissionController extends Controller
                 ->route('panel.submission')
                 ->with('error', 'Debes guardar tu proyecto primero antes de subir documentos.');
         }
+        
+        // Verificar si el proyecto ya está enviado
+        if ($project->status === 'enviado') {
+            return redirect()
+                ->route('panel.submission')
+                ->with('error', 'No puedes subir documentos a un proyecto ya enviado.');
+        }
 
         // Guardar el archivo
         if ($request->hasFile('pdf_file')) {
@@ -218,5 +236,116 @@ class SubmissionController extends Controller
         return redirect()
             ->route('panel.submission')
             ->with('error', 'No se pudo subir el archivo.');
+    }
+
+    /**
+     * Eliminar un documento PDF
+     */
+    public function deletePdf($documentId)
+    {
+        $user = auth()->user();
+        
+        $document = \App\Models\ProjectDocument::findOrFail($documentId);
+        
+        // Verificar que el documento pertenece a un proyecto del usuario
+        $project = $document->project;
+        if ($project->team->leader_id !== $user->id) {
+            return redirect()
+                ->route('panel.submission')
+                ->with('error', 'No tienes permiso para eliminar este documento.');
+        }
+        
+        // Verificar si el proyecto ya está enviado
+        if ($project->status === 'enviado') {
+            return redirect()
+                ->route('panel.submission')
+                ->with('error', 'No puedes eliminar documentos de un proyecto ya enviado.');
+        }
+        
+        // Eliminar el archivo del storage
+        if (\Storage::disk('public')->exists($document->file_path)) {
+            \Storage::disk('public')->delete($document->file_path);
+        }
+        
+        // Eliminar el registro de la base de datos
+        $document->delete();
+        
+        return redirect()
+            ->route('panel.submission')
+            ->with('success', 'Documento eliminado correctamente.');
+    }
+
+    /**
+     * Confirmar y enviar el proyecto (cambia estado pero sigue siendo editable)
+     */
+    public function confirmSubmission()
+    {
+        $user = auth()->user();
+        
+        $project = Project::with('event')->whereHas('team', function ($query) use ($user) {
+            $query->where('leader_id', $user->id);
+        })->first();
+        
+        if (!$project) {
+            return redirect()
+                ->route('panel.submission')
+                ->with('error', 'No tienes un proyecto para enviar.');
+        }
+        
+        if ($project->documents()->count() === 0) {
+            return redirect()
+                ->route('panel.submission')
+                ->with('error', 'Debes subir al menos un documento antes de enviar el proyecto.');
+        }
+        
+        // Obtener las rúbricas del evento
+        $event = $project->event;
+        $rubricIds = $event->rubric_ids ?? [];
+        
+        if (empty($rubricIds)) {
+            return redirect()
+                ->route('panel.submission')
+                ->with('error', 'El evento no tiene rúbricas asignadas. Contacta al administrador.');
+        }
+        
+        // Asignar la primera rúbrica del evento al proyecto
+        $rubricId = is_array($rubricIds) ? $rubricIds[0] : $rubricIds;
+        
+        // Obtener los jueces del evento
+        $judgeIds = $event->judge_ids ?? [];
+        
+        if (empty($judgeIds)) {
+            return redirect()
+                ->route('panel.submission')
+                ->with('error', 'El evento no tiene jueces asignados. Contacta al administrador.');
+        }
+        
+        // Actualizar el estado del proyecto y asignar rúbrica
+        $project->update([
+            'status' => 'enviado',
+            'rubric_id' => $rubricId,
+        ]);
+        
+        // Asignar todos los jueces del evento al proyecto
+        foreach ($judgeIds as $judgeId) {
+            // Verificar si ya está asignado
+            $exists = \DB::table('project_judge')
+                ->where('project_id', $project->id)
+                ->where('user_id', $judgeId)
+                ->exists();
+            
+            if (!$exists) {
+                \DB::table('project_judge')->insert([
+                    'project_id' => $project->id,
+                    'user_id' => $judgeId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+        
+        return redirect()
+            ->route('panel.submission')
+            ->with('success', '¡Proyecto enviado correctamente! Los jueces ya pueden evaluarlo. El proyecto ha sido bloqueado y no podrá ser editado.');
     }
 }

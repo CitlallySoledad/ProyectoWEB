@@ -315,10 +315,10 @@
                 </li>
 
                 <li class="sidebar-item">
-                    <a class="sidebar-link {{ str_starts_with($routeName, 'admin.judge-assignment.') ? 'active' : '' }}"
-                       href="{{ route('admin.judge-assignment.index') }}">
-                        <i class="bi bi-person-check"></i>
-                        <span>Asignar Jurados</span>
+                    <a class="sidebar-link {{ str_starts_with($routeName, 'admin.rubrics.') ? 'active' : '' }}"
+                       href="{{ route('admin.rubrics.index') }}">
+                        <i class="bi bi-clipboard-data"></i>
+                        <span>Rúbricas</span>
                     </a>
                 </li>
             </ul>

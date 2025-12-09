@@ -52,6 +52,20 @@
                 </div>
 
                 <div class="col-md-6">
+                    <label class="form-label">Categoría</label>
+                    <select name="category" class="form-select rounded-pill">
+                        <option value="">-- Selecciona una categoría --</option>
+                        <option value="Desarrollo Web" {{ old('category') == 'Desarrollo Web' ? 'selected' : '' }}>Desarrollo Web</option>
+                        <option value="Desarrollo Móvil" {{ old('category') == 'Desarrollo Móvil' ? 'selected' : '' }}>Desarrollo Móvil</option>
+                        <option value="Aplicaciones de Escritorio" {{ old('category') == 'Aplicaciones de Escritorio' ? 'selected' : '' }}>Aplicaciones de Escritorio</option>
+                        <option value="Ciencia de Datos & IA" {{ old('category') == 'Ciencia de Datos & IA' ? 'selected' : '' }}>Ciencia de Datos & IA</option>
+                        <option value="Desarrollo de Juegos" {{ old('category') == 'Desarrollo de Juegos' ? 'selected' : '' }}>Desarrollo de Juegos</option>
+                        <option value="DevOps & Infraestructura" {{ old('category') == 'DevOps & Infraestructura' ? 'selected' : '' }}>DevOps & Infraestructura</option>
+                        <option value="IoT & Hardware" {{ old('category') == 'IoT & Hardware' ? 'selected' : '' }}>IoT & Hardware</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
                     <label class="form-label">Fecha inicio</label>
                     <input type="date" name="start_date" value="{{ old('start_date') }}"
                            class="form-control rounded-pill">
@@ -69,6 +83,74 @@
                               class="form-control"
                               style="border-radius: 18px;"
                               placeholder="Describe el evento, premios, reglas, etc.">{{ old('description') }}</textarea>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Asignación de Jurados</label>
+                    <div class="card p-3" style="border-radius: 18px;">
+                        @if(isset($judges) && $judges->count() > 0)
+                            <div class="row">
+                                @foreach($judges as $judge)
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" 
+                                                   name="judge_ids[]" 
+                                                   value="{{ $judge->id }}" 
+                                                   id="judge_{{ $judge->id }}"
+                                                   {{ in_array($judge->id, old('judge_ids', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="judge_{{ $judge->id }}">
+                                                {{ $judge->name }}
+                                                <small class="text-muted d-block">{{ $judge->email }}</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-muted mb-0">
+                                <i class="bi bi-info-circle"></i> No hay jueces registrados. 
+                                <a href="{{ route('admin.users.index') }}" class="text-decoration-none">Crear jueces</a>
+                            </p>
+                        @endif
+                    </div>
+                    <small class="text-muted">Selecciona los jueces que evaluarán los proyectos de este evento</small>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Rúbricas de Evaluación</label>
+                    <div class="card p-3" style="border-radius: 18px;">
+                        @if(isset($rubrics) && $rubrics->count() > 0)
+                            <div class="row">
+                                @foreach($rubrics as $rubric)
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" 
+                                                   name="rubric_ids[]" 
+                                                   value="{{ $rubric->id }}" 
+                                                   id="rubric_{{ $rubric->id }}"
+                                                   {{ in_array($rubric->id, old('rubric_ids', [])) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="rubric_{{ $rubric->id }}">
+                                                {{ $rubric->name }}
+                                                <small class="text-muted d-block">
+                                                    @if($rubric->event_id)
+                                                        Asociada a: {{ $rubric->event->title ?? 'Evento' }}
+                                                    @else
+                                                        Rúbrica general
+                                                    @endif
+                                                </small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-muted mb-0">
+                                <i class="bi bi-info-circle"></i> No hay rúbricas activas. 
+                                <a href="{{ route('admin.rubrics.create') }}" class="text-decoration-none">Crear rúbrica</a>
+                            </p>
+                        @endif
+                    </div>
+                    <small class="text-muted">Selecciona las rúbricas que se usarán para evaluar los proyectos</small>
                 </div>
             </div>
 

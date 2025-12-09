@@ -70,73 +70,84 @@
         </button>
     </div>
 
-    <div class="admin-card">
-        <div class="admin-card-title">Proyectos</div>
+    @forelse($projectsByEvent as $eventId => $projects)
+        @php
+            $event = $events->get($eventId);
+        @endphp
+        
+        <div class="admin-card mb-4">
+            <div class="admin-card-title" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 1.5rem; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                <span><i class="bi bi-calendar-event me-2"></i>{{ $event ? $event->title : 'Evento sin nombre' }}</span>
+                <span class="badge" style="background-color: rgba(255,255,255,0.2); padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                    {{ $projects->count() }} {{ $projects->count() == 1 ? 'proyecto' : 'proyectos' }}
+                </span>
+            </div>
 
-        <table class="admin-table">
-            <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Rúbrica</th>
-                <th>Proyecto</th>
-                <th>Estado</th>
-                <th>Miembros</th>
-                <th>Documentos</th>
-                <th style="width: 150px;">Acciones</th>
-            </tr>
-            </thead>
-            <tbody>
-            @forelse($projects as $project)
+            <table class="admin-table">
+                <thead>
                 <tr>
-                    <td>{{ $project->team?->name ?? '-' }}</td>
-                    <td>
-                        {{ $project->rubric?->name ?? '—' }}
-                    </td>
-                    <td>{{ $project->name }}</td>
-                    <td class="text-capitalize">{{ $project->status }}</td>
-                    <td>
-                        @if($project->team && $project->team->members->isNotEmpty())
-                            {{ $project->team->members->pluck('name')->join(', ') }}
-                        @else
-                            <span style="color: #94a3b8; font-style: italic;">Sin miembros</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if($project->documents->isNotEmpty())
-                            @foreach($project->documents as $doc)
-                                <a href="{{ asset('storage/' . $doc->file_path) }}" 
-                                   target="_blank" 
-                                   class="judge-pill-evaluate" 
-                                   style="display: inline-block; margin: 2px; padding: 4px 10px; font-size: 0.85rem; text-decoration: none;">
-                                    <i class="bi bi-file-pdf"></i> {{ $doc->original_name }}
-                                </a>
-                            @endforeach
-                        @else
-                            <span style="color: #94a3b8; font-style: italic; font-size: 0.85rem;">Sin documentos</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if($project->rubric_id)
-                            <button class="judge-pill-evaluate"
-                                    onclick="window.location='{{ route('judge.evaluations.show', $project) }}'">
-                                Evaluar
-                            </button>
-                        @else
-                            <button class="judge-pill-evaluate" disabled title="No hay rúbrica asignada">
-                                Evaluar
-                            </button>
-                        @endif
-                    </td>
+                    <th>Nombre</th>
+                    <th>Rúbrica</th>
+                    <th>Proyecto</th>
+                    <th>Estado</th>
+                    <th>Miembros</th>
+                    <th>Documentos</th>
+                    <th style="width: 150px;">Acciones</th>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="5">No hay proyectos para evaluar.</td>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
-    </div>
-    <div class="mt-3">
-        {{ $projects->links() }}
-    </div>
+                </thead>
+                <tbody>
+                @foreach($projects as $project)
+                    <tr>
+                        <td>{{ $project->team?->name ?? '-' }}</td>
+                        <td>
+                            {{ $project->rubric?->name ?? '—' }}
+                        </td>
+                        <td>{{ $project->name }}</td>
+                        <td class="text-capitalize">{{ $project->status }}</td>
+                        <td>
+                            @if($project->team && $project->team->members->isNotEmpty())
+                                {{ $project->team->members->pluck('name')->join(', ') }}
+                            @else
+                                <span style="color: #94a3b8; font-style: italic;">Sin miembros</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($project->documents->isNotEmpty())
+                                @foreach($project->documents as $doc)
+                                    <a href="{{ asset('storage/' . $doc->file_path) }}" 
+                                       target="_blank" 
+                                       class="judge-pill-evaluate" 
+                                       style="display: inline-block; margin: 2px; padding: 4px 10px; font-size: 0.85rem; text-decoration: none;">
+                                        <i class="bi bi-file-pdf"></i> {{ $doc->original_name }}
+                                    </a>
+                                @endforeach
+                            @else
+                                <span style="color: #94a3b8; font-style: italic; font-size: 0.85rem;">Sin documentos</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($project->rubric_id)
+                                <button class="judge-pill-evaluate"
+                                        onclick="window.location='{{ route('judge.evaluations.show', $project) }}'">
+                                    Evaluar
+                                </button>
+                            @else
+                                <button class="judge-pill-evaluate" disabled title="No hay rúbrica asignada">
+                                    Evaluar
+                                </button>
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    @empty
+        <div class="admin-card">
+            <div class="admin-card-title">Proyectos</div>
+            <p class="text-center py-4" style="color: #94a3b8; font-style: italic;">
+                No hay proyectos para evaluar.
+            </p>
+        </div>
+    @endforelse
 @endsection

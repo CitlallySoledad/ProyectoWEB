@@ -14,11 +14,16 @@ class Event extends Model
         'start_date',
         'end_date',
         'status',
+        'category',
+        'judge_ids',
+        'rubric_ids',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date'   => 'date',
+        'judge_ids'  => 'array',
+        'rubric_ids' => 'array',
     ];
 
     /**
@@ -28,6 +33,28 @@ class Event extends Model
     {
         return $this->belongsToMany(Team::class, 'event_team')
             ->withTimestamps();
+    }
+
+    /**
+     * Jueces asignados al evento
+     */
+    public function judges()
+    {
+        return $this->belongsToMany(User::class, 'event_judge', 'event_id', 'judge_id')
+            ->wherePivot('judge_id', 'in', $this->judge_ids ?? []);
+    }
+
+    /**
+     * Obtener objetos de usuarios jueces
+     */
+    public function getJudgesAttribute()
+    {
+        if (empty($this->attributes['judge_ids'])) {
+            return collect([]);
+        }
+        
+        $judgeIds = json_decode($this->attributes['judge_ids'], true);
+        return User::whereIn('id', $judgeIds)->get();
     }
 
     // ===============================

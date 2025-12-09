@@ -11,11 +11,11 @@ use Illuminate\Http\Request;
 class RubricController extends Controller
 {
     /**
-     * Mostrar todas las rúbricas y opcionalmente una seleccionada.
+     * Mostrar todas las rúbricas (solo lectura para jueces)
      */
     public function index(Request $request)
     {
-        $rubrics = Rubric::all();
+        $rubrics = Rubric::with('event')->get();
 
         $rubric = null;
         if ($request->has('rubric')) {

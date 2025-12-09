@@ -132,7 +132,7 @@
         </tr>
         <tr>
             <td>Juez:</td>
-            <td>{{ $evaluation->judge->name }}</td>
+            <td>{{ $evaluation->judge?->name ?? '—' }}</td>
         </tr>
         <tr>
             <td>Estado:</td>

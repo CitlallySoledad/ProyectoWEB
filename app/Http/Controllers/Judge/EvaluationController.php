@@ -19,11 +19,20 @@ class EvaluationController extends Controller
     {
         $judge = Auth::user();
         $evaluations = Evaluation::where('judge_id', $judge->id)
-            ->with(['project.team', 'rubric'])
+            ->with(['project.team', 'project.event', 'rubric'])
             ->latest('evaluated_at')
             ->get();
 
-        return view('judge.evaluations.index', compact('evaluations'));
+        // Agrupar evaluaciones por evento
+        $evaluationsByEvent = $evaluations->groupBy(function($evaluation) {
+            return $evaluation->project->event_id ?? 0;
+        });
+
+        // Cargar los eventos
+        $eventIds = $evaluationsByEvent->keys()->filter(fn($id) => $id > 0);
+        $events = \App\Models\Event::whereIn('id', $eventIds)->get()->keyBy('id');
+
+        return view('judge.evaluations.index', compact('evaluationsByEvent', 'events'));
     }
 
     public function show(Project $project)
@@ -37,12 +46,6 @@ class EvaluationController extends Controller
         $evaluation = Evaluation::where('project_id', $project->id)
             ->where('judge_id', $judgeId)
             ->first();
-
-        // Si ya está completada, redirigir a lista
-        if ($evaluation && $evaluation->status === 'completada') {
-            return redirect()->route('judge.evaluations.index')
-                ->with('info', 'Esta evaluación ya fue completada.');
-        }
 
         // Determinar la rúbrica a usar (puede venir del proyecto o de la evaluación existente)
         $rubricId = $evaluation->rubric_id ?? $project->rubric_id;
@@ -150,6 +153,18 @@ class EvaluationController extends Controller
             ->with('success', 'Evaluación guardada correctamente. Evidencias subidas.');
     }
 
+    public function viewCompleted(Evaluation $evaluation)
+    {
+        if ($evaluation->judge_id !== Auth::id()) {
+            return redirect()->route('judge.evaluations.index')
+                ->with('error', 'No tienes permiso para ver esta evaluación.');
+        }
+
+        $evaluation->load(['project.team.members', 'rubric.criteria', 'scores', 'evidences']);
+
+        return view('judge.evaluations.view', compact('evaluation'));
+    }
+
     public function exportPdf(Evaluation $evaluation)
     {
         if ($evaluation->judge_id !== Auth::id()) {
@@ -157,7 +172,7 @@ class EvaluationController extends Controller
                 ->with('error', 'No tienes permiso para descargar esta evaluación.');
         }
 
-        $evaluation->load(['project.team', 'rubric.criteria', 'scores', 'evidences']);
+        $evaluation->load(['project.team', 'rubric.criteria', 'scores', 'evidences', 'judge']);
 
         $pdf = \PDF::loadView('judge.evaluations.pdf', compact('evaluation'));
         

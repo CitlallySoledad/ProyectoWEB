@@ -400,6 +400,33 @@
     min-height: 38px;
 }
 
+/* Botón ver equipos */
+.btn-view-teams {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-view-teams:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+    color: #ffffff;
+}
+
+.btn-view-teams i {
+    font-size: 1rem;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .events-layout {
@@ -536,6 +563,7 @@
                                 <tbody>
                                     @forelse ($events as $event)
                                         <tr class="event-row"
+                                            data-event-id="{{ $event->id }}"
                                             data-title="{{ $event->title }}"
                                             data-start="{{ optional($event->start_date)->format('Y-m-d') }}"
                                             data-end="{{ optional($event->end_date)->format('Y-m-d') }}"
@@ -596,33 +624,6 @@
                                                         <span>No disponible</span>
                                                     </button>
                                                 @endif
-                                                
-                                                {{-- Equipos inscritos --}}
-                                                @if($event->teams && $event->teams->count() > 0)
-                                                    <div class="enrolled-teams-list">
-                                                        @foreach($event->teams as $team)
-                                                            @php
-                                                                $isLeader = auth()->id() === $team->leader_id;
-                                                            @endphp
-                                                            <div class="enrolled-team-badge">
-                                                                <i class="bi bi-check-circle-fill"></i>
-                                                                <span>{{ $team->name }}</span>
-                                                                @if($isLeader)
-                                                                    <form action="{{ route('panel.events.leave', ['event' => $event->id, 'team' => $team->id]) }}" 
-                                                                          method="POST" 
-                                                                          style="display: inline; margin: 0;"
-                                                                          onsubmit="return confirm('¿Estás seguro de que deseas retirar el equipo {{ $team->name }} de este evento?');">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <button type="submit" class="btn-remove-team" title="Retirar equipo">
-                                                                            <i class="bi bi-x"></i>
-                                                                        </button>
-                                                                    </form>
-                                                                @endif
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                @endif
                                             </td>
                                         </tr>
                                     @empty
@@ -654,6 +655,16 @@
                         <div class="events-info-label">Disponibilidad</div>
                         <div class="events-info-text" id="infoEventSlots">
                             —
+                        </div>
+
+                        <div class="events-info-label">Equipos Inscritos</div>
+                        <div class="events-info-text" id="infoEventTeams">
+                            —
+                        </div>
+                        <div id="infoEventTeamsBtn" style="display: none; margin-top: 10px;">
+                            <a href="#" id="viewTeamsLink" class="btn-view-teams">
+                                <i class="bi bi-people-fill"></i> Ver equipos inscritos
+                            </a>
                         </div>
                     </aside>
                 </div>
@@ -894,6 +905,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const infoDesc = document.getElementById('infoEventDescription');
     const infoPlace = document.getElementById('infoEventPlace');
     const infoSlots = document.getElementById('infoEventSlots');
+    const infoTeams = document.getElementById('infoEventTeams');
+    const infoTeamsBtn = document.getElementById('infoEventTeamsBtn');
+    const viewTeamsLink = document.getElementById('viewTeamsLink');
 
     // Al hacer clic en una fila → mostrar info a la derecha
     rows.forEach(row => {
@@ -906,6 +920,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const capacity = row.dataset.capacity || '∞';
             const enrolled = row.dataset.enrolled || '0';
             const slots = row.dataset.slots || '—';
+            const eventId = row.dataset.eventId || '';
 
             infoDesc.textContent = desc;
             infoPlace.textContent = place;
@@ -926,6 +941,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             infoSlots.textContent = slotsText;
+
+            // Mostrar información de equipos inscritos
+            const enrolledNum = parseInt(enrolled);
+            if (enrolledNum > 0) {
+                infoTeams.textContent = `${enrolledNum} equipo(s) inscrito(s)`;
+                infoTeamsBtn.style.display = 'block';
+                viewTeamsLink.href = `/evento/${eventId}/equipos`;
+            } else {
+                infoTeams.textContent = 'No hay equipos inscritos aún';
+                infoTeamsBtn.style.display = 'none';
+            }
         });
     });
 

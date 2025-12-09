@@ -124,6 +124,12 @@ Route::middleware(['auth', 'role:student'])->group(function () {
         return view('pagPrincipal.listaEventos', compact('events'));
     })->name('panel.lista-eventos');
 
+    Route::get('/evento/{event}/equipos', function(\App\Models\Event $event) {
+        // Mostrar equipos inscritos en un evento específico
+        $teams = $event->teams()->with(['leader', 'members'])->get();
+        return view('pagPrincipal.eventTeams', compact('event', 'teams'));
+    })->name('panel.event.teams');
+
     Route::get('/api/user/leader-teams', [App\Http\Controllers\EventParticipantController::class, 'getUserLeaderTeams'])->name('api.user.leader-teams');
     Route::get('/api/user/eligible-teams', [SubmissionController::class, 'getEligibleTeams'])->name('api.user.eligible-teams');
     Route::post('/eventos/{event}/join', [App\Http\Controllers\EventParticipantController::class, 'joinEvent'])->name('panel.events.join');
@@ -140,6 +146,8 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/submision-proyecto', [SubmissionController::class, 'show'])->name('panel.submission');
     Route::post('/submision-proyecto', [SubmissionController::class, 'update'])->name('panel.submission.update');
     Route::post('/submision-proyecto/upload-pdf', [SubmissionController::class, 'uploadPdf'])->name('panel.submission.upload-pdf');
+    Route::delete('/submision-proyecto/delete-pdf/{document}', [SubmissionController::class, 'deletePdf'])->name('panel.submission.delete-pdf');
+    Route::post('/submision-proyecto/confirm', [SubmissionController::class, 'confirmSubmission'])->name('panel.submission.confirm');
     Route::get('/submision-proyecto/repositorios', [SubmissionController::class, 'repositories'])->name('panel.submission.repositories');
 });
 
@@ -171,6 +179,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('eventos/crear', [AdminEventController::class, 'create'])->name('events.create');
     Route::post('eventos', [AdminEventController::class, 'store'])->name('events.store');
     Route::get('eventos/{event}/editar', [AdminEventController::class, 'edit'])->name('events.edit');
+    Route::get('eventos/{event}/resultados', [AdminEventController::class, 'showResults'])->name('events.results');
     Route::put('eventos/{event}', [AdminEventController::class, 'update'])->name('events.update');
     Route::delete('eventos/{event}', [AdminEventController::class, 'destroy'])->name('events.destroy');
 
@@ -195,11 +204,19 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('usuarios/crear', [AdminUserController::class, 'create'])->name('users.create');
     Route::post('usuarios', [AdminUserController::class, 'store'])->name('users.store');
 
-    // Asignación de Jurados
-    Route::get('asignacion-jurados', [App\Http\Controllers\Admin\JudgeAssignmentController::class, 'index'])->name('judge-assignment.index');
-    Route::post('asignacion-jurados/asignar', [App\Http\Controllers\Admin\JudgeAssignmentController::class, 'assign'])->name('judge-assignment.assign');
-    Route::post('asignacion-jurados/remover', [App\Http\Controllers\Admin\JudgeAssignmentController::class, 'remove'])->name('judge-assignment.remove');
-    Route::post('asignacion-jurados/auto-asignar', [App\Http\Controllers\Admin\JudgeAssignmentController::class, 'autoAssign'])->name('judge-assignment.auto-assign');
+    // Rúbricas (Admin tiene control total)
+    Route::get('rubricas', [App\Http\Controllers\Admin\RubricController::class, 'index'])->name('rubrics.index');
+    Route::get('rubricas/crear', [App\Http\Controllers\Admin\RubricController::class, 'create'])->name('rubrics.create');
+    Route::post('rubricas', [App\Http\Controllers\Admin\RubricController::class, 'store'])->name('rubrics.store');
+    Route::get('rubricas/{rubric}/editar', [App\Http\Controllers\Admin\RubricController::class, 'edit'])->name('rubrics.edit');
+    Route::put('rubricas/{rubric}', [App\Http\Controllers\Admin\RubricController::class, 'update'])->name('rubrics.update');
+    Route::delete('rubricas/{rubric}', [App\Http\Controllers\Admin\RubricController::class, 'destroy'])->name('rubrics.destroy');
+
+    // Criterios de rúbricas
+    Route::post('rubricas/{rubric}/criterios', [App\Http\Controllers\Admin\RubricController::class, 'storeCriterion'])->name('rubrics.criteria.store');
+    Route::post('rubricas/{rubric}/criterios/guardar', [App\Http\Controllers\Admin\RubricController::class, 'bulkUpdate'])->name('rubrics.criteria.bulkUpdate');
+    Route::put('rubricas/criterios/{criterion}', [App\Http\Controllers\Admin\RubricController::class, 'updateCriterion'])->name('rubrics.criteria.update');
+    Route::delete('rubricas/criterios/{criterion}', [App\Http\Controllers\Admin\RubricController::class, 'destroyCriterion'])->name('rubrics.criteria.destroy');
 });
 
 // ==========================================================
@@ -210,20 +227,9 @@ Route::middleware(['auth', 'role:judge'])->prefix('juez')->name('judge.')->group
     Route::get('/proyectos/{project}', [EvaluationController::class, 'show'])->name('evaluations.show');
     Route::post('/proyectos/{project}', [EvaluationController::class, 'store'])->name('evaluations.store');
     Route::get('/evaluaciones', [EvaluationController::class, 'index'])->name('evaluations.index');
+    Route::get('/evaluaciones/{evaluation}/ver', [EvaluationController::class, 'viewCompleted'])->name('evaluations.view');
     Route::get('/evaluaciones/{evaluation}/pdf', [EvaluationController::class, 'exportPdf'])->name('evaluations.export-pdf');
+    
+    // Rúbricas (solo lectura para jueces)
     Route::get('/rubricas', [RubricController::class, 'index'])->name('rubrics.index');
-    Route::get('/rubricas/crear', [RubricController::class, 'create'])->name('rubrics.create');
-    Route::post('/rubricas', [RubricController::class, 'store'])->name('rubrics.store');
-    Route::get('/rubricas/{rubric}/editar', [RubricController::class, 'edit'])->name('rubrics.edit');
-    Route::put('/rubricas/{rubric}', [RubricController::class, 'update'])->name('rubrics.update');
-    Route::delete('/rubricas/{rubric}', [RubricController::class, 'destroy'])->name('rubrics.destroy');
-
-    // Rubric criteria
-    Route::post('/rubricas/{rubric}/criterios', [RubricController::class, 'storeCriterion'])->name('rubrics.criteria.store');
-    Route::post('/rubricas/{rubric}/criterios/guardar', [RubricController::class, 'bulkUpdate'])->name('rubrics.criteria.bulkUpdate');
-    Route::post('/rubricas/{rubric}/aplicar', [RubricController::class, 'apply'])->name('rubrics.apply');
-    Route::get('/rubricas/criterios/{criterion}/editar', [RubricController::class, 'editCriterion'])->name('rubrics.criteria.edit');
-    Route::put('/rubricas/criterios/{criterion}', [RubricController::class, 'updateCriterion'])->name('rubrics.criteria.update');
-    Route::delete('/rubricas/criterios/{criterion}', [RubricController::class, 'destroyCriterion'])->name('rubrics.criteria.destroy');
-
 }); 

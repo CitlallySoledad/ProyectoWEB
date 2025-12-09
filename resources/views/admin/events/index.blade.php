@@ -35,8 +35,10 @@
                 <thead>
                     <tr>
                         <th>Nombre</th>
+                        <th>Categoría</th>
                         <th>Lugar</th>
                         <th>Estado</th>
+                        <th>Jurados</th>
                         <th>Inscritos / Capacidad</th>
                         <th>Fecha inicio</th>
                         <th>Fecha fin</th>
@@ -52,6 +54,13 @@
                                     <small class="text-muted d-block">Finalizado</small>
                                 @endif
                             </td>
+                            <td>
+                                @if($event->category)
+                                    <span class="badge bg-primary">{{ $event->category }}</span>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </td>
                             <td>{{ $event->place ?? '—' }}</td>
                             <td>
                                 @if($event->status === 'activo')
@@ -62,6 +71,23 @@
                                     <span class="badge bg-danger">Cerrado</span>
                                 @else
                                     <span class="badge bg-secondary">Borrador</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($event->judge_ids && count($event->judge_ids) > 0)
+                                    @php
+                                        $judges = \App\Models\User::whereIn('id', $event->judge_ids)->get();
+                                    @endphp
+                                    <button type="button" 
+                                            class="badge bg-info border-0" 
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="top" 
+                                            data-bs-html="true"
+                                            title="{{ $judges->pluck('name')->implode('<br>') }}">
+                                        {{ $judges->count() }} jurado(s)
+                                    </button>
+                                @else
+                                    <span class="text-muted">Sin asignar</span>
                                 @endif
                             </td>
                             <td>
@@ -82,24 +108,32 @@
                             <td>{{ $event->start_date ? $event->start_date->format('d/m/Y') : '—' }}</td>
                             <td>{{ $event->end_date ? $event->end_date->format('d/m/Y') : '—' }}</td>
                             <td>
-                                <a href="{{ route('admin.events.edit', $event) }}"
-                                   class="btn btn-sm btn-light rounded-pill me-1"
-                                   title="Editar evento">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </a>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a href="{{ route('admin.events.results', $event) }}"
+                                       class="btn btn-sm btn-primary rounded-pill"
+                                       title="Ver equipos y calificaciones">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
+                                    
+                                    <a href="{{ route('admin.events.edit', $event) }}"
+                                       class="btn btn-sm btn-warning rounded-pill"
+                                       title="Editar evento">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
 
-                                <form action="{{ route('admin.events.destroy', $event) }}"
-                                      method="POST"
-                                      class="d-inline"
-                                      onsubmit="return confirm('¿Eliminar este evento? Se perderán todas las inscripciones.')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                            class="btn btn-sm btn-danger rounded-pill"
-                                            title="Eliminar evento">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                                    <form action="{{ route('admin.events.destroy', $event) }}"
+                                          method="POST"
+                                          class="d-inline m-0"
+                                          onsubmit="return confirm('¿Eliminar este evento? Se perderán todas las inscripciones.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="btn btn-sm btn-danger rounded-pill"
+                                                title="Eliminar evento">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
@@ -139,5 +173,17 @@
     </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    // Inicializar tooltips de Bootstrap
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+@endpush
 
 

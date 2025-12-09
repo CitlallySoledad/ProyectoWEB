@@ -15,8 +15,8 @@ class ProjectController extends Controller
         $judge = Auth::user();
         $q = request('q');
 
-        // Mostrar proyectos asignados a este juez y pendientes de evaluación por él
-        $projects = Project::with(['team.members','event', 'rubric', 'documents'])
+        // Obtener proyectos asignados a este juez y pendientes de evaluación por él
+        $allProjects = Project::with(['team.members','event', 'rubric', 'documents'])
             ->whereHas('judges', function ($jb) use ($judge) {
                 $jb->where('users.id', $judge->id);
             })
@@ -29,15 +29,15 @@ class ProjectController extends Controller
                        $t->where('name', 'like', "%{$q}%");
                    });
             })
-            ->paginate(10)
-            ->withQueryString();
+            ->get();
 
-        // obtener qué eventos tienen rúbrica para optimizar la vista
-        $eventIds = $projects->pluck('event_id')->filter()->unique()->toArray();
-        // mapear event_id => rubric name para mostrar la rúbrica aplicada en la lista
-        $rubricsByEvent = Rubric::whereIn('event_id', $eventIds)->pluck('name', 'event_id')->toArray();
+        // Agrupar proyectos por evento
+        $projectsByEvent = $allProjects->groupBy('event_id');
+        
+        // Obtener información de los eventos
+        $events = \App\Models\Event::whereIn('id', $projectsByEvent->keys())->get()->keyBy('id');
 
-        return view('judge.projects.index', compact('projects', 'rubricsByEvent'));
+        return view('judge.projects.index', compact('projectsByEvent', 'events', 'q'));
     }
 }
 

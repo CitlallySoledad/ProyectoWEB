@@ -485,9 +485,10 @@
                     $projectName = $project ? $project->name : '';
                     $visibility  = old('visibility', $project ? $project->visibility : 'privado');
                     $selectedTeamId = old('team_id', $project ? $project->team_id : null);
+                    $selectedEventId = old('event_id', $project ? $project->event_id : null);
                 @endphp
 
-                <div class="submission-layout">
+                <div class="submission-layout" id="editFormSection">
                     {{-- COLUMNA IZQUIERDA: formulario principal --}}
                     <div class="submission-left">
                         <form action="{{ route('panel.submission.update') }}" method="POST">
@@ -499,11 +500,9 @@
                                 
                                 @if($eligibleTeams->isEmpty())
                                     <div class="alert alert-warning" style="padding: 12px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; margin-bottom: 1rem;">
-                                        <strong>⚠️ No tienes equipos elegibles</strong>
+                                        <strong>⚠️ No tienes equipos</strong>
                                         <p style="margin: 8px 0 0 0; font-size: 14px;">
-                                            Para enviar un proyecto debes:
-                                            <br>• Ser líder de un equipo
-                                            <br>• El equipo debe estar inscrito en un evento activo
+                                            Para enviar un proyecto debes ser líder de un equipo.
                                         </p>
                                     </div>
                                 @else
@@ -513,8 +512,7 @@
                                             <option value="{{ $team->id }}" 
                                                     {{ $selectedTeamId == $team->id ? 'selected' : '' }}>
                                                 {{ $team->name }} 
-                                                ({{ $team->members_count }} miembros) 
-                                                - Evento: {{ $team->events->first()->name }}
+                                                ({{ $team->members_count }} miembros)
                                             </option>
                                         @endforeach
                                     </select>
@@ -523,6 +521,40 @@
                                 @error('team_id')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
+                            </div>
+
+                            {{-- Selección de evento --}}
+                            <div class="mb-2">
+                                <div class="submission-label">Evento <span style="color: #dc3545;">*</span></div>
+                                
+                                @if($activeEvents->isEmpty())
+                                    <div class="alert alert-warning" style="padding: 12px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; margin-bottom: 1rem;">
+                                        <strong>⚠️ No hay eventos activos</strong>
+                                        <p style="margin: 8px 0 0 0; font-size: 14px;">
+                                            Tu equipo debe estar inscrito en un evento activo para enviar proyectos.
+                                        </p>
+                                    </div>
+                                @else
+                                    <select name="event_id" class="submission-input" required>
+                                        <option value="">Selecciona un evento</option>
+                                        @foreach($activeEvents as $event)
+                                            <option value="{{ $event->id }}" 
+                                                    {{ ($project && $project->event_id == $event->id) || old('event_id') == $event->id ? 'selected' : '' }}>
+                                                {{ $event->title }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                                
+                                @error('event_id')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                                
+                                @if($activeEvents->isNotEmpty())
+                                    <div class="submission-hint">
+                                        Selecciona el evento al cual enviarás tu proyecto. Solo puedes elegir eventos en los que tu equipo esté inscrito.
+                                    </div>
+                                @endif
                             </div>
 
                             {{-- Nombre del proyecto --}}
@@ -605,11 +637,130 @@
                         <p class="submission-right-small">
                             Gestiona los repositorios asociados a esta submisión.
                         </p>
-                        <button type="button" class="btn-rounded btn-repo" onclick="openPdfModal()">
+                        <button type="button" class="btn-rounded btn-repo" onclick="openPdfModal()"
+                                {{ $eligibleTeams->isEmpty() || ($project && $project->status === 'enviado') ? 'disabled style=opacity:0.5;cursor:not-allowed;' : '' }}>
                             Gestionar / ver repositorios
                         </button>
+                        
+                        @if($eligibleTeams->isEmpty())
+                            <small class="text-muted d-block mt-2" style="font-size: 0.85rem; color: #94a3b8;">
+                                Debes cumplir los requisitos para gestionar repositorios.
+                            </small>
+                        @elseif($project && $project->status === 'enviado')
+                            <small class="text-muted d-block mt-2" style="font-size: 0.85rem; color: #94a3b8;">
+                                No puedes subir documentos a un proyecto ya enviado.
+                            </small>
+                        @endif
                     </div>
                 </div>
+
+                {{-- Mostrar proyecto guardado con sus documentos (ABAJO) --}}
+                @if($project)
+                <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.5); border-radius: 16px; padding: 20px; margin-top: 24px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(34, 197, 94, 0.2); display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-check-circle" style="font-size: 24px; color: #22c55e;"></i>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 600; color: #e5e7eb;">{{ $project->name }}</h3>
+                                <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #94a3b8;">
+                                    Equipo: {{ $project->team->name }} | Evento: {{ $project->event->title ?? 'N/A' }} | Visibilidad: <span style="text-transform: capitalize;">{{ $project->visibility }}</span>
+                                    @if($project->status === 'enviado')
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.5); border-radius: 999px; font-size: 0.75rem; margin-left: 8px;">
+                                            <i class="bi bi-lock-fill"></i> Enviado
+                                        </span>
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                        @if($project->status !== 'enviado')
+                        <button type="button" 
+                                onclick="toggleEditMode()"
+                                style="padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.6); background: rgba(15, 23, 42, 0.7); color: #e5e7eb; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;"
+                                onmouseover="this.style.background='rgba(59, 130, 246, 0.2)'; this.style.borderColor='#3b82f6';"
+                                onmouseout="this.style.background='rgba(15, 23, 42, 0.7)'; this.style.borderColor='rgba(148, 163, 184, 0.6)';">
+                            <i class="bi bi-pencil"></i>
+                            <span>Editar proyecto</span>
+                        </button>
+                        @endif
+                    </div>
+                    
+                    @if($project->documents && $project->documents->count() > 0)
+                    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(148, 163, 184, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <p style="margin: 0; font-size: 0.9rem; font-weight: 600; color: #e5e7eb;">
+                                <i class="bi bi-file-earmark-pdf"></i> Documentos subidos ({{ $project->documents->count() }})
+                            </p>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                            @foreach($project->documents as $doc)
+                            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(148, 163, 184, 0.4); border-radius: 999px;">
+                                <a href="{{ asset('storage/' . $doc->file_path) }}" 
+                                   target="_blank"
+                                   style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #fbbf24; font-size: 0.9rem;"
+                                   onmouseover="this.style.color='#fde047';"
+                                   onmouseout="this.style.color='#fbbf24';">
+                                    <i class="bi bi-file-pdf-fill"></i>
+                                    <span>{{ $doc->original_name }}</span>
+                                    <small style="color: #94a3b8;">({{ number_format($doc->file_size / 1024, 1) }} KB)</small>
+                                </a>
+                                @if($project->status !== 'enviado')
+                                <form action="{{ route('panel.submission.delete-pdf', $doc->id) }}" method="POST" style="display: inline; margin: 0;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" 
+                                            onclick="return confirm('¿Estás seguro de eliminar este documento?')"
+                                            style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 0; font-size: 18px; line-height: 1;"
+                                            title="Eliminar documento">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                                @endif
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @else
+                    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(148, 163, 184, 0.3);">
+                        <p style="margin: 0; font-size: 0.85rem; color: #94a3b8; font-style: italic;">
+                            <i class="bi bi-info-circle"></i> No hay documentos PDF subidos aún. Usa el botón "Gestionar / ver repositorios" para subir archivos.
+                        </p>
+                    </div>
+                    @endif
+                    
+                    {{-- Botón para confirmar y enviar proyecto --}}
+                    @if($project->documents && $project->documents->count() > 0)
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(148, 163, 184, 0.3); text-align: center;">
+                        @if($project->status === 'enviado')
+                            <div style="padding: 16px; background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 12px; margin-bottom: 12px;">
+                                <p style="margin: 0; font-size: 0.95rem; color: #22c55e; font-weight: 600;">
+                                    <i class="bi bi-check-circle-fill"></i> Proyecto enviado a los jueces
+                                </p>
+                                <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #94a3b8;">
+                                    Tu proyecto está listo para evaluación. Puedes seguir editándolo si lo necesitas.
+                                </p>
+                            </div>
+                        @else
+                            <form action="{{ route('panel.submission.confirm') }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas enviar este proyecto? Una vez enviado, NO PODRÁS editarlo ni subir más documentos.');">
+
+                                @csrf
+                                <button type="submit" 
+                                        style="padding: 12px 32px; border-radius: 999px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: white; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s;"
+                                        onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 15px 30px rgba(16, 185, 129, 0.4)';"
+                                        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 10px 25px rgba(16, 185, 129, 0.3)';">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    <span>Confirmar y enviar proyecto</span>
+                                </button>
+                            </form>
+                            <p style="margin: 12px 0 0 0; font-size: 0.85rem; color: #94a3b8; font-style: italic;">
+                                Una vez confirmado, el proyecto será enviado a los jueces para evaluación
+                            </p>
+                        @endif
+                    </div>
+                    @endif
+                </div>
+                @endif
 
             </div>
         </div>
@@ -902,5 +1053,17 @@
     });
 
     document.addEventListener('DOMContentLoaded', toggleVisibilityPills);
+    
+    // Función para alternar entre vista de proyecto y formulario de edición
+    function toggleEditMode() {
+        const editSection = document.getElementById('editFormSection');
+        if (editSection.style.display === 'none' || editSection.style.display === '') {
+            editSection.style.display = 'grid';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            editSection.style.display = 'none';
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+    }
 </script>
 @endsection
