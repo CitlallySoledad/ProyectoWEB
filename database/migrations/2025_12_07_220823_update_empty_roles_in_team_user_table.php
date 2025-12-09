@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,10 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Actualizar roles NULL a 'Miembro' por defecto
-        DB::table('team_user')
-            ->whereNull('role')
-            ->update(['role' => 'Miembro']);
+        // Solo ejecutamos si la tabla y la columna existen
+        if (Schema::hasTable('team_user') && Schema::hasColumn('team_user', 'role')) {
+            DB::table('team_user')
+                ->whereNull('role')
+                ->update(['role' => 'Miembro']);
+        }
+        // Si no existe la columna 'role', no hacemos nada
     }
 
     /**
@@ -22,9 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Revertir los cambios (opcional)
-        DB::table('team_user')
-            ->where('role', 'Miembro')
-            ->update(['role' => null]);
+        // No es necesario revertir nada aquí
     }
 };
+

@@ -357,7 +357,8 @@
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link active" href="javascript:void(0)">
+                        {{-- 👇 ahora sí apunta a la ruta propia --}}
+                        <a class="sidebar-link active" href="{{ route('panel.cambiarContrasena') }}">
                             <i class="bi bi-lock-fill"></i>
                             <span>Cambiar contraseña</span>
                         </a>
@@ -385,7 +386,7 @@
                     <div class="user-avatar">
                         <i class="bi bi-person-fill"></i>
                     </div>
-                    <span>Participante</span>
+                    <span>{{ auth()->user()->name ?? 'Usuario' }}</span>
                 </div>
             </header>
 
@@ -404,17 +405,35 @@
                         </div>
 
                         {{-- FORMULARIO REAL --}}
-                        <form class="password-form" action="{{ route('password.update') }}" method="POST">
+                        <form class="password-form" action="{{ route('panel.cambiarContrasena.update') }}" method="POST">
                             @csrf
 
                             <label class="password-label" for="current_password">Contraseña actual</label>
-                            <input type="password" id="current_password" class="password-input" name="current_password">
+                            <input
+                                type="password"
+                                id="current_password"
+                                class="password-input"
+                                name="current_password"
+                                required
+                            >
 
                             <label class="password-label" for="new_password">Contraseña nueva</label>
-                            <input type="password" id="new_password" class="password-input" name="new_password">
+                            <input
+                                type="password"
+                                id="new_password"
+                                class="password-input"
+                                name="new_password"
+                                required
+                            >
 
                             <label class="password-label" for="new_password_confirmation">Repite la contraseña nueva</label>
-                            <input type="password" id="new_password_confirmation" class="password-input" name="new_password_confirmation">
+                            <input
+                                type="password"
+                                id="new_password_confirmation"
+                                class="password-input"
+                                name="new_password_confirmation"
+                                required
+                            >
 
                             <div class="password-actions">
                                 <button type="submit" class="password-btn">

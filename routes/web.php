@@ -16,6 +16,8 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\Judge\ProjectController;
 use App\Http\Controllers\Judge\RubricController;
 use App\Http\Controllers\Judge\EvaluationController;
+use App\Http\Controllers\PanelPasswordController;
+
 
 // ==========================================================
 // PÁGINA PRINCIPAL
@@ -149,7 +151,16 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::delete('/submision-proyecto/delete-pdf/{document}', [SubmissionController::class, 'deletePdf'])->name('panel.submission.delete-pdf');
     Route::post('/submision-proyecto/confirm', [SubmissionController::class, 'confirmSubmission'])->name('panel.submission.confirm');
     Route::get('/submision-proyecto/repositorios', [SubmissionController::class, 'repositories'])->name('panel.submission.repositories');
+
+    // Mostrar formulario de cambiar contraseña
+    Route::get('/panel/cambiar-contrasena', [PanelPasswordController::class, 'show'])
+        ->name('panel.cambiarContrasena');
+
+    // Procesar el cambio de contraseña
+    Route::post('/panel/cambiar-contrasena', [PanelPasswordController::class, 'update'])
+        ->name('panel.cambiarContrasena.update');
 });
+
 
 // ==========================================================
 // RUTAS ADMIN (role:admin)

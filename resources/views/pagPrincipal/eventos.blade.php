@@ -307,10 +307,10 @@
             {{-- HEADER SUPERIOR --}}
             <header class="panel-header">
                 <div class="user-badge">
-                    <div class="user-avatar">
-                        <i class="bi bi-person-fill"></i>
-                    </div>
-                    <span>Participante</span>
+                <div class="user-avatar">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <span>{{ auth()->user()->name ?? 'Usuario' }}</span>
                 </div>
             </header>
 

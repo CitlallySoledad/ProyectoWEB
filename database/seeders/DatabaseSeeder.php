@@ -21,5 +21,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AssignJudgeRoleSeeder::class);
         $this->call(DemoProjectsSeeder::class);
         $this->call(AssignJudgeToProjectsSeeder::class);
+
+        $this->call(StudentUserSeeder::class);
     }
 }

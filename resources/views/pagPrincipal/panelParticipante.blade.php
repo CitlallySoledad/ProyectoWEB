@@ -406,12 +406,12 @@
 
             {{-- HEADER SUPERIOR --}}
             <header class="panel-header">
-                <div class="user-badge">
-                    <div class="user-avatar">
+                    <div class="user-badge">
+                        <div class="user-avatar">
                         <i class="bi bi-person-fill"></i>
+                        </div>
+                        <span>{{ auth()->user()->name ?? 'Participante' }}</span>
                     </div>
-                    <span>Participante</span>
-                </div>
             </header>
 
             {{-- CONTENIDO --}}
@@ -422,7 +422,7 @@
                     <div class="card">
                         <div class="card-title">Próximo evento</div>
                         <div class="card-main-text">HackaTec</div>
-                        <div class="card-subtext">15 de septiembre</div>
+                        <div class="card-subtext">10 de noviembre</div>
                     </div>
 
                     <div class="card card-with-icon">
@@ -431,8 +431,8 @@
                         </div>
                         <div>
                             <div class="card-title">Próximo evento</div>
-                            <div class="card-main-text">HackaTec</div>
-                            <div class="card-subtext">15 de septiembre</div>
+                            <div class="card-main-text">EvaluaTec</div>
+                            <div class="card-subtext">12 de diciembre</div>
                         </div>
                     </div>
 
