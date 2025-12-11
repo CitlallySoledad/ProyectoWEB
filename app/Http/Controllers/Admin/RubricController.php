@@ -16,13 +16,14 @@ class RubricController extends Controller
     public function index(Request $request)
     {
         $rubrics = Rubric::with('event')->get();
+        $events = Event::all();
 
         $rubric = null;
         if ($request->has('rubric')) {
             $rubric = Rubric::with('criteria')->find($request->rubric);
         }
 
-        return view('admin.rubrics.index', compact('rubrics', 'rubric'));
+        return view('admin.rubrics.index', compact('rubrics', 'rubric', 'events'));
     }
 
     /**
@@ -70,6 +71,32 @@ class RubricController extends Controller
             'event_id' => 'nullable|exists:events,id',
             'status' => 'required|in:activa,inactiva',
         ]);
+
+        // Si cambió el event_id, actualizar el array rubric_ids en los eventos
+        $oldEventId = $rubric->event_id;
+        $newEventId = $data['event_id'];
+
+        // Si se desasignó de un evento
+        if ($oldEventId && $oldEventId != $newEventId) {
+            $oldEvent = Event::find($oldEventId);
+            if ($oldEvent && $oldEvent->rubric_ids) {
+                $rubricIds = $oldEvent->rubric_ids;
+                $rubricIds = array_values(array_diff($rubricIds, [$rubric->id]));
+                $oldEvent->update(['rubric_ids' => $rubricIds]);
+            }
+        }
+
+        // Si se asignó a un evento nuevo
+        if ($newEventId && $oldEventId != $newEventId) {
+            $newEvent = Event::find($newEventId);
+            if ($newEvent) {
+                $rubricIds = $newEvent->rubric_ids ?? [];
+                if (!in_array($rubric->id, $rubricIds)) {
+                    $rubricIds[] = $rubric->id;
+                    $newEvent->update(['rubric_ids' => $rubricIds]);
+                }
+            }
+        }
 
         $rubric->update($data);
 

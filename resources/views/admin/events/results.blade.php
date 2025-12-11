@@ -248,10 +248,19 @@
                 <i class="bi bi-arrow-left me-2"></i>Volver a Eventos
             </a>
 
-            {{-- Constancias 1°, 2° y 3° --}}
+            {{-- Constancias 1°, 2° y 3° (Descargar PDF) --}}
             <a href="{{ route('admin.events.certificates', $event) }}" class="btn btn-primary">
-                <i class="bi bi-award me-2"></i>Constancias (Top 3)
+                <i class="bi bi-award me-2"></i>Descargar Constancias
             </a>
+
+            {{-- Enviar constancias por correo --}}
+            <form action="{{ route('admin.events.send_certificates', $event) }}" method="POST" style="display: inline;" 
+                  onsubmit="return confirm('¿Estás seguro de enviar las constancias por correo electrónico a todos los miembros del Top 3?');">
+                @csrf
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-envelope-fill me-2"></i>Enviar Constancias por Email
+                </button>
+            </form>
 
             {{-- Reporte Excel (CSV) de todos los eventos --}}
             <a href="{{ route('admin.events.export_excel') }}" class="btn btn-success">
@@ -261,6 +270,19 @@
     </div>
 </div>
 
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
 
 <!-- Estadísticas -->
 <div class="row mb-4">

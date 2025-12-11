@@ -36,16 +36,17 @@ class SubmissionController extends Controller
             })
             ->get();
 
-        // Buscar proyecto existente del usuario con documentos y evento
-        $project = Project::with(['documents', 'team', 'event'])
-            ->where('team_id', function ($query) use ($user) {
-                $query->select('id')
-                    ->from('teams')
-                    ->where('leader_id', $user->id)
-                    ->limit(1);
-            })->first();
+        // Obtener TODOS los proyectos del usuario (como líder) con documentos y evento
+        // Ordenar por updated_at descendente para mostrar el más reciente primero
+        $projects = Project::with(['documents', 'team', 'event'])
+            ->whereIn('team_id', $teamIds)
+            ->orderBy('updated_at', 'desc')
+            ->get();
 
-        return view('pagPrincipal.submission', compact('project', 'eligibleTeams', 'activeEvents'));
+        // Para compatibilidad con vistas antiguas, mantener $project como el más reciente
+        $project = $projects->first();
+
+        return view('pagPrincipal.submission', compact('project', 'projects', 'eligibleTeams', 'activeEvents'));
     }
     
     /**
@@ -112,8 +113,11 @@ class SubmissionController extends Controller
                 ->with('error', 'No eres el líder de este equipo.');
         }
         
-        // Verificar si el proyecto ya está enviado
-        $existingProject = Project::where('team_id', $request->team_id)->first();
+        // Verificar si ya existe un proyecto para este EQUIPO y EVENTO específico
+        $existingProject = Project::where('team_id', $request->team_id)
+            ->where('event_id', $request->event_id)
+            ->first();
+        
         if ($existingProject && $existingProject->status === 'enviado') {
             return redirect()
                 ->route('panel.submission')
@@ -140,13 +144,15 @@ class SubmissionController extends Controller
                 ->with('error', 'El evento seleccionado no está activo.');
         }
 
-        // Crear o actualizar el proyecto
+        // Crear o actualizar el proyecto (clave única: team_id + event_id)
         $project = Project::updateOrCreate(
-            ['team_id' => $request->team_id],
+            [
+                'team_id' => $request->team_id,
+                'event_id' => $request->event_id
+            ],
             [
                 'name' => $request->project_name,
                 'visibility' => $request->visibility,
-                'event_id' => $request->event_id,
                 'status' => 'pendiente',
             ]
         );
@@ -189,19 +195,14 @@ class SubmissionController extends Controller
         $request->validate([
             'pdf_file' => 'required|file|mimes:pdf|max:10240', // 10MB max
             'description' => 'nullable|string|max:500',
+            'project_id' => 'required|exists:projects,id', // Ahora necesitamos saber a qué proyecto pertenece
         ]);
 
-        // Verificar que el usuario tenga un proyecto activo
+        // Verificar que el proyecto existe y pertenece a un equipo del usuario
         $project = Project::whereHas('team', function ($query) use ($user) {
             $query->where('leader_id', $user->id);
-        })->first();
+        })->findOrFail($request->project_id);
 
-        if (!$project) {
-            return redirect()
-                ->route('panel.submission')
-                ->with('error', 'Debes guardar tu proyecto primero antes de subir documentos.');
-        }
-        
         // Verificar si el proyecto ya está enviado
         if ($project->status === 'enviado') {
             return redirect()
@@ -278,19 +279,17 @@ class SubmissionController extends Controller
     /**
      * Confirmar y enviar el proyecto (cambia estado pero sigue siendo editable)
      */
-    public function confirmSubmission()
+    public function confirmSubmission(Request $request)
     {
         $user = auth()->user();
         
+        $request->validate([
+            'project_id' => 'required|exists:projects,id',
+        ]);
+        
         $project = Project::with('event')->whereHas('team', function ($query) use ($user) {
             $query->where('leader_id', $user->id);
-        })->first();
-        
-        if (!$project) {
-            return redirect()
-                ->route('panel.submission')
-                ->with('error', 'No tienes un proyecto para enviar.');
-        }
+        })->findOrFail($request->project_id);
         
         if ($project->documents()->count() === 0) {
             return redirect()

@@ -126,14 +126,20 @@
                             @endif
                         </td>
                         <td>
-                            @if($project->rubric_id)
+                            @if($project->already_evaluated ?? false)
+                                <button class="judge-pill-evaluate" 
+                                        style="background: #22c55e; cursor: default;"
+                                        title="Ya evaluaste este proyecto">
+                                    <i class="bi bi-check-circle"></i> Evaluado
+                                </button>
+                            @elseif($project->rubric_id)
                                 <button class="judge-pill-evaluate"
                                         onclick="window.location='{{ route('judge.evaluations.show', $project) }}'">
                                     Evaluar
                                 </button>
                             @else
                                 <button class="judge-pill-evaluate" disabled title="No hay rúbrica asignada">
-                                    Evaluar
+                                    Sin rúbrica
                                 </button>
                             @endif
                         </td>

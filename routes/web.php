@@ -8,6 +8,7 @@ use App\Http\Controllers\RegistroController;
 use App\Http\Controllers\ParticipantTeamController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\PanelProfileController;
+use App\Http\Controllers\PanelParticipanteController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminEventController;
 use App\Http\Controllers\AdminTeamController;
@@ -41,6 +42,10 @@ Route::match(['get', 'post'], '/login', function (Request $request) {
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+            
+            // Actualizar el campo updated_at para rastrear actividad reciente
+            Auth::user()->touch();
+            
             return redirect()->route(getRedirectRouteByRole(Auth::user()));
         }
 
@@ -97,7 +102,7 @@ Route::get('/invitacion/{token}', [ParticipantTeamController::class, 'acceptInvi
 // PANEL PARTICIPANTE (role:student)
 // ==========================================================
 Route::middleware(['auth', 'role:student'])->group(function () {
-    Route::get('/panel', fn() => view('pagPrincipal.panelParticipante'))->name('panel.participante');
+    Route::get('/panel', [PanelParticipanteController::class, 'index'])->name('panel.participante');
 
     Route::get('/panel/mi-equipo', [ParticipantTeamController::class, 'miEquipo'])->name('panel.mi-equipo');
     Route::get('/panel/lista-equipo', [ParticipantTeamController::class, 'index'])->name('panel.lista-equipo');
@@ -232,6 +237,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // 👉 NUEVAS RUTAS
     Route::get('eventos/{event}/constancias', [AdminEventController::class, 'generateCertificates'])
         ->name('events.certificates');
+
+    Route::post('eventos/{event}/enviar-constancias', [AdminEventController::class, 'sendCertificates'])
+        ->name('events.send_certificates');
 
     Route::get('eventos/reporte/excel', [AdminEventController::class, 'exportExcel'])
         ->name('events.export_excel');

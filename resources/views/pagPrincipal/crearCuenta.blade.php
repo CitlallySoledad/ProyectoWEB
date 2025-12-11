@@ -156,6 +156,37 @@ body {
     box-shadow: 0 10px 20px rgba(0, 0, 0, .55);
 }
 
+/* MENSAJES DE ERROR */
+.alert {
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 13px;
+}
+.alert-error {
+    background: rgba(239, 68, 68, 0.9);
+    color: #fff;
+    border: 1px solid rgba(239, 68, 68, 1);
+}
+.alert ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.alert li {
+    margin: 4px 0;
+}
+.error-message {
+    display: block;
+    color: #fecaca;
+    font-size: 12px;
+    margin-top: 4px;
+}
+.required {
+    color: #fca5a5;
+    font-weight: bold;
+}
+
 /* RESPONSIVO */
 @media (max-width: 900px) {
     .registro-card {
@@ -207,63 +238,87 @@ body {
 
                 <h1>Crear cuenta</h1>
 
+                @if ($errors->any())
+                    <div class="alert alert-error">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <div class="form-group">
-                    <label>Número de control</label>
-                    <input type="text" name="control" placeholder="Número de control">
+                    <label>Número de control <span class="required">*</span></label>
+                    <input type="text" name="control" placeholder="Letras y números" value="{{ old('control') }}" required pattern="[A-Za-z0-9]+">
+                    @error('control')<span class="error-message">{{ $message }}</span>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label>Nombre</label>
-                    <input type="text" name="nombre" placeholder="Nombre">
+                    <label>Nombre <span class="required">*</span></label>
+                    <input type="text" name="nombre" placeholder="Solo letras" value="{{ old('nombre') }}" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+">
+                    @error('nombre')<span class="error-message">{{ $message }}</span>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label>Apellido Paterno</label>
-                    <input type="text" name="ap_paterno" placeholder="Apellido Paterno">
+                    <label>Apellido Paterno <span class="required">*</span></label>
+                    <input type="text" name="ap_paterno" placeholder="Solo letras" value="{{ old('ap_paterno') }}" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+">
+                    @error('ap_paterno')<span class="error-message">{{ $message }}</span>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label>Apellido Materno</label>
-                    <input type="text" name="ap_materno" placeholder="Apellido Materno">
+                    <label>Apellido Materno <span class="required">*</span></label>
+                    <input type="text" name="ap_materno" placeholder="Solo letras" value="{{ old('ap_materno') }}" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+">
+                    @error('ap_materno')<span class="error-message">{{ $message }}</span>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label>Contraseña</label>
-                    <input type="password" name="password" placeholder="Contraseña">
+                    <label>Contraseña <span class="required">*</span></label>
+                    <input type="password" name="password" placeholder="Letras y números" required minlength="6">
+                    @error('password')<span class="error-message">{{ $message }}</span>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label>Confirmar contraseña</label>
-                    <input type="password" name="password_confirmation" placeholder="Confirmar contraseña">
+                    <label>Confirmar contraseña <span class="required">*</span></label>
+                    <input type="password" name="password_confirmation" placeholder="Confirmar contraseña" required minlength="6">
                 </div>
 
                 <div class="form-group">
-                    <label>Correo electrónico</label>
-                    <input type="email" name="email" placeholder="Correo electrónico">
+                    <label>Correo electrónico <span class="required">*</span></label>
+                    <input type="email" name="email" placeholder="ejemplo@dominio.com" value="{{ old('email') }}" required>
+                    @error('email')<span class="error-message">{{ $message }}</span>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label>Teléfono</label>
-                    <input type="tel" name="telefono" placeholder="Teléfono">
+                    <label>Teléfono <span class="required">*</span></label>
+                    <input type="tel" name="telefono" placeholder="Solo números" value="{{ old('telefono') }}" required pattern="[0-9]+">
+                    @error('telefono')<span class="error-message">{{ $message }}</span>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label>Selecciona tu carrera</label>
-                    <select name="carrera">
+                    <label>Selecciona tu carrera <span class="required">*</span></label>
+                    <select name="carrera" required>
                         <option value="">Seleccione su carrera</option>
-                        <option>Ingeniería en Sistemas Computacionales</option>
-                        <option>Ingeniería Industrial</option>
-                        <option>Ingeniería Civil</option>
-                        <option>Otra...</option>
+                        <option value="Contador Público" {{ old('carrera') == 'Contador Público' ? 'selected' : '' }}>Contador Público</option>
+                        <option value="Licenciatura en Administración" {{ old('carrera') == 'Licenciatura en Administración' ? 'selected' : '' }}>Licenciatura en Administración</option>
+                        <option value="Ingeniería Química" {{ old('carrera') == 'Ingeniería Química' ? 'selected' : '' }}>Ingeniería Química</option>
+                        <option value="Ingeniería Mecánica" {{ old('carrera') == 'Ingeniería Mecánica' ? 'selected' : '' }}>Ingeniería Mecánica</option>
+                        <option value="Ingeniería Industrial" {{ old('carrera') == 'Ingeniería Industrial' ? 'selected' : '' }}>Ingeniería Industrial</option>
+                        <option value="Ingeniería en Sistemas Computacionales" {{ old('carrera') == 'Ingeniería en Sistemas Computacionales' ? 'selected' : '' }}>Ingeniería en Sistemas Computacionales</option>
+                        <option value="Ingeniería en Gestión Empresarial" {{ old('carrera') == 'Ingeniería en Gestión Empresarial' ? 'selected' : '' }}>Ingeniería en Gestión Empresarial</option>
+                        <option value="Ingeniería Electrónica" {{ old('carrera') == 'Ingeniería Electrónica' ? 'selected' : '' }}>Ingeniería Electrónica</option>
+                        <option value="Ingeniería Eléctrica" {{ old('carrera') == 'Ingeniería Eléctrica' ? 'selected' : '' }}>Ingeniería Eléctrica</option>
+                        <option value="Ingeniería Civil" {{ old('carrera') == 'Ingeniería Civil' ? 'selected' : '' }}>Ingeniería Civil</option>
                     </select>
+                    @error('carrera')<span class="error-message">{{ $message }}</span>@enderror
                 </div>
 
                 <div class="form-group">
-                    <label>Rol</label>
-                    <select name="role">
-                        <option value="student">Estudiante</option>
-                        <option value="judge">Juez</option>
+                    <label>Rol <span class="required">*</span></label>
+                    <select name="role" required>
+                        <option value="student" selected>Estudiante</option>
                     </select>
+                    @error('role')<span class="error-message">{{ $message }}</span>@enderror
                 </div>
 
                 <div class="form-actions">

@@ -55,7 +55,7 @@
             <thead>
             <tr>
                 <th>Nombre</th>
-                <th>Evento</th>
+                <th>Evento Asignado</th>
                 <th>Estado</th>
                 <th style="width: 220px;">Acciones</th>
             </tr>
@@ -64,7 +64,18 @@
             @forelse($rubrics as $rubricItem)
                 <tr @if($rubric && $rubric->id === $rubricItem->id) style="box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);" @endif>
                     <td><strong>{{ $rubricItem->name }}</strong></td>
-                    <td>{{ $rubricItem->event?->title ?? '-' }}</td>
+                    <td>
+                        @php
+                            $assignedEvents = $rubricItem->events();
+                        @endphp
+                        @if($assignedEvents->isNotEmpty())
+                            @foreach($assignedEvents as $assignedEvent)
+                                <span class="badge bg-info me-1 mb-1">{{ $assignedEvent->title }}</span>
+                            @endforeach
+                        @else
+                            <span class="text-muted">Sin asignar</span>
+                        @endif
+                    </td>
                     <td>
                         @if($rubricItem->status === 'activa')
                             <span class="badge bg-success">Activa</span>

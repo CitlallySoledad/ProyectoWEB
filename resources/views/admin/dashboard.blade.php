@@ -99,6 +99,11 @@
                     </div>
                 @endforeach
             </div>
+            
+            {{-- Paginación --}}
+            <div class="mt-4 d-flex justify-content-center">
+                {{ $recentTeams->links('pagination::bootstrap-5') }}
+            </div>
         @endif
     </div>
 

@@ -16,8 +16,7 @@ class AdminDashboardController extends Controller
 
         $recentTeams = Team::with('leader')
             ->latest('created_at')
-            ->take(5)
-            ->get();
+            ->paginate(3);
 
         return view('admin.dashboard', compact('eventsCount', 'teamsCount', 'usersCount', 'recentTeams'));
     }

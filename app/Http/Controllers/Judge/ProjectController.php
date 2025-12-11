@@ -15,14 +15,18 @@ class ProjectController extends Controller
         $judge = Auth::user();
         $q = request('q');
 
-        // Obtener proyectos asignados a este juez y pendientes de evaluación por él
+        // Obtener todos los eventos donde este juez está asignado
+        // Usar sintaxis compatible con SQLite y MySQL
+        $eventsWithJudge = \App\Models\Event::where(function($query) use ($judge) {
+            $query->whereRaw("INSTR(judge_ids, ?) > 0", ['"'.$judge->id.'"'])
+                  ->orWhereRaw("judge_ids LIKE ?", ['%"'.$judge->id.'"%']);
+        })
+            ->pluck('id');
+
+        // Obtener TODOS los proyectos enviados de esos eventos (incluso si no están en pivot project_judge)
         $allProjects = Project::with(['team.members','event', 'rubric', 'documents'])
-            ->whereHas('judges', function ($jb) use ($judge) {
-                $jb->where('users.id', $judge->id);
-            })
-            ->whereDoesntHave('evaluations', function ($qBuilder) use ($judge) {
-                $qBuilder->where('judge_id', $judge->id);
-            })
+            ->whereIn('event_id', $eventsWithJudge)
+            ->where('status', 'enviado') // Solo proyectos enviados
             ->when($q, function ($qb) use ($q) {
                 $qb->where('name', 'like', "%{$q}%")
                    ->orWhereHas('team', function ($t) use ($q) {
@@ -30,6 +34,13 @@ class ProjectController extends Controller
                    });
             })
             ->get();
+
+        // Marcar cuáles ya fueron evaluados por este juez
+        $allProjects->each(function($project) use ($judge) {
+            $project->already_evaluated = $project->evaluations()
+                ->where('judge_id', $judge->id)
+                ->exists();
+        });
 
         // Agrupar proyectos por evento
         $projectsByEvent = $allProjects->groupBy('event_id');

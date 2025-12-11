@@ -165,6 +165,8 @@
             <p>📋 Requisitos de la contraseña:</p>
             <ul>
                 <li>Mínimo 8 caracteres</li>
+                <li>Debe contener al menos una letra</li>
+                <li>Debe contener al menos un número</li>
                 <li>Las contraseñas deben coincidir</li>
             </ul>
         </div>
@@ -196,9 +198,12 @@
                 id="password"
                 name="password"
                 class="reset-password-input"
-                placeholder="Ingresa tu nueva contraseña"
+                placeholder="Letras y números (mín. 8 caracteres)"
                 required
                 autofocus
+                minlength="8"
+                pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$"
+                title="La contraseña debe contener al menos una letra y un número"
             >
 
             <label class="reset-password-label" for="password_confirmation">
@@ -211,6 +216,7 @@
                 class="reset-password-input"
                 placeholder="Confirma tu nueva contraseña"
                 required
+                minlength="8"
             >
 
             <button type="submit" class="reset-password-btn">

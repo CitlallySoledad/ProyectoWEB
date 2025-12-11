@@ -2,24 +2,152 @@
 
 @section('title', 'Eventos')
 
+@push('styles')
+<style>
+/* ===== PAGINACIÓN COMPACTA EVENTOS ===== */
+.events-pagination {
+    margin: 24px auto 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    width: auto;
+    max-width: 100%;
+    font-size: 0.85rem;
+    color: #1e293b;
+}
+
+.events-pagination-info {
+    white-space: nowrap;
+    opacity: 0.85;
+    font-weight: 500;
+}
+
+.events-pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Botones de página */
+.page-number,
+.page-arrow {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid #2563eb;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: #1e293b;
+    background: transparent;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+    cursor: pointer;
+}
+
+.page-number:hover,
+.page-arrow:hover {
+    background: #2563eb;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* Página actual */
+.page-number.active {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #1d4ed8;
+    font-weight: 600;
+}
+
+/* Deshabilitados */
+.page-arrow.disabled {
+    opacity: 0.35;
+    border-color: #94a3b8;
+    cursor: default;
+    pointer-events: none;
+}
+</style>
+@endpush
+
 @section('content')
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h4 mb-0">Eventos</h1>
-        <a href="{{ route('admin.events.create') }}" class="admin-btn-primary text-decoration-none">
-            <i class="bi bi-plus-circle me-1"></i> Crear evento
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1 fw-bold">🎯 Gestión de Eventos</h1>
+            <p class="text-muted mb-0">Administra todos los eventos del sistema</p>
+        </div>
+        <a href="{{ route('admin.events.create') }}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none;">
+            <i class="bi bi-plus-circle me-2"></i> Crear Evento
         </a>
+    </div>
+
+    {{-- BARRA DE ESTADÍSTICAS --}}
+    <div class="row g-3 mb-4">
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="card-body text-center text-white py-4">
+                    <div class="display-4 fw-bold mb-2">{{ $stats['total'] }}</div>
+                    <div class="text-white-50 fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Total</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">
+                <div class="card-body text-center text-white py-4">
+                    <div class="display-4 fw-bold mb-2">{{ $stats['activos'] }}</div>
+                    <div class="text-white-50 fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Activos</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                <div class="card-body text-center text-white py-4">
+                    <div class="display-4 fw-bold mb-2">{{ $stats['publicados'] }}</div>
+                    <div class="text-white-50 fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Publicados</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);">
+                <div class="card-body text-center text-white py-4">
+                    <div class="display-4 fw-bold mb-2">{{ $stats['borradores'] }}</div>
+                    <div class="text-white-50 fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Borradores</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                <div class="card-body text-center text-white py-4">
+                    <div class="display-4 fw-bold mb-2">{{ $stats['cerrados'] }}</div>
+                    <div class="text-white-50 fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Cerrados</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <div class="card-body text-center text-white py-4">
+                    <div class="display-4 fw-bold mb-2">{{ $stats['inscritos'] }}</div>
+                    <div class="text-white-50 fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Inscritos</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- MENSAJES DE ÉXITO --}}
     @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show rounded-3 py-2 mb-3" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+        <div class="alert alert-success alert-dismissible fade show" style="border-radius: 15px; border-left: 4px solid #22c55e;" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i><strong>¡Éxito!</strong> {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
-    <div class="admin-card">
+    <div class="admin-card" style="border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
         <div class="admin-card-title">Lista de eventos</div>
 
         @if($events->isEmpty())
@@ -140,35 +268,39 @@
                 </tbody>
             </table>
 
-            {{-- ESTADÍSTICAS RÁPIDAS --}}
-            <div class="mt-3 p-3 bg-light rounded-3">
-                <div class="row text-center">
-                    <div class="col-md-2">
-                        <h5 class="mb-0">{{ $events->count() }}</h5>
-                        <small class="text-muted">Total</small>
-                    </div>
-                    <div class="col-md-2">
-                        <h5 class="mb-0">{{ $events->where('status', 'activo')->count() }}</h5>
-                        <small class="text-muted">Activos</small>
-                    </div>
-                    <div class="col-md-2">
-                        <h5 class="mb-0">{{ $events->where('status', 'publicado')->count() }}</h5>
-                        <small class="text-muted">Publicados</small>
-                    </div>
-                    <div class="col-md-2">
-                        <h5 class="mb-0">{{ $events->where('status', 'borrador')->count() }}</h5>
-                        <small class="text-muted">Borradores</small>
-                    </div>
-                    <div class="col-md-2">
-                        <h5 class="mb-0">{{ $events->where('status', 'cerrado')->count() }}</h5>
-                        <small class="text-muted">Cerrados</small>
-                    </div>
-                    <div class="col-md-2">
-                        <h5 class="mb-0">{{ $events->sum(fn($e) => $e->teams()->count()) }}</h5>
-                        <small class="text-muted">Inscritos</small>
+            {{-- PAGINACIÓN COMPACTA --}}
+            @if ($events->hasPages())
+                <div class="events-pagination">
+                    <span class="events-pagination-info">
+                        Mostrando {{ $events->firstItem() }} - {{ $events->lastItem() }} de {{ $events->total() }} eventos
+                    </span>
+
+                    <div class="events-pagination-pages">
+                        {{-- Flecha Anterior --}}
+                        @if ($events->onFirstPage())
+                            <span class="page-arrow disabled">&laquo;</span>
+                        @else
+                            <a href="{{ $events->previousPageUrl() }}" class="page-arrow">&laquo;</a>
+                        @endif
+
+                        {{-- Números de página --}}
+                        @foreach ($events->getUrlRange(1, $events->lastPage()) as $page => $url)
+                            @if ($page == $events->currentPage())
+                                <span class="page-number active">{{ $page }}</span>
+                            @else
+                                <a href="{{ $url }}" class="page-number">{{ $page }}</a>
+                            @endif
+                        @endforeach
+
+                        {{-- Flecha Siguiente --}}
+                        @if ($events->hasMorePages())
+                            <a href="{{ $events->nextPageUrl() }}" class="page-arrow">&raquo;</a>
+                        @else
+                            <span class="page-arrow disabled">&raquo;</span>
+                        @endif
                     </div>
                 </div>
-            </div>
+            @endif
         @endif
     </div>
 

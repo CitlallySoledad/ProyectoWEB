@@ -421,8 +421,13 @@
                 <div class="cards-row">
                     <div class="card">
                         <div class="card-title">Próximo evento</div>
-                        <div class="card-main-text">HackaTec</div>
-                        <div class="card-subtext">10 de noviembre</div>
+                        @if($proximoEvento)
+                            <div class="card-main-text">{{ $proximoEvento->title }}</div>
+                            <div class="card-subtext">{{ \Carbon\Carbon::parse($proximoEvento->start_date)->locale('es')->isoFormat('D [de] MMMM [de] YYYY') }}</div>
+                        @else
+                            <div class="card-main-text">Sin eventos</div>
+                            <div class="card-subtext">No hay eventos programados</div>
+                        @endif
                     </div>
 
                     <div class="card card-with-icon">
@@ -431,15 +436,25 @@
                         </div>
                         <div>
                             <div class="card-title">Próximo evento</div>
-                            <div class="card-main-text">EvaluaTec</div>
-                            <div class="card-subtext">12 de diciembre</div>
+                            @if($proximoEvento)
+                                <div class="card-main-text">{{ $proximoEvento->title }}</div>
+                                <div class="card-subtext">{{ \Carbon\Carbon::parse($proximoEvento->start_date)->locale('es')->isoFormat('D [de] MMMM') }}</div>
+                            @else
+                                <div class="card-main-text">Sin eventos</div>
+                                <div class="card-subtext">-</div>
+                            @endif
                         </div>
                     </div>
 
                     <div class="card card-progress">
-                        <div class="card-title">Progreso de roles</div>
-                        <div class="card-main-text">4/4 completo</div>
-                        <div class="card-progress-value">Completado</div>
+                        <div class="card-title">Mi equipo</div>
+                        @if($equipo)
+                            <div class="card-main-text">{{ $equipo->name }}</div>
+                            <div class="card-progress-value">{{ $equipo->members()->count() }} miembros</div>
+                        @else
+                            <div class="card-main-text">Sin equipo</div>
+                            <div class="card-subtext">Crea o únete a un equipo</div>
+                        @endif
                     </div>
                 </div>
 
@@ -447,18 +462,33 @@
                 <div class="activity-card">
                     <div class="activity-title">Actividad</div>
                     <ul class="activity-list">
-                        <li>
-                            <span class="emoji">🔴</span>
-                            <span>El evento HackaTec está próximo a comenzar.</span>
-                        </li>
-                        <li>
-                            <span class="emoji">❗</span>
-                            <span>Se ha unido recientemente Alfredo.</span>
-                        </li>
-                        <li>
-                            <span class="emoji">❗</span>
-                            <span>Se ha unido recientemente Liz.</span>
-                        </li>
+                        @if($proximoEvento)
+                            <li>
+                                <span class="emoji">🔴</span>
+                                <span>El evento {{ $proximoEvento->title }} está próximo a comenzar.</span>
+                            </li>
+                        @endif
+                        
+                        @if(count($actividadReciente) > 0)
+                            @foreach($actividadReciente as $actividad)
+                                <li>
+                                    <span class="emoji">✅</span>
+                                    <span>{{ $actividad['nombre'] }} inició sesión {{ $actividad['tiempo'] }}.</span>
+                                </li>
+                            @endforeach
+                        @else
+                            @if($equipo)
+                                <li>
+                                    <span class="emoji">ℹ️</span>
+                                    <span>No hay actividad reciente de tu equipo.</span>
+                                </li>
+                            @else
+                                <li>
+                                    <span class="emoji">ℹ️</span>
+                                    <span>Únete a un equipo para ver la actividad.</span>
+                                </li>
+                            @endif
+                        @endif
                     </ul>
                 </div>
 

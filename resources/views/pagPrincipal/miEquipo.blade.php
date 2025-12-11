@@ -292,6 +292,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const pills = document.querySelectorAll('.user-team-pill');
     const title = document.getElementById('teamTitle');
     const memberLists = document.querySelectorAll('.team-members-list');
+    const leaderActions = document.querySelectorAll('.leader-actions-section');
 
     function mostrarEquipo(teamId, teamName, isLeader) {
         // Cambiar título con icono de líder o miembro
@@ -307,6 +308,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 list.style.display = 'block';
             } else {
                 list.style.display = 'none';
+            }
+        });
+
+        // Mostrar/ocultar acciones de líder según el equipo seleccionado
+        leaderActions.forEach(action => {
+            const actionTeamId = action.id.replace('leader-actions-', '');
+            if (actionTeamId === teamId && isLeader === 'true') {
+                action.style.display = 'block';
+            } else {
+                action.style.display = 'none';
             }
         });
     }
@@ -331,7 +342,7 @@ document.addEventListener('DOMContentLoaded', function () {
             pills.forEach(p => p.classList.remove('active'));
             this.classList.add('active');
 
-            // Mostrar miembros del equipo
+            // Mostrar miembros del equipo y controlar visibilidad de botones de líder
             mostrarEquipo(teamId, teamName, isLeader);
         });
     });
@@ -548,8 +559,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                 @endforeach
 
-                {{-- BOTÓN PARA INVITAR NUEVOS MIEMBROS (solo para líderes) --}}
-                @if (auth()->id() === $t->leader_id)
+                {{-- BOTÓN PARA INVITAR NUEVOS MIEMBROS (solo visible para equipos donde es líder) --}}
+                <div id="leader-actions-{{ $t->id }}" class="leader-actions-section" style="{{ auth()->id() === $t->leader_id ? '' : 'display: none;' }}">
                     <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #475569;">
                         <button 
                             type="button" 
@@ -612,190 +623,87 @@ document.addEventListener('DOMContentLoaded', function () {
                             @endforeach
                         </div>
                     @endif
-                @endif
+
+                    {{-- BOTÓN SOLICITUDES DE UNIRSE --}}
+                    @php
+                        $teamRequests = $pendingRequests->where('team_id', $t->id);
+                    @endphp
+                    <div style="margin-top: 20px;">
+                        <button 
+                            type="button" 
+                            onclick="toggleRequestsSection('{{ $t->id }}')"
+                            style="width: 100%; padding: 14px 20px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);">
+                            <i class="bi bi-inbox" style="font-size: 1.2rem;"></i>
+                            <span>Solicitudes de unirse</span>
+                            @if($teamRequests->count() > 0)
+                                <span style="display: inline-block; background: #ef4444; color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; font-weight: 600;">
+                                    {{ $teamRequests->count() }}
+                                </span>
+                            @endif
+                            <i class="bi bi-chevron-down" id="requests-icon-{{ $t->id }}" style="font-size: 0.9rem; transition: transform 0.3s ease;"></i>
+                        </button>
+
+                        {{-- CONTENIDO DE SOLICITUDES (oculto por defecto) --}}
+                        <div id="requests-section-{{ $t->id }}" style="display: none; margin-top: 16px; padding: 20px; background: rgba(15, 23, 42, 0.5); border-radius: 8px; border: 1px solid #475569;">
+                            @if($teamRequests->count() > 0)
+                                @foreach($teamRequests as $request)
+                                    @php
+                                        // Verificar si el rol ya está ocupado en el equipo
+                                        $roleOccupied = $request->team->members()
+                                            ->wherePivot('role', $request->role)
+                                            ->first();
+                                    @endphp
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(15, 23, 42, 0.3); border-radius: 12px; margin-bottom: 12px; border-left: 4px solid {{ $roleOccupied ? '#f59e0b' : '#a78bfa' }};">
+                                        <div style="flex: 1;">
+                                            <p style="color: #e2e8f0; font-weight: 600; margin: 0 0 8px 0;">{{ $request->user->name }}</p>
+                                            <p style="color: #9ca3af; margin: 0; font-size: 0.9rem;">
+                                                Quiere unirse como: <strong style="color: #bfdbfe;">{{ $request->role }}</strong>
+                                            </p>
+                                            
+                                            @if($roleOccupied)
+                                                <div style="display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 6px 12px; background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 6px;">
+                                                    <span style="color: #fbbf24; font-size: 0.85rem; font-weight: 600;">
+                                                        ⚠️ Rol ocupado por {{ $roleOccupied->name }}
+                                                    </span>
+                                                </div>
+                                                <p style="color: #9ca3af; margin: 8px 0 0 0; font-size: 0.8rem; font-style: italic;">
+                                                    Para aceptar esta solicitud, primero elimina a {{ $roleOccupied->name }} del equipo.
+                                                </p>
+                                            @endif
+                                        </div>
+                                        <div style="display: flex; gap: 8px; flex-direction: column;">
+                                            <form action="{{ route('panel.requests.accept', $request->id) }}" method="POST" style="display: inline;">
+                                                @csrf
+                                                <button type="submit" 
+                                                        style="padding: 8px 16px; background: {{ $roleOccupied ? '#6b7280' : '#10b981' }}; color: white; border: none; border-radius: 8px; cursor: {{ $roleOccupied ? 'not-allowed' : 'pointer' }}; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; width: 100%;"
+                                                        {{ $roleOccupied ? 'disabled' : '' }}
+                                                        title="{{ $roleOccupied ? 'Elimina primero a ' . $roleOccupied->name . ' para aceptar esta solicitud' : '' }}">
+                                                    <i class="bi bi-check-circle"></i> Aceptar
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('panel.requests.reject', $request->id) }}" method="POST" style="display: inline;">
+                                                @csrf
+                                                <button type="submit" style="padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; width: 100%;">
+                                                    <i class="bi bi-x-circle"></i> Rechazar
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div style="text-align: center; padding: 40px 20px;">
+                                    <div style="font-size: 64px; margin-bottom: 16px; opacity: 0.5;">📭</div>
+                                    <p style="color: #9ca3af; font-size: 1.1rem; margin: 0;">No hay solicitudes pendientes</p>
+                                    <p style="color: #6b7280; font-size: 0.9rem; margin-top: 8px;">Las solicitudes para unirse a este equipo aparecerán aquí.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
             </div>
         @endforeach
     </div>
 @endif
-
-{{-- TARJETA DE MIEMBROS DEL EQUIPO PRINCIPAL --}}
-                @if (!$team)
-                    
-                @else
-                    <div class="team-box">
-                        <h2 class="team-box-title">Miembros — {{ $team->name }}</h2>
-
-                        @foreach ($team->members ?? [] as $member)
-                            <div class="member-item" style="display: flex; justify-content: space-between; align-items: center;">
-                                <div style="display: flex; align-items: center; flex: 1; gap: 12px;">
-                                    <img 
-                                        src="https://ui-avatars.com/api/?name={{ urlencode($member->name) }}&background=random"
-                                        class="member-avatar"
-                                        alt="{{ $member->name }}">
-                                    
-                                    <div class="member-info">
-                                        <span class="member-name">{{ $member->name }}</span>
-                                        {{-- Mostrar rol desde la tabla pivote o Líder si es líder --}}
-                                        @if ($team->leader && $team->leader->id === $member->id)
-                                            <span class="member-role">Líder</span>
-                                        @elseif($member->pivot->role)
-                                            <span class="member-role">{{ $member->pivot->role }}</span>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                {{-- Botón para eliminar miembro (solo visible para el líder) --}}
-                                @if (auth()->id() === $team->leader_id && auth()->id() !== $member->id)
-                                    <form action="{{ route('panel.members.remove', [$team->id, $member->id]) }}" method="POST" style="display: inline;">
-                                        @csrf
-                                        <button type="submit" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.875rem; background: #dc2626; color: white; border: none; border-radius: 0.375rem; cursor: pointer;">
-                                            Eliminar
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-
-                    {{-- FORMULARIO DE INVITACIÓN (solo para líderes) --}}
-                    @if (auth()->id() === $team->leader_id)
-                        <div style="margin-top: 20px; padding: 16px; background: rgba(15, 23, 42, 0.3); border-radius: 12px; border-left: 4px solid #3b82f6;">
-                            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: #e2e8f0;">
-                                <i class="bi bi-envelope"></i> Invitar nuevos miembros
-                            </h3>
-                            <form action="{{ route('panel.invitations.send') }}" method="POST" style="display: flex; flex-direction: column; gap: 12px;">
-                                @csrf
-                                <input type="hidden" name="team_id" value="{{ $team->id }}">
-                                <input 
-                                    type="email" 
-                                    name="email" 
-                                    placeholder="Correo del usuario a invitar"
-                                    style="width: 100%; padding: 10px; background: rgba(15, 23, 42, 0.3); border: 1px solid #475569; border-radius: 8px; color: #e2e8f0; font-size: 0.95rem;"
-                                    required>
-                                <select 
-                                    name="role" 
-                                    style="width: 100%; padding: 10px; background: rgba(15, 23, 42, 0.3); border: 1px solid #475569; border-radius: 8px; color: #e2e8f0; font-size: 0.95rem;"
-                                    required>
-                                    <option value="" disabled selected>Selecciona el rol para esta invitación</option>
-                                    <option value="Back">Back-end</option>
-                                    <option value="Front">Front-end</option>
-                                    <option value="Diseñador">Diseñador</option>
-                                </select>
-                                <button type="submit" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s;">
-                                    <i class="bi bi-send"></i> Enviar Invitación
-                                </button>
-                            </form>
-                            @if ($errors->has('email'))
-                                <p style="color: #fca5a5; margin-top: 8px; font-size: 0.9rem;">{{ $errors->first('email') }}</p>
-                            @endif
-                        </div>
-
-                        {{-- INVITACIONES PENDIENTES DEL EQUIPO PRINCIPAL --}}
-                        @php
-                            $pendingInvitations = $team->invitations()->where('status', 'pending')->get();
-                        @endphp
-                        @if ($pendingInvitations->count() > 0)
-                            <div style="margin-top: 20px;">
-                                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: #fbbf24;">
-                                    <i class="bi bi-hourglass-split"></i> Invitaciones pendientes
-                                </h3>
-                                @foreach ($pendingInvitations as $invitation)
-                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(15, 23, 42, 0.3); border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #fbbf24;">
-                                        <div style="flex: 1;">
-                                            <p style="color: #e2e8f0; font-weight: 600; margin: 0; font-size: 0.9rem;">{{ $invitation->email }}</p>
-                                            <p style="color: #9ca3af; margin: 4px 0 0 0; font-size: 0.8rem;">{{ $invitation->created_at->format('d/m/Y H:i') }}</p>
-                                        </div>
-                                        <button onclick="copiarEnlace('{{ route('team-invitation.accept', ['token' => $invitation->token]) }}')" style="padding: 6px 12px; background: #8b5cf6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
-                                            <i class="bi bi-clipboard"></i> Copiar
-                                        </button>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
-                    @endif
-                @endif
-
-            {{-- SOLICITUDES PENDIENTES --}}
-            @php
-                $isLeaderOfAnyTeam = $leaderTeams->isNotEmpty();
-            @endphp
-            @if($isLeaderOfAnyTeam)
-                <section style="margin-top: 40px;">
-                    <button 
-                        type="button" 
-                        onclick="toggleRequestsSection()"
-                        style="width: 100%; padding: 16px 24px; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <i class="bi bi-inbox" style="font-size: 1.4rem;"></i>
-                            <span>Solicitudes de unirse</span>
-                            @if($pendingRequests && $pendingRequests->count() > 0)
-                                <span style="display: inline-block; background: #ef4444; color: white; font-size: 0.85rem; padding: 4px 12px; border-radius: 999px; font-weight: 600;">
-                                    {{ $pendingRequests->count() }}
-                                </span>
-                            @endif
-                        </div>
-                        <i class="bi bi-chevron-down" id="requests-icon" style="font-size: 1.1rem; transition: transform 0.3s ease;"></i>
-                    </button>
-
-                    <div id="requests-section" style="display: none; margin-top: 16px; background: rgba(15, 23, 42, 0.65); border-radius: 18px; padding: 20px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);">
-                        @if($pendingRequests && $pendingRequests->count() > 0)
-                            @foreach($pendingRequests as $request)
-                                @php
-                                    // Verificar si el rol ya está ocupado en el equipo
-                                    $roleOccupied = $request->team->members()
-                                        ->wherePivot('role', $request->role)
-                                        ->first();
-                                @endphp
-                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(15, 23, 42, 0.3); border-radius: 12px; margin-bottom: 12px; border-left: 4px solid {{ $roleOccupied ? '#f59e0b' : '#a78bfa' }};">
-                                    <div style="flex: 1;">
-                                        <p style="color: #e2e8f0; font-weight: 600; margin: 0 0 8px 0;">{{ $request->user->name }}</p>
-                                        <p style="color: #9ca3af; margin: 0; font-size: 0.9rem;">
-                                            Quiere unirse como: <strong style="color: #bfdbfe;">{{ $request->role }}</strong>
-                                        </p>
-                                        <p style="color: #6b7280; margin: 4px 0 0 0; font-size: 0.85rem;">
-                                            En el equipo: <strong>{{ $request->team->name }}</strong>
-                                        </p>
-                                        
-                                        @if($roleOccupied)
-                                            <div style="display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 6px 12px; background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 6px;">
-                                                <span style="color: #fbbf24; font-size: 0.85rem; font-weight: 600;">
-                                                    ⚠️ Rol ocupado por {{ $roleOccupied->name }}
-                                                </span>
-                                            </div>
-                                            <p style="color: #9ca3af; margin: 8px 0 0 0; font-size: 0.8rem; font-style: italic;">
-                                                Para aceptar esta solicitud, primero elimina a {{ $roleOccupied->name }} del equipo.
-                                            </p>
-                                        @endif
-                                    </div>
-                                    <div style="display: flex; gap: 8px; flex-direction: column;">
-                                        <form action="{{ route('panel.requests.accept', $request->id) }}" method="POST" style="display: inline;">
-                                            @csrf
-                                            <button type="submit" 
-                                                    style="padding: 8px 16px; background: {{ $roleOccupied ? '#6b7280' : '#10b981' }}; color: white; border: none; border-radius: 8px; cursor: {{ $roleOccupied ? 'not-allowed' : 'pointer' }}; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; width: 100%;"
-                                                    {{ $roleOccupied ? 'disabled' : '' }}
-                                                    title="{{ $roleOccupied ? 'Elimina primero a ' . $roleOccupied->name . ' para aceptar esta solicitud' : '' }}">
-                                                <i class="bi bi-check-circle"></i> Aceptar
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('panel.requests.reject', $request->id) }}" method="POST" style="display: inline;">
-                                            @csrf
-                                            <button type="submit" style="padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; width: 100%;">
-                                                <i class="bi bi-x-circle"></i> Rechazar
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            @endforeach
-                        @else
-                            <div style="text-align: center; padding: 40px 20px;">
-                                <div style="font-size: 64px; margin-bottom: 16px; opacity: 0.5;">📭</div>
-                                <p style="color: #9ca3af; font-size: 1.1rem; margin: 0;">No hay solicitudes pendientes</p>
-                                <p style="color: #6b7280; font-size: 0.9rem; margin-top: 8px;">Las solicitudes para unirse a tus equipos aparecerán aquí.</p>
-                            </div>
-                        @endif
-                    </div>
-                </section>
-            @endif
 
         </main>
 
@@ -817,10 +725,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Función para alternar visibilidad de solicitudes
-    function toggleRequestsSection() {
-        const section = document.getElementById('requests-section');
-        const icon = document.getElementById('requests-icon');
+    // Función para alternar visibilidad de solicitudes por equipo
+    function toggleRequestsSection(teamId) {
+        const section = document.getElementById('requests-section-' + teamId);
+        const icon = document.getElementById('requests-icon-' + teamId);
         
         if (section.style.display === 'none' || section.style.display === '') {
             section.style.display = 'block';

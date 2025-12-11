@@ -635,12 +635,13 @@
                         <hr style="border-color: rgba(148,163,184,0.4); margin: 16px 0;">
 
                         <p class="submission-right-small">
-                            Gestiona los repositorios asociados a esta submisión.
+                            Crea un nuevo proyecto o edita uno existente abajo.
                         </p>
-                        <button type="button" class="btn-rounded btn-repo" onclick="openPdfModal()"
-                                {{ $eligibleTeams->isEmpty() || ($project && $project->status === 'enviado') ? 'disabled style=opacity:0.5;cursor:not-allowed;' : '' }}>
-                            Gestionar / ver repositorios
-                        </button>
+                        @if($projects && $projects->count() > 0)
+                        <p class="submission-right-small" style="margin-top: 12px; color: #22c55e;">
+                            <i class="bi bi-check-circle"></i> Tienes {{ $projects->count() }} proyecto(s) guardado(s)
+                        </p>
+                        @endif
                         
                         @if($eligibleTeams->isEmpty())
                             <small class="text-muted d-block mt-2" style="font-size: 0.85rem; color: #94a3b8;">
@@ -654,112 +655,132 @@
                     </div>
                 </div>
 
-                {{-- Mostrar proyecto guardado con sus documentos (ABAJO) --}}
-                @if($project)
-                <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.5); border-radius: 16px; padding: 20px; margin-top: 24px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(34, 197, 94, 0.2); display: flex; align-items: center; justify-content: center;">
-                                <i class="bi bi-check-circle" style="font-size: 24px; color: #22c55e;"></i>
-                            </div>
-                            <div>
-                                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 600; color: #e5e7eb;">{{ $project->name }}</h3>
-                                <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #94a3b8;">
-                                    Equipo: {{ $project->team->name }} | Evento: {{ $project->event->title ?? 'N/A' }} | Visibilidad: <span style="text-transform: capitalize;">{{ $project->visibility }}</span>
-                                    @if($project->status === 'enviado')
-                                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.5); border-radius: 999px; font-size: 0.75rem; margin-left: 8px;">
-                                            <i class="bi bi-lock-fill"></i> Enviado
-                                        </span>
-                                    @endif
-                                </p>
-                            </div>
-                        </div>
-                        @if($project->status !== 'enviado')
-                        <button type="button" 
-                                onclick="toggleEditMode()"
-                                style="padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.6); background: rgba(15, 23, 42, 0.7); color: #e5e7eb; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;"
-                                onmouseover="this.style.background='rgba(59, 130, 246, 0.2)'; this.style.borderColor='#3b82f6';"
-                                onmouseout="this.style.background='rgba(15, 23, 42, 0.7)'; this.style.borderColor='rgba(148, 163, 184, 0.6)';">
-                            <i class="bi bi-pencil"></i>
-                            <span>Editar proyecto</span>
-                        </button>
-                        @endif
-                    </div>
-                    
-                    @if($project->documents && $project->documents->count() > 0)
-                    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(148, 163, 184, 0.3);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <p style="margin: 0; font-size: 0.9rem; font-weight: 600; color: #e5e7eb;">
-                                <i class="bi bi-file-earmark-pdf"></i> Documentos subidos ({{ $project->documents->count() }})
-                            </p>
-                        </div>
-                        <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-                            @foreach($project->documents as $doc)
-                            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(148, 163, 184, 0.4); border-radius: 999px;">
-                                <a href="{{ asset('storage/' . $doc->file_path) }}" 
-                                   target="_blank"
-                                   style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #fbbf24; font-size: 0.9rem;"
-                                   onmouseover="this.style.color='#fde047';"
-                                   onmouseout="this.style.color='#fbbf24';">
-                                    <i class="bi bi-file-pdf-fill"></i>
-                                    <span>{{ $doc->original_name }}</span>
-                                    <small style="color: #94a3b8;">({{ number_format($doc->file_size / 1024, 1) }} KB)</small>
-                                </a>
-                                @if($project->status !== 'enviado')
-                                <form action="{{ route('panel.submission.delete-pdf', $doc->id) }}" method="POST" style="display: inline; margin: 0;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" 
-                                            onclick="return confirm('¿Estás seguro de eliminar este documento?')"
-                                            style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 0; font-size: 18px; line-height: 1;"
-                                            title="Eliminar documento">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                                @endif
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    @else
-                    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(148, 163, 184, 0.3);">
-                        <p style="margin: 0; font-size: 0.85rem; color: #94a3b8; font-style: italic;">
-                            <i class="bi bi-info-circle"></i> No hay documentos PDF subidos aún. Usa el botón "Gestionar / ver repositorios" para subir archivos.
+                {{-- Mostrar TODOS los proyectos guardados con sus documentos (ABAJO) --}}
+                @if($projects && $projects->count() > 0)
+                    @if($projects->count() > 1)
+                    <div style="margin-top: 24px; margin-bottom: 16px;">
+                        <h2 style="color: #e5e7eb; font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            <i class="bi bi-folder-fill" style="color: #8b5cf6;"></i>
+                            Tus proyectos ({{ $projects->count() }})
+                        </h2>
+                        <p style="color: #94a3b8; font-size: 0.9rem; margin: 8px 0 0 0;">
+                            Puedes gestionar cada proyecto de forma independiente según el equipo y evento.
                         </p>
                     </div>
                     @endif
                     
-                    {{-- Botón para confirmar y enviar proyecto --}}
-                    @if($project->documents && $project->documents->count() > 0)
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(148, 163, 184, 0.3); text-align: center;">
-                        @if($project->status === 'enviado')
-                            <div style="padding: 16px; background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 12px; margin-bottom: 12px;">
-                                <p style="margin: 0; font-size: 0.95rem; color: #22c55e; font-weight: 600;">
-                                    <i class="bi bi-check-circle-fill"></i> Proyecto enviado a los jueces
-                                </p>
-                                <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #94a3b8;">
-                                    Tu proyecto está listo para evaluación. Puedes seguir editándolo si lo necesitas.
+                    @foreach($projects as $proj)
+                    <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.5); border-radius: 16px; padding: 20px; margin-top: 24px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(34, 197, 94, 0.2); display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-check-circle" style="font-size: 24px; color: #22c55e;"></i>
+                                </div>
+                                <div>
+                                    <h3 style="margin: 0; font-size: 1.2rem; font-weight: 600; color: #e5e7eb;">{{ $proj->name }}</h3>
+                                    <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #94a3b8;">
+                                        Equipo: {{ $proj->team->name }} | Evento: {{ $proj->event->title ?? 'N/A' }} | Visibilidad: <span style="text-transform: capitalize;">{{ $proj->visibility }}</span>
+                                        @if($proj->status === 'enviado')
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.5); border-radius: 999px; font-size: 0.75rem; margin-left: 8px;">
+                                                <i class="bi bi-lock-fill"></i> Enviado
+                                            </span>
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+                            @if($proj->status !== 'enviado')
+                            <button type="button" 
+                                    onclick="editProject({{ $proj->id }}, '{{ $proj->name }}', '{{ $proj->visibility }}', {{ $proj->team_id }}, {{ $proj->event_id }})"
+                                    style="padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.6); background: rgba(15, 23, 42, 0.7); color: #e5e7eb; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;"
+                                    onmouseover="this.style.background='rgba(59, 130, 246, 0.2)'; this.style.borderColor='#3b82f6';"
+                                    onmouseout="this.style.background='rgba(15, 23, 42, 0.7)'; this.style.borderColor='rgba(148, 163, 184, 0.6)';">
+                                <i class="bi bi-pencil"></i>
+                                <span>Editar proyecto</span>
+                            </button>
+                            @endif
+                        </div>
+                        
+                        @if($proj->documents && $proj->documents->count() > 0)
+                        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(148, 163, 184, 0.3);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <p style="margin: 0; font-size: 0.9rem; font-weight: 600; color: #e5e7eb;">
+                                    <i class="bi bi-file-earmark-pdf"></i> Documentos subidos ({{ $proj->documents->count() }})
                                 </p>
                             </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                                @foreach($proj->documents as $doc)
+                                <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(148, 163, 184, 0.4); border-radius: 999px;">
+                                    <a href="{{ asset('storage/' . $doc->file_path) }}" 
+                                       target="_blank"
+                                       style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #fbbf24; font-size: 0.9rem;"
+                                       onmouseover="this.style.color='#fde047';"
+                                       onmouseout="this.style.color='#fbbf24';">
+                                        <i class="bi bi-file-pdf-fill"></i>
+                                        <span>{{ $doc->original_name }}</span>
+                                        <small style="color: #94a3b8;">({{ number_format($doc->file_size / 1024, 1) }} KB)</small>
+                                    </a>
+                                    @if($proj->status !== 'enviado')
+                                    <form action="{{ route('panel.submission.delete-pdf', $doc->id) }}" method="POST" style="display: inline; margin: 0;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                onclick="return confirm('¿Estás seguro de eliminar este documento?')"
+                                                style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 0; font-size: 18px; line-height: 1;"
+                                                title="Eliminar documento">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    @endif
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
                         @else
-                            <form action="{{ route('panel.submission.confirm') }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas enviar este proyecto? Una vez enviado, NO PODRÁS editarlo ni subir más documentos.');">
-
-                                @csrf
-                                <button type="submit" 
-                                        style="padding: 12px 32px; border-radius: 999px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: white; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s;"
-                                        onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 15px 30px rgba(16, 185, 129, 0.4)';"
-                                        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 10px 25px rgba(16, 185, 129, 0.3)';">
-                                    <i class="bi bi-check-circle-fill"></i>
-                                    <span>Confirmar y enviar proyecto</span>
-                                </button>
-                            </form>
-                            <p style="margin: 12px 0 0 0; font-size: 0.85rem; color: #94a3b8; font-style: italic;">
-                                Una vez confirmado, el proyecto será enviado a los jueces para evaluación
+                        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(148, 163, 184, 0.3);">
+                            <p style="margin: 0; font-size: 0.85rem; color: #94a3b8; font-style: italic;">
+                                <i class="bi bi-info-circle"></i> No hay documentos PDF subidos aún.
                             </p>
+                        </div>
                         @endif
+                        
+                        {{-- Botones de acción por proyecto --}}
+                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(148, 163, 184, 0.3); display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            @if($proj->status !== 'enviado')
+                                <button type="button" 
+                                        class="btn-rounded btn-repo" 
+                                        onclick="openPdfModal({{ $proj->id }})"
+                                        style="padding: 10px 24px; border-radius: 999px; border: 1px solid rgba(139, 92, 246, 0.6); background: rgba(139, 92, 246, 0.1); color: #a78bfa; cursor: pointer; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s;"
+                                        onmouseover="this.style.background='rgba(139, 92, 246, 0.2)'; this.style.borderColor='#8b5cf6';"
+                                        onmouseout="this.style.background='rgba(139, 92, 246, 0.1)'; this.style.borderColor='rgba(139, 92, 246, 0.6)';">
+                                    <i class="bi bi-cloud-upload"></i>
+                                    <span>Subir PDF</span>
+                                </button>
+                            @endif
+                            
+                            @if($proj->documents && $proj->documents->count() > 0 && $proj->status !== 'enviado')
+                                <form action="{{ route('panel.submission.confirm') }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Estás seguro de que deseas enviar este proyecto? Una vez enviado, NO PODRÁS editarlo ni subir más documentos.');">
+                                    @csrf
+                                    <input type="hidden" name="project_id" value="{{ $proj->id }}">
+                                    <button type="submit" 
+                                            style="padding: 10px 24px; border-radius: 999px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: white; font-size: 0.95rem; font-weight: 600; cursor: pointer; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s;"
+                                            onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 12px 25px rgba(16, 185, 129, 0.4)';"
+                                            onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 8px 20px rgba(16, 185, 129, 0.3)';">
+                                        <i class="bi bi-send-fill"></i>
+                                        <span>Enviar a jueces</span>
+                                    </button>
+                                </form>
+                            @endif
+                            
+                            @if($proj->status === 'enviado')
+                                <div style="padding: 12px 24px; background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 999px;">
+                                    <p style="margin: 0; font-size: 0.9rem; color: #22c55e; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                        <i class="bi bi-check-circle-fill"></i> Proyecto enviado correctamente
+                                    </p>
+                                </div>
+                            @endif
+                        </div>
                     </div>
-                    @endif
-                </div>
+                    @endforeach
                 @endif
 
             </div>
@@ -780,6 +801,7 @@
         <div class="modal-body" style="padding: 24px;">
             <form id="pdfUploadForm" action="{{ route('panel.submission.upload-pdf') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                {{-- El project_id se agrega dinámicamente por JavaScript cuando se abre el modal --}}
                 
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #334155;">
@@ -957,7 +979,39 @@
         pills[1].classList.toggle('inactive', privadoChecked);
     }
 
-    function openPdfModal() {
+    // Función para editar un proyecto específico
+    function editProject(projectId, name, visibility, teamId, eventId) {
+        // Scroll al formulario
+        document.getElementById('editFormSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Llenar los campos del formulario
+        document.querySelector('input[name="project_name"]').value = name;
+        document.querySelector('select[name="team_id"]').value = teamId;
+        document.querySelector('select[name="event_id"]').value = eventId;
+        
+        // Seleccionar la visibilidad
+        if (visibility === 'privado') {
+            document.getElementById('visibility-privado').checked = true;
+        } else {
+            document.getElementById('visibility-publico').checked = true;
+        }
+        toggleVisibilityPills();
+    }
+
+    function openPdfModal(projectId) {
+        // Guardar el project_id en el formulario
+        const form = document.getElementById('pdfUploadForm');
+        let projectIdInput = form.querySelector('input[name="project_id"]');
+        
+        if (!projectIdInput) {
+            projectIdInput = document.createElement('input');
+            projectIdInput.type = 'hidden';
+            projectIdInput.name = 'project_id';
+            form.appendChild(projectIdInput);
+        }
+        
+        projectIdInput.value = projectId;
+        
         document.getElementById('pdfModal').style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
