@@ -1039,9 +1039,8 @@ async function loadUserLeaderTeams() {
             container.innerHTML = `
                 <div style="text-align: center; padding: 30px; color: #94a3b8;">
                     <i class="bi bi-exclamation-circle" style="font-size: 3rem; color: #f59e0b; margin-bottom: 10px;"></i>
-                    <p style="font-size: 1rem; margin-bottom: 8px;">No tienes equipos completos</p>
-                    <p style="font-size: 0.85rem;">Solo puedes inscribir equipos con 4 miembros completos.</p>
-                    <p style="font-size: 0.85rem; margin-top: 8px;">Completa tu equipo o espera a que los miembros acepten las invitaciones.</p>
+                    <p style="font-size: 1rem; margin-bottom: 8px;">No tienes equipos disponibles</p>
+                    <p style="font-size: 0.85rem;">Crea un equipo o acepta invitaciones para poder inscribirte.</p>
                 </div>
             `;
             submitBtn.disabled = true;

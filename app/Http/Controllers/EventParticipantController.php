@@ -13,7 +13,7 @@ class EventParticipantController extends Controller
      */
     public function getUserLeaderTeams(Request $request)
     {
-        $user = auth()->user();
+        $user = $request->user();
         $eventId = $request->input('event_id');
         
         $teams = Team::where('leader_id', $user->id)
@@ -21,8 +21,8 @@ class EventParticipantController extends Controller
             ->with('events') // Cargar relación con eventos
             ->get()
             ->filter(function ($team) {
-                // Solo equipos con 4 miembros completos
-                return $team->members_count == 4;
+                // Equipos con al menos un integrante (líder cuenta)
+                return $team->members_count >= 1;
             })
             ->map(function ($team) use ($eventId) {
                 $isEnrolled = false;
@@ -52,7 +52,7 @@ class EventParticipantController extends Controller
     public function joinEvent(Request $request, $eventId)
     {
         $event = Event::findOrFail($eventId);
-        $user = auth()->user();
+        $user = $request->user();
 
         // Validar que se envió un team_id
         $request->validate([
@@ -103,11 +103,11 @@ class EventParticipantController extends Controller
         }
 
         // ========================================
-        // VALIDACIÓN 6: Equipo debe tener 4 miembros
+        // VALIDACIÓN 6: Equipo debe tener al menos 1 miembro
         // ========================================
         $membersCount = $team->members()->count();
-        if ($membersCount < 4) {
-            return back()->with('error', 'El equipo debe tener 4 miembros completos para inscribirse en un evento. Actualmente tiene ' . $membersCount . ' miembros.');
+        if ($membersCount < 1) {
+            return back()->with('error', 'El equipo debe tener al menos 1 miembro para inscribirse en un evento.');
         }
 
         // ========================================
@@ -131,7 +131,7 @@ class EventParticipantController extends Controller
     {
         $event = Event::findOrFail($eventId);
         $team = Team::findOrFail($teamId);
-        $user = auth()->user();
+        $user = $request->user();
 
         // Verificar que el usuario sea el líder del equipo
         if ($team->leader_id !== $user->id) {
