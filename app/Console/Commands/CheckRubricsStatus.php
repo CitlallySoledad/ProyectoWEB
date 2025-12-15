@@ -14,7 +14,6 @@ class CheckRubricsStatus extends Command
 
     public function handle()
     {
-        // Obtener el usuario autenticado o el usuario "Juez" específico
         $judge = User::where('name', 'Juez')->orWhere('email', 'judge@example.com')->first();
         
         if (!$judge) {
@@ -24,7 +23,6 @@ class CheckRubricsStatus extends Command
         }
 
         if (!$judge) {
-            // Si aún no hay, obtener simplemente el primero que no sea admin
             $judge = User::where('is_admin', 0)->first();
         }
 
