@@ -207,7 +207,7 @@
             <div class="section-title">Evidencias Adjuntas</div>
             <div>
                 @foreach($evaluation->evidences as $evidence)
-                    <a href="{{ asset('storage/' . $evidence->file_path) }}" 
+                    <a href="{{ route('storage.file', ['path' => $evidence->file_path]) }}" 
                        target="_blank" 
                        class="evidence-item">
                         <i class="bi bi-file-earmark me-2"></i>{{ $evidence->original_name }}
@@ -243,7 +243,7 @@
             <div class="section-title">Documentos del Proyecto</div>
             <div>
                 @foreach($evaluation->project->documents as $doc)
-                    <a href="{{ asset('storage/' . $doc->file_path) }}" 
+                    <a href="{{ route('storage.file', ['path' => $doc->file_path]) }}" 
                        target="_blank" 
                        class="evidence-item d-block mb-2">
                         <i class="bi bi-file-pdf me-2"></i>{{ $doc->original_name }}

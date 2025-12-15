@@ -55,7 +55,7 @@
             </div>
             <div style="display: flex; flex-wrap: wrap; gap: 12px;">
                 @foreach($project->documents as $doc)
-                    <a href="{{ asset('storage/' . $doc->file_path) }}" 
+                    <a href="{{ route('storage.file', ['path' => $doc->file_path]) }}" 
                        target="_blank" 
                        class="btn btn-sm"
                        style="background: rgba(139,92,246,0.2); border: 1px solid #8b5cf6; color: #e5e7eb; padding: 8px 16px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
