@@ -20,6 +20,19 @@ use Illuminate\Support\Str;
 
 class TeamController extends Controller
 {
+    /**
+     * Indica si el equipo está inscrito en un evento activo (status 'activo' o is_active=1).
+     */
+    protected function teamHasActiveEvent(Team $team): bool
+    {
+        return $team->projects()
+            ->whereHas('event', function ($q) {
+                $q->whereRaw('LOWER(status) = ?', ['activo'])
+                  ->orWhere('is_active', true);
+            })
+            ->exists();
+    }
+
     // Muestra la lista de equipos en el panel del participante
     public function index()
     {
@@ -80,11 +93,7 @@ class TeamController extends Controller
         $team = Team::findOrFail($request->team_id);
 
         // Bloquear nuevas solicitudes si el equipo participa en un evento activo
-        $hasActiveEvent = $team->projects()
-            ->whereHas('event', function ($q) {
-                $q->where('status', 'activo');
-            })
-            ->exists();
+        $hasActiveEvent = $this->teamHasActiveEvent($team);
 
         if ($hasActiveEvent) {
             return back()->with('error', 'No puedes enviar solicitudes porque el equipo participa en un evento activo.');
@@ -150,11 +159,7 @@ class TeamController extends Controller
             return back()->with('error', 'No tienes permiso para aceptar solicitudes de este equipo.');
         }
 
-        $hasActiveEvent = $team->projects()
-            ->whereHas('event', function ($q) {
-                $q->where('status', 'activo');
-            })
-            ->exists();
+        $hasActiveEvent = $this->teamHasActiveEvent($team);
         if ($hasActiveEvent) {
             return back()->with('error', 'No puedes agregar miembros mientras el equipo está participando en un evento activo.');
         }
@@ -202,11 +207,7 @@ class TeamController extends Controller
             return back()->with('error', 'No tienes permiso para eliminar miembros de este equipo.');
         }
 
-        $hasActiveEvent = $team->projects()
-            ->whereHas('event', function ($q) {
-                $q->where('status', 'activo');
-            })
-            ->exists();
+        $hasActiveEvent = $this->teamHasActiveEvent($team);
         if ($hasActiveEvent) {
             return back()->with('error', 'No puedes eliminar miembros mientras el equipo está participando en un evento activo.');
         }
@@ -240,11 +241,7 @@ class TeamController extends Controller
         }
 
         // Bloquear invitaciones si el equipo participa en un evento activo
-        $hasActiveEvent = $team->projects()
-            ->whereHas('event', function ($q) {
-                $q->where('status', 'activo');
-            })
-            ->exists();
+        $hasActiveEvent = $this->teamHasActiveEvent($team);
         if ($hasActiveEvent) {
             return back()->with('error', 'No puedes enviar invitaciones mientras el equipo participa en un evento activo.');
         }
@@ -377,11 +374,7 @@ class TeamController extends Controller
                 ->with('error', 'Esta invitación es para otro email. Debes iniciar sesión con ' . $invitation->email);
         }
 
-        $hasActiveEvent = $team->projects()
-            ->whereHas('event', function ($q) {
-                $q->where('status', 'activo');
-            })
-            ->exists();
+        $hasActiveEvent = $this->teamHasActiveEvent($team);
         if ($hasActiveEvent) {
             return redirect()->route('panel.mi-equipo')
                 ->with('error', 'No puedes unirte a este equipo mientras está participando en un evento activo.');
