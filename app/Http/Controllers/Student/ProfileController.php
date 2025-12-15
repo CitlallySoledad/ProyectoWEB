@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateProfileRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -44,26 +45,18 @@ class ProfileController extends Controller
 
         $data = $request->validated();
 
-        // Manejar la subida de foto de perfil (guardar en public/profile-photos)
+        // Manejar la subida de foto de perfil (guardar en storage/app/public/profile_photos)
         if ($request->hasFile('profile_photo')) {
-            // Eliminar foto anterior si existe (buscar primero en public/, luego en storage)
+            // Eliminar foto anterior si existe
             if ($user->profile_photo) {
-                $oldPublicPath = public_path($user->profile_photo);
-                if ($oldPublicPath && file_exists($oldPublicPath)) {
-                    @unlink($oldPublicPath);
-                } elseif (\Storage::disk('public')->exists($user->profile_photo)) {
-                    \Storage::disk('public')->delete($user->profile_photo);
-                }
+                Storage::disk('public')->delete($user->profile_photo);
             }
 
             $file = $request->file('profile_photo');
             $fileName = time() . '_' . $file->getClientOriginalName();
-            $publicDir = public_path('profile-photos');
-            if (!file_exists($publicDir)) {
-                mkdir($publicDir, 0755, true);
-            }
-            $file->move($publicDir, $fileName);
-            $data['profile_photo'] = 'profile-photos/' . $fileName;
+            Storage::disk('public')->makeDirectory('profile_photos');
+            Storage::disk('public')->putFileAs('profile_photos', $file, $fileName);
+            $data['profile_photo'] = 'profile_photos/' . $fileName;
         }
 
         $user->update($data);
@@ -102,24 +95,16 @@ class ProfileController extends Controller
 
             $user = $request->user();
 
-            // Eliminar foto anterior si existe (public o storage)
+            // Eliminar foto anterior si existe
             if ($user->profile_photo) {
-                $oldPublicPath = public_path($user->profile_photo);
-                if ($oldPublicPath && file_exists($oldPublicPath)) {
-                    @unlink($oldPublicPath);
-                } elseif (\Storage::disk('public')->exists($user->profile_photo)) {
-                    \Storage::disk('public')->delete($user->profile_photo);
-                }
+                Storage::disk('public')->delete($user->profile_photo);
             }
 
-            // Guardar nueva foto en public/profile-photos
+            // Guardar nueva foto en storage/app/public/profile_photos
             $fileName = time() . '_' . $file->getClientOriginalName();
-            $publicDir = public_path('profile-photos');
-            if (!file_exists($publicDir)) {
-                mkdir($publicDir, 0755, true);
-            }
-            $file->move($publicDir, $fileName);
-            $relativePath = 'profile-photos/' . $fileName;
+            Storage::disk('public')->makeDirectory('profile_photos');
+            Storage::disk('public')->putFileAs('profile_photos', $file, $fileName);
+            $relativePath = 'profile_photos/' . $fileName;
             
             if (!$relativePath) {
                 return Redirect::route('panel.perfil')
