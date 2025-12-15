@@ -83,6 +83,28 @@
         color: #111827;
     }
 
+    .user-login-password {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .user-login-password input {
+        padding-right: 42px;
+    }
+
+    .user-login-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        color: #4b5563;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
     .user-login-input::placeholder {
         color: #6b7280;
     }
@@ -186,17 +208,22 @@
 
                 <div class="mb-2">
                     <label class="user-login-label" for="password">Contraseña</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="user-login-input"
-                        placeholder="Contraseña"
-                        required
-                        minlength="6"
-                        autocomplete="current-password"
-                        title="Ingresa tu contraseña (mínimo 6 caracteres)"
-                    >
+                    <div class="user-login-password">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="user-login-input"
+                            placeholder="Contraseña"
+                            required
+                            minlength="6"
+                            autocomplete="current-password"
+                            title="Ingresa tu contraseña (mínimo 6 caracteres)"
+                        >
+                        <button type="button" class="user-login-toggle" onclick="togglePassword()">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -225,6 +252,22 @@
 
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function togglePassword() {
+        const input = document.getElementById('password');
+        const toggle = event.currentTarget.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            toggle.classList.remove('bi-eye');
+            toggle.classList.add('bi-eye-slash');
+        } else {
+            input.type = 'password';
+            toggle.classList.remove('bi-eye-slash');
+            toggle.classList.add('bi-eye');
+        }
+    }
+</script>
+@endpush
 @endsection
-
-
