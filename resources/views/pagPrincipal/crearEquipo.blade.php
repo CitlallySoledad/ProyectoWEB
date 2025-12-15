@@ -124,21 +124,26 @@
         display: flex;
         justify-content: flex-end;
         align-items: flex-end;
-        padding-bottom: 10px;
+        padding: 16px 0;
+        width: 100%;
     }
 
     .action-row {
         display: flex;
-        gap: 12px;
+        gap: 14px;
         align-items: center;
+        justify-content: flex-end;
+        width: 100%;
+        max-width: 520px;
     }
 
     .btn-action {
         border: none; border-radius: 999px; padding: 12px 28px;
         font-size: 0.95rem; font-weight: 600; cursor: pointer;
-        transition: transform 0.2s, opacity 0.2s; width: auto;
+        transition: transform 0.2s, opacity 0.2s; width: 180px;
+        text-align: center;
     }
-    .btn-action:hover { transform: scale(1.05); opacity: 0.9; }
+    .btn-action:hover { transform: scale(1.03); opacity: 0.92; }
 
     .btn-secondary { background-color: rgba(30, 45, 85, 0.8); color: #e5e7eb; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);}
     .btn-primary-create {
@@ -160,11 +165,9 @@
         .sidebar-link { white-space: nowrap; padding: 6px 12px; font-size: 0.85rem; }
         
         .create-team-layout { flex-direction: column; gap: 30px; }
-        .actions-section { 
-            align-items: center; justify-content: flex-end; width: 100%;
-        }
+        .actions-section { align-items: center; justify-content: flex-end; width: 100%; }
         .action-row { width: 100%; justify-content: flex-end; }
-        .btn-action { width: auto; margin-bottom: 0; }
+        .btn-action { width: 180px; margin-bottom: 0; }
     }
 
     @media (max-width: 640px) {
