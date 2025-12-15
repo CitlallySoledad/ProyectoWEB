@@ -416,7 +416,7 @@
                 {{-- FOTO --}}
                 <div class="profile-image">
                     @if($user->profile_photo)
-                        <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="Foto de perfil" style="object-fit: cover;">
+                        <img src="{{ route('storage.file', ['path' => $user->profile_photo]) }}" alt="Foto de perfil" style="object-fit: cover;">
                     @else
                         <img src="{{ asset('imagenes/foto-perfil.jpg') }}" alt="Foto de perfil">
                     @endif
@@ -627,4 +627,3 @@
 <x-toast-notification />
 
 @endsection
-

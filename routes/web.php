@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 // Auth Controllers
 use App\Http\Controllers\Auth\RegistroController;
@@ -267,3 +268,16 @@ Route::middleware(['auth', 'role:judge'])->prefix('juez')->name('judge.')->group
     Route::get('/rubricas', [RubricController::class, 'index'])->name('rubrics.index');
     Route::get('/rubricas/{rubric}', [RubricController::class, 'show'])->name('rubrics.show');
 }); 
+
+// ==========================================================
+// SERVIR ARCHIVOS PUBLICOS SIN DEPENDER DE SYMLINK
+// ==========================================================
+Route::get('/storage/{path}', function ($path) {
+    $safePath = ltrim(str_replace(['..', '\\'], '', $path), '/');
+
+    if (!Storage::disk('public')->exists($safePath)) {
+        abort(404);
+    }
+
+    return Storage::disk('public')->response($safePath);
+})->where('path', '.*')->name('storage.file');
