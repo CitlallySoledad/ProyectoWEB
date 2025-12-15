@@ -215,6 +215,7 @@ class SubmissionController extends Controller
             $file = $request->file('pdf_file');
             $originalName = $file->getClientOriginalName();
             $fileName = time() . '_' . $originalName;
+            $fileSize = $file->getSize(); // capturar antes de mover
 
             // Guardar directamente en public/pdfs para no depender del symlink storage:link
             $publicPdfPath = public_path('pdfs');
@@ -231,7 +232,7 @@ class SubmissionController extends Controller
                 'file_name' => $fileName,
                 'file_path' => $relativePath,
                 'original_name' => $originalName,
-                'file_size' => $file->getSize(),
+                'file_size' => $fileSize,
                 'description' => $request->description,
             ]);
             
