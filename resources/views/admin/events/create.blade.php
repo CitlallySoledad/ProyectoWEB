@@ -42,17 +42,23 @@
                             <i class="bi bi-trophy text-warning me-1"></i> Título del evento *
                         </label>
                         <input type="text" name="title" value="{{ old('title') }}"
-                               class="form-control rounded-pill" placeholder="Ej: Hackathon 2025" required
+                               class="form-control rounded-pill @error('title') is-invalid @enderror" placeholder="Ej: Hackathon 2025" required
                                style="padding: 12px 20px; border: 2px solid #e5e7eb; transition: all 0.3s;">
+                        @error('title')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label fw-semibold text-dark">
                             <i class="bi bi-geo-alt-fill text-danger me-1"></i> Lugar / Campus *
                         </label>
-                        <input type="text" name="place" value="{{ old('place') }}"
-                               class="form-control rounded-pill" placeholder="Ej: Campus Central, Auditorio A" required
+                           <input type="text" name="place" value="{{ old('place') }}"
+                               class="form-control rounded-pill @error('place') is-invalid @enderror" placeholder="Ej: Campus Central, Auditorio A" required
                                style="padding: 12px 20px; border: 2px solid #e5e7eb; transition: all 0.3s;">
+                           @error('place')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                           @enderror
                     </div>
 
                     <div class="col-md-6">
@@ -60,16 +66,19 @@
                             <i class="bi bi-people-fill text-primary me-1"></i> Capacidad (equipos) *
                         </label>
                         <input type="number" name="capacity" value="{{ old('capacity', 10) }}"
-                               class="form-control rounded-pill" placeholder="10" min="1" required
+                               class="form-control rounded-pill @error('capacity') is-invalid @enderror" placeholder="10" min="1" required
                                style="padding: 12px 20px; border: 2px solid #e5e7eb; transition: all 0.3s;">
+                        @error('capacity')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label fw-semibold text-dark">
                             <i class="bi bi-tag-fill text-success me-1"></i> Categoría *
                         </label>
-                        <select name="category" class="form-select rounded-pill" required
-                                style="padding: 12px 20px; border: 2px solid #e5e7eb; transition: all 0.3s;">
+                        <select name="category" class="form-select rounded-pill @error('category') is-invalid @enderror" required
+                            style="padding: 12px 20px; border: 2px solid #e5e7eb; transition: all 0.3s;">
                             <option value="">-- Selecciona una categoría --</option>
                             <option value="Desarrollo Web" {{ old('category') == 'Desarrollo Web' ? 'selected' : '' }}>🌐 Desarrollo Web</option>
                             <option value="Desarrollo Móvil" {{ old('category') == 'Desarrollo Móvil' ? 'selected' : '' }}>📱 Desarrollo Móvil</option>
@@ -79,6 +88,9 @@
                             <option value="DevOps & Infraestructura" {{ old('category') == 'DevOps & Infraestructura' ? 'selected' : '' }}>⚙️ DevOps & Infraestructura</option>
                             <option value="IoT & Hardware" {{ old('category') == 'IoT & Hardware' ? 'selected' : '' }}>🔌 IoT & Hardware</option>
                         </select>
+                        @error('category')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-12">
@@ -86,9 +98,12 @@
                             <i class="bi bi-file-text-fill text-info me-1"></i> Descripción *
                         </label>
                         <textarea name="description" rows="5"
-                                  class="form-control"
+                                  class="form-control @error('description') is-invalid @enderror"
                                   style="border-radius: 18px; padding: 15px 20px; border: 2px solid #e5e7eb; transition: all 0.3s;"
                                   placeholder="Describe el evento, objetivos, premios, reglas, etc." required>{{ old('description') }}</textarea>
+                        @error('description')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
             </div>
@@ -105,31 +120,40 @@
                         <label class="form-label fw-semibold text-dark">
                             <i class="bi bi-calendar-check text-success me-1"></i> Fecha inicio *
                         </label>
-                        <input type="date" name="start_date" value="{{ old('start_date') }}"
-                               class="form-control rounded-pill" required
+                           <input type="date" name="start_date" value="{{ old('start_date') }}"
+                               class="form-control rounded-pill @error('start_date') is-invalid @enderror" required
                                style="padding: 12px 20px; border: 2px solid #e5e7eb; transition: all 0.3s;">
+                           @error('start_date')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                           @enderror
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-semibold text-dark">
                             <i class="bi bi-calendar-x text-danger me-1"></i> Fecha fin *
                         </label>
-                        <input type="date" name="end_date" value="{{ old('end_date') }}"
-                               class="form-control rounded-pill" required
+                           <input type="date" name="end_date" value="{{ old('end_date') }}"
+                               class="form-control rounded-pill @error('end_date') is-invalid @enderror" required
                                style="padding: 12px 20px; border: 2px solid #e5e7eb; transition: all 0.3s;">
+                           @error('end_date')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                           @enderror
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-semibold text-dark">
                             <i class="bi bi-circle-fill text-primary me-1"></i> Estado *
                         </label>
-                        <select name="status" class="form-select rounded-pill" required
-                                style="padding: 12px 20px; border: 2px solid #e5e7eb; transition: all 0.3s;">
+                        <select name="status" class="form-select rounded-pill @error('status') is-invalid @enderror" required
+                            style="padding: 12px 20px; border: 2px solid #e5e7eb; transition: all 0.3s;">
                             <option value="borrador" {{ old('status', 'borrador') == 'borrador' ? 'selected' : '' }}>📝 Borrador</option>
                             <option value="publicado" {{ old('status') == 'publicado' ? 'selected' : '' }}>📢 Publicado</option>
                             <option value="activo" {{ old('status') == 'activo' ? 'selected' : '' }}>⚡ Activo</option>
                             <option value="cerrado" {{ old('status') == 'cerrado' ? 'selected' : '' }}>🔒 Cerrado</option>
                         </select>
+                        @error('status')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                         <small class="text-dark d-block mt-1">
                             <strong>Publicado:</strong> acepta inscripciones | <strong>Activo:</strong> evento en curso
                         </small>

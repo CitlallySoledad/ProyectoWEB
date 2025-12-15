@@ -197,11 +197,6 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('panel.eventos') }}">
-                                <i class="bi bi-calendar-event"></i> <span>Eventos</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
                             <a class="sidebar-link" href="{{ route('panel.perfil') }}">
                                 <i class="bi bi-person"></i> <span>Mi perfil</span>
                             </a>
@@ -256,11 +251,11 @@
 
             <header class="panel-header">
                 <h1 class="panel-title">Crear equipo</h1>
-                <div class="user-badge">
+                <a href="{{ route('panel.perfil') }}" class="user-badge" style="text-decoration: none; color: inherit; cursor: pointer;">
                     <i class="bi bi-person-circle"></i>
                     {{-- Mostrar siempre el usuario autenticado --}}
                     <span>{{ auth()->check() ? auth()->user()->name : 'Usuario' }}</span>
-                </div>
+                </a>
             </header>
 
             <div class="create-team-layout">
@@ -271,17 +266,36 @@
                         @csrf
 
                         <div class="form-group">
-                            <label for="team_name" class="form-label">Nombre de equipo</label>
-                            <input type="text" id="team_name" name="team_name" class="form-input" placeholder="Introduce el nombre del equipo" required>
+                            <x-input-label for="team_name" value="Nombre de equipo" class="form-label" />
+                            <x-text-input 
+                                id="team_name" 
+                                name="team_name" 
+                                type="text"
+                                class="form-input" 
+                                placeholder="Introduce el nombre del equipo" 
+                                required
+                                minlength="3"
+                                maxlength="100"
+                                pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+"
+                                title="Mínimo 3 caracteres. Solo letras, números y espacios"
+                            />
+                            <x-input-error :messages="$errors->get('team_name')" class="mt-2" />
                         </div>
 
                         <div class="form-group">
-                            <label for="user_name" class="form-label">Nombre Usuario</label>
+                            <x-input-label for="user_name" value="Nombre Usuario" class="form-label" />
                             <div class="input-with-badge-wrapper">
-                                <input type="text" id="user_name" name="user_name" class="form-input" 
-                                    value="{{ auth()->check() ? auth()->user()->name : 'Usuario' }}" readonly>
+                                <x-text-input 
+                                    id="user_name" 
+                                    name="user_name" 
+                                    type="text"
+                                    class="form-input" 
+                                    :value="auth()->check() ? auth()->user()->name : 'Usuario'" 
+                                    readonly 
+                                />
                                 <span class="badge-lider">Lider</span>
                             </div>
+                            <x-input-error :messages="$errors->get('user_name')" class="mt-2" />
                         </div>
 
                         {{-- ELIMINADO: Campo Descripción --}}
@@ -307,4 +321,8 @@
         </main>
     </div>
 </div>
+
+{{-- Sistema de notificaciones Toast --}}
+<x-toast-notification />
+
 @endsection

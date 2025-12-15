@@ -4,6 +4,15 @@
 
 @push('styles')
 <style>
+    /* ===== COLORES BLANCOS PARA TEXTO ===== */
+    .h3, .mb-0, .admin-card-title, .admin-table th, .admin-table td, .form-label {
+        color: #fff !important;
+    }
+    
+    .text-muted {
+        color: #94a3b8 !important;
+    }
+    
     .judge-search-rubric {
         border-radius: 999px;
         border: none;
@@ -27,13 +36,82 @@
         background: #047857;
         color: #ffffff;
     }
+    
+    /* ===== PAGINACIÓN COMPACTA RÚBRICAS ===== */
+    .rubrics-pagination {
+        margin: 24px auto 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(37, 99, 235, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        width: auto;
+        max-width: 100%;
+        font-size: 0.85rem;
+        color: #e5e7eb;
+    }
+
+    .rubrics-pagination-info {
+        white-space: nowrap;
+        opacity: 0.85;
+        font-weight: 500;
+    }
+
+    .rubrics-pagination-pages {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Botones de página */
+    .page-number,
+    .page-arrow {
+        min-width: 32px;
+        height: 32px;
+        padding: 0 10px;
+        border-radius: 999px;
+        border: 1px solid #2563eb;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        text-decoration: none;
+        color: #e5e7eb;
+        background: transparent;
+        transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+        cursor: pointer;
+    }
+
+    .page-number:hover,
+    .page-arrow:hover {
+        background: #2563eb;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    /* Página actual */
+    .page-number.active {
+        background: #2563eb;
+        color: #ffffff;
+        border-color: #1d4ed8;
+        font-weight: 600;
+    }
+
+    /* Deshabilitados */
+    .page-arrow.disabled {
+        opacity: 0.35;
+        border-color: #94a3b8;
+        cursor: default;
+        pointer-events: none;
+    }
 </style>
 @endpush
 
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h3 mb-0">Gestión de rúbricas</h1>
-        <a href="{{ route('admin.rubrics.create') }}" class="judge-new-rubric-btn">+ Nueva Rúbrica</a>
+        <a href="{{ route('admin.rubrics.create') }}" target="_blank" class="judge-new-rubric-btn">+ Nueva Rúbrica</a>
     </div>
 
     @if(session('success'))
@@ -85,10 +163,6 @@
                     </td>
                     <td>
                         <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
-                            <a href="{{ route('admin.rubrics.index', ['rubric' => $rubricItem->id]) }}"
-                                class="btn btn-sm btn-light rounded-pill">
-                                <i class="bi bi-eye"></i> Ver
-                            </a>
                             <a href="{{ route('admin.rubrics.edit', $rubricItem) }}" class="btn btn-sm btn-primary rounded-pill">
                                 <i class="bi bi-pencil"></i> Editar
                             </a>
@@ -108,6 +182,40 @@
             @endforelse
             </tbody>
         </table>
+        
+        {{-- PAGINACIÓN COMPACTA --}}
+        @if ($rubrics->hasPages())
+            <div class="rubrics-pagination">
+                <span class="rubrics-pagination-info">
+                    Mostrando {{ $rubrics->firstItem() }} - {{ $rubrics->lastItem() }} de {{ $rubrics->total() }} rúbricas
+                </span>
+
+                <div class="rubrics-pagination-pages">
+                    {{-- Flecha Anterior --}}
+                    @if ($rubrics->onFirstPage())
+                        <span class="page-arrow disabled">&laquo;</span>
+                    @else
+                        <a href="{{ $rubrics->previousPageUrl() }}" class="page-arrow">&laquo;</a>
+                    @endif
+
+                    {{-- Números de página --}}
+                    @foreach ($rubrics->getUrlRange(1, $rubrics->lastPage()) as $page => $url)
+                        @if ($page == $rubrics->currentPage())
+                            <span class="page-number active">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}" class="page-number">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    {{-- Flecha Siguiente --}}
+                    @if ($rubrics->hasMorePages())
+                        <a href="{{ $rubrics->nextPageUrl() }}" class="page-arrow">&raquo;</a>
+                    @else
+                        <span class="page-arrow disabled">&raquo;</span>
+                    @endif
+                </div>
+            </div>
+        @endif
     </div>
 
     {{-- Formularios ocultos para eliminar rúbricas --}}
@@ -117,111 +225,4 @@
             @method('DELETE')
         </form>
     @endforeach
-
-    {{-- Si hay rúbrica seleccionada, mostramos criterios debajo --}}
-    @if($rubric)
-        <div class="admin-card">
-            <div class="admin-card-title">Criterios de: {{ $rubric->name }}</div>
-            
-            {{-- Formulario para actualizar todos los criterios en bloque --}}
-            <form id="bulk-criteria-form" action="{{ route('admin.rubrics.criteria.bulkUpdate', $rubric) }}" method="POST">
-                @csrf
-                <div id="selected-rubric-criteria">
-                    <table class="admin-table">
-                        <thead>
-                        <tr>
-                            <th>Criterio</th>
-                            <th>Descripción</th>
-                            <th style="width:100px;">Peso</th>
-                            <th style="width:80px;">Min</th>
-                            <th style="width:80px;">Max</th>
-                            <th style="width:120px;">Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @forelse($rubric->criteria as $i => $criterion)
-                            <tr>
-                                <td>
-                                    <input type="hidden" name="criteria[{{ $i }}][id]" value="{{ $criterion->id }}">
-                                    <input type="text" name="criteria[{{ $i }}][name]" class="form-control form-control-sm rounded-pill" value="{{ old('criteria.'.$i.'.name', $criterion->name) }}" required>
-                                </td>
-                                <td>
-                                    <input type="text" name="criteria[{{ $i }}][description]" class="form-control form-control-sm rounded-pill" value="{{ old('criteria.'.$i.'.description', $criterion->description) }}">
-                                </td>
-                                <td>
-                                    <input type="number" name="criteria[{{ $i }}][weight]" class="form-control form-control-sm rounded-pill" value="{{ old('criteria.'.$i.'.weight', $criterion->weight) }}" min="0" step="0.01">
-                                </td>
-                                <td>
-                                    <input type="number" name="criteria[{{ $i }}][min_score]" class="form-control form-control-sm rounded-pill" value="{{ old('criteria.'.$i.'.min_score', $criterion->min_score) }}" min="0">
-                                </td>
-                                <td>
-                                    <input type="number" name="criteria[{{ $i }}][max_score]" class="form-control form-control-sm rounded-pill" value="{{ old('criteria.'.$i.'.max_score', $criterion->max_score) }}" min="1">
-                                </td>
-                                <td>
-                                    <button type="submit" form="delete-criterion-{{ $criterion->id }}" class="btn btn-sm btn-danger rounded-pill" onclick="return confirm('¿Eliminar criterio?')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center py-3">
-                                    <small class="text-muted">No hay criterios definidos. Agrega uno usando el formulario de abajo.</small>
-                                </td>
-                            </tr>
-                        @endforelse
-                        </tbody>
-                    </table>
-
-                    @if($rubric->criteria->count() > 0)
-                        <div class="d-flex justify-content-end mt-3">
-                            <button type="submit" class="admin-btn-primary">
-                                <i class="bi bi-save"></i> Guardar cambios
-                            </button>
-                        </div>
-                    @endif
-                </div>
-            </form>
-
-            {{-- Formulario para agregar un nuevo criterio --}}
-            <hr style="border-color: rgba(148, 163, 184, 0.2); margin: 20px 0;">
-            <div class="admin-card-title mb-3">Agregar nuevo criterio</div>
-            <form action="{{ route('admin.rubrics.criteria.store', $rubric) }}" method="POST" class="row g-3">
-                @csrf
-                <div class="col-md-3">
-                    <label class="form-label">Nombre del criterio</label>
-                    <input type="text" name="name" class="form-control rounded-pill" placeholder="Ej: Creatividad" required>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Descripción</label>
-                    <input type="text" name="description" class="form-control rounded-pill" placeholder="Descripción (opcional)">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">Peso</label>
-                    <input type="number" name="weight" class="form-control rounded-pill" placeholder="1.0" min="0" step="0.01" value="1" required>
-                </div>
-                <div class="col-md-1">
-                    <label class="form-label">Min</label>
-                    <input type="number" name="min_score" class="form-control rounded-pill" placeholder="0" min="0" value="0" required>
-                </div>
-                <div class="col-md-1">
-                    <label class="form-label">Max</label>
-                    <input type="number" name="max_score" class="form-control rounded-pill" placeholder="10" min="1" value="10" required>
-                </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button class="admin-btn-primary w-100" type="submit">
-                        <i class="bi bi-plus-circle"></i> Agregar
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        {{-- Formularios ocultos para borrar criterios --}}
-        @foreach($rubric->criteria as $criterion)
-            <form id="delete-criterion-{{ $criterion->id }}" action="{{ route('admin.rubrics.criteria.destroy', $criterion) }}" method="POST" style="display:none;">
-                @csrf
-                @method('DELETE')
-            </form>
-        @endforeach
-    @endif
 @endsection

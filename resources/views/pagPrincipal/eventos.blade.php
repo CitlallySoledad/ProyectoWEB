@@ -285,12 +285,7 @@
                             <span>Inicio</span>
                         </a>
                     </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link active" href="{{ route('panel.eventos') }}">
-                            <i class="bi bi-calendar-event"></i>
-                            <span>Eventos</span>
-                        </a>
-                    </li>
+                  
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="{{ route('panel.perfil') }}">
                             <i class="bi bi-person"></i>
@@ -306,12 +301,12 @@
 
             {{-- HEADER SUPERIOR --}}
             <header class="panel-header">
-                <div class="user-badge">
+                <a href="{{ route('panel.perfil') }}" class="user-badge" style="text-decoration: none; color: inherit; cursor: pointer;">
                 <div class="user-avatar">
                     <i class="bi bi-person-fill"></i>
                 </div>
                 <span>{{ auth()->user()->name ?? 'Usuario' }}</span>
-                </div>
+                </a>
             </header>
 
             {{-- CONTENIDO DE LOS EVENTOS --}}

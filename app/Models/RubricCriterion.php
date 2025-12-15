@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class RubricCriterion extends Model
 {
+    use HasFactory;
     protected $table = 'rubric_criteria';
 
     protected $fillable = [

@@ -76,7 +76,7 @@
 /* ===== BUSCADOR + FILTROS ===== */
 .team-search { background: rgba(15, 23, 42, 0.3); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
 .team-search-input-wrapper { position: relative; width: 100%; }
-.team-search-input-wrapper input { width: 100%; padding: 10px 14px 10px 38px; border-radius: 999px; border: none; outline: none; font-size: 0.9rem; background: #f9fafb; color: #111827; }
+.team-search-input-wrapper input { width: 100%; padding: 10px 14px 10px 38px; border-radius: 999px; border: none; outline: none; font-size: 0.9rem; background: #f9fafb; color: #111827 !important; }
 .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6b7280; }
 .team-filters { display: flex; flex-wrap: wrap; gap: 12px; }
 .btn-chip { border: none; border-radius: 16px; padding: 10px 18px; background: #0f3355; color: #e5e7eb; box-shadow: 0 8px 16px rgba(15, 23, 42, 0.45); font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; text-decoration: none; }
@@ -89,12 +89,13 @@
 .team-table thead th { text-align: left; padding: 10px 12px; font-size: 0.9rem; font-weight: 600; color: #e5e7eb; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .team-table tbody tr { border-radius: 12px; transition: background 0.2s; }
 .team-table tbody tr:hover { background: rgba(15, 23, 42, 0.7); }
-.team-table tbody td { padding: 12px 12px; font-size: 0.9rem; vertical-align: middle; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.team-table tbody td { padding: 12px 12px; font-size: 0.9rem; vertical-align: middle; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff !important; }
 .team-table tbody tr:last-child td { border-bottom: none; }
 .avatar-stack { display: flex; }
 .avatar-stack img { width: 28px; height: 28px; border-radius: 999px; border: 2px solid #0b2b4a; object-fit: cover; margin-left: -8px; }
 .avatar-stack img:first-child { margin-left: 0; }
-.btn-info { border-radius: 999px; border: none; padding: 6px 16px; font-size: 0.8rem; background: #e5e7eb; color: #111827; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.btn-info { border-radius: 999px; border: none; padding: 6px 16px; font-size: 0.8rem; background: #1e293b; color: #fff !important; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.btn-info:hover { background: #334155; }
 
 /* ===== PANEL DE DETALLES (OVERLAY) ===== */
 /* Lo hacemos de pantalla completa también */
@@ -572,7 +573,6 @@
                     <div class="sidebar-section-title">Menú</div>
                     <ul class="sidebar-nav">
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.participante') }}"><i class="bi bi-house-door"></i> <span>Inicio</span></a></li>
-                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.eventos') }}"><i class="bi bi-calendar-event"></i> <span>Eventos</span></a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.perfil') }}"><i class="bi bi-person"></i> <span>Mi perfil</span></a></li>
                     </ul>
                 </div>
@@ -622,7 +622,6 @@
 <input type="text" id="teamSearchInput" placeholder="Buscar equipo...">
                     </div>
                     <div class="team-filters">
-                        <button class="btn-chip"><i class="bi bi-funnel"></i> Filtrar</button>
                         <a href="{{ route('panel.teams.create') }}" class="btn-chip primary" style="margin-left: auto;">
                             <i class="bi bi-plus-lg"></i> Crear nuevo
                         </a>
@@ -958,3 +957,6 @@
     }
 </script>
 @endsection
+
+{{-- Sistema de notificaciones Toast --}}
+<x-toast-notification />

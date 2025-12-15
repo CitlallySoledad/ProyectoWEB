@@ -18,7 +18,7 @@
     @endif
 
     <div class="admin-card">
-        <form action="{{ route('admin.events.update', $event->id) }}" method="POST">
+        <form action="{{ route('admin.events.update', $event->id) }}" method="POST" autocomplete="off">
             @csrf
             @method('PUT')
 
@@ -32,11 +32,14 @@
                             type="text"
                             id="title"
                             name="title"
-                            class="form-control rounded-pill"
+                            class="form-control rounded-pill @error('title') is-invalid @enderror"
                             placeholder="Título del evento"
                             value="{{ old('title', $event->title) }}"
                             required
                         >
+                        @error('title')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     {{-- Descripción --}}
@@ -105,11 +108,14 @@
                             type="number"
                             id="capacity"
                             name="capacity"
-                            class="form-control rounded-pill"
+                            class="form-control rounded-pill @error('capacity') is-invalid @enderror"
                             placeholder="10"
                             value="{{ old('capacity', $event->capacity) }}"
                             min="1"
                         >
+                        @error('capacity')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     {{-- Fecha inicio --}}

@@ -17,11 +17,6 @@
                     </a>
                 </div>
                 <div class="admin-sidebar-icon">
-                    <a href="{{ route('panel.eventos') }}">
-                        <i class="bi bi-search"></i>
-                    </a>
-                </div>
-                <div class="admin-sidebar-icon">
                     <a href="{{ route('panel.perfil') }}">
                         <i class="bi bi-people"></i>
                     </a>

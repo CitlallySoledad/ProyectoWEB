@@ -24,6 +24,7 @@ class User extends Authenticatable
         'estado_civil',
         'telefono',
         'profesion',
+        'profile_photo',    // foto de perfil
     ];
 
     protected $hidden = [

@@ -15,7 +15,7 @@ class RubricController extends Controller
      */
     public function index(Request $request)
     {
-        $rubrics = Rubric::with('event')->get();
+        $rubrics = Rubric::with('event')->paginate(10);
         $events = Event::all();
 
         $rubric = null;
@@ -48,6 +48,15 @@ class RubricController extends Controller
 
         $rubric = Rubric::create($data);
 
+        // Si es petición AJAX, devolver JSON
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'rubric_id' => $rubric->id,
+                'message' => 'Rúbrica creada correctamente.'
+            ]);
+        }
+
         return redirect()->route('admin.rubrics.index', ['rubric' => $rubric->id])
             ->with('success', 'Rúbrica creada correctamente.');
     }
@@ -57,6 +66,7 @@ class RubricController extends Controller
      */
     public function edit(Rubric $rubric)
     {
+        $rubric->load('criteria');
         $events = Event::all();
         return view('admin.rubrics.edit', compact('rubric', 'events'));
     }
@@ -122,13 +132,43 @@ class RubricController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'weight' => 'required|numeric|min:0',
+            'weight' => 'required|numeric|min:0|max:100',
             'min_score' => 'required|numeric|min:0',
             'max_score' => 'required|numeric|gt:min_score',
         ]);
 
+        // Calcular suma actual de pesos
+        $currentWeightSum = $rubric->criteria()->sum('weight');
+        $newWeightSum = $currentWeightSum + $data['weight'];
+
+        // Validar que no exceda 100
+        if ($newWeightSum > 100) {
+            $available = 100 - $currentWeightSum;
+            
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "La suma de pesos excede 100. Actualmente tienes {$currentWeightSum} de peso asignado. Solo puedes agregar hasta {$available} más."
+                ], 422);
+            }
+            
+            return redirect()->back()
+                ->withErrors(['weight' => "La suma de pesos excede 100. Actualmente tienes {$currentWeightSum} de peso asignado. Solo puedes agregar hasta {$available} más."])
+                ->withInput();
+        }
+
         $data['rubric_id'] = $rubric->id;
-        RubricCriterion::create($data);
+        $criterion = RubricCriterion::create($data);
+
+        // Si es petición AJAX, devolver JSON
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'criterion' => $criterion,
+                'current_weight_sum' => $newWeightSum,
+                'message' => 'Criterio agregado.'
+            ]);
+        }
 
         return redirect()->route('admin.rubrics.index', ['rubric' => $rubric->id])
             ->with('success', 'Criterio agregado.');

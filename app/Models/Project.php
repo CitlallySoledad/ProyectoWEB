@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
-    protected $fillable = ['name', 'team_id', 'event_id', 'status', 'rubric_id', 'visibility'];
+    use HasFactory;
+    protected $fillable = ['name', 'team_id', 'event_id', 'status', 'rubric_id'];
 
     // Relación con el equipo
     public function team()

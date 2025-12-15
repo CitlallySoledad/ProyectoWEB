@@ -323,14 +323,6 @@
                 </a>
             </li>
 
-            {{-- Eventos --}}
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{{ route('panel.eventos') }}">
-                    <i class="bi bi-calendar-event"></i>
-                    <span>Eventos</span>
-                </a>
-            </li>
-
             {{-- Mi perfil --}}
             <li class="sidebar-item">
                 <a class="sidebar-link" href="{{ route('panel.perfil') }}">
@@ -406,12 +398,12 @@
 
             {{-- HEADER SUPERIOR --}}
             <header class="panel-header">
-                    <div class="user-badge">
+                    <a href="{{ route('panel.perfil') }}" class="user-badge" style="text-decoration: none; color: inherit; cursor: pointer;">
                         <div class="user-avatar">
                         <i class="bi bi-person-fill"></i>
                         </div>
                         <span>{{ auth()->user()->name ?? 'Participante' }}</span>
-                    </div>
+                    </a>
             </header>
 
             {{-- CONTENIDO --}}
@@ -514,3 +506,6 @@
     </script>
 @endif
 @endsection
+
+{{-- Sistema de notificaciones Toast --}}
+<x-toast-notification />

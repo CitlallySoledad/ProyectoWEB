@@ -207,35 +207,6 @@
         color: #9ca3af;
     }
 
-    .visibility-group {
-        margin-top: 4px;
-    }
-
-    .visibility-options {
-        display: inline-flex;
-        padding: 4px;
-        border-radius: 999px;
-        background: #020617;
-    }
-
-    .visibility-pill {
-        border-radius: 999px;
-        padding: 6px 22px;
-        font-size: 0.85rem;
-        border: none;
-        cursor: pointer;
-    }
-
-    .visibility-pill.active {
-        background: #2563eb;
-        color: #f9fafb;
-    }
-
-    .visibility-pill.inactive {
-        background: #f9fafb;
-        color: #111827;
-    }
-
     .submission-hint {
         font-size: 0.8rem;
         color: #e5e7eb;
@@ -393,13 +364,6 @@
                         </li>
 
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('panel.eventos') }}">
-                                <i class="bi bi-calendar2-week"></i>
-                                <span>Eventos</span>
-                            </a>
-                        </li>
-
-                        <li class="sidebar-item">
                             <a class="sidebar-link" href="{{ route('panel.perfil') }}">
                                 <i class="bi bi-person"></i>
                                 <span>Mi perfil</span>
@@ -469,10 +433,10 @@
                 <div class="panel-header">
                     <h1 class="panel-title">Submisión del proyecto</h1>
 
-                    <div class="user-badge">
+                    <a href="{{ route('panel.perfil') }}" class="user-badge" style="text-decoration: none; color: inherit; cursor: pointer;">
                         <i class="bi bi-person-circle"></i>
                         <span>{{ auth()->user()->name ?? 'Usuario' }}</span>
-                    </div>
+                    </a>
                 </div>
 
                 @if(session('success'))
@@ -483,7 +447,6 @@
 
                 @php
                     $projectName = $project ? $project->name : '';
-                    $visibility  = old('visibility', $project ? $project->visibility : 'privado');
                     $selectedTeamId = old('team_id', $project ? $project->team_id : null);
                     $selectedEventId = old('event_id', $project ? $project->event_id : null);
                 @endphp
@@ -567,6 +530,11 @@
                                     placeholder="Nombre de proyecto"
                                     value="{{ old('project_name', $projectName) }}"
                                     {{ $eligibleTeams->isEmpty() ? 'disabled' : '' }}
+                                    @if($eligibleTeams->isNotEmpty())
+                                    minlength="5"
+                                    maxlength="255"
+                                    title="Mínimo 5 caracteres para el nombre del proyecto"
+                                    @endif
                                 >
                                 @error('project_name')
                                     <small class="text-danger">{{ $message }}</small>
@@ -577,35 +545,6 @@
                                         Escribe el nombre del proyecto que tu equipo está desarrollando para el evento.
                                     </div>
                                 @endif
-                            </div>
-
-                            {{-- Visibilidad --}}
-                            <div class="visibility-group">
-                                <div class="submission-label">Visibilidad</div>
-
-                                <div class="visibility-options">
-                                    <button type="button"
-                                            class="visibility-pill {{ $visibility === 'privado' ? 'active' : 'inactive' }}"
-                                            onclick="document.getElementById('visibility-privado').checked = true; toggleVisibilityPills();"
-                                            {{ $eligibleTeams->isEmpty() ? 'disabled' : '' }}>
-                                        Privado
-                                    </button>
-                                    <button type="button"
-                                            class="visibility-pill {{ $visibility === 'publico' ? 'active' : 'inactive' }}"
-                                            onclick="document.getElementById('visibility-publico').checked = true; toggleVisibilityPills();"
-                                            {{ $eligibleTeams->isEmpty() ? 'disabled' : '' }}>
-                                        Público
-                                    </button>
-                                </div>
-
-                                <input type="radio" id="visibility-privado" name="visibility" value="privado"
-                                       style="display:none" {{ $visibility === 'privado' ? 'checked' : '' }}>
-                                <input type="radio" id="visibility-publico" name="visibility" value="publico"
-                                       style="display:none" {{ $visibility === 'publico' ? 'checked' : '' }}>
-
-                                @error('visibility')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
                             </div>
 
                             {{-- Esta parte se conecta con los botones de la derecha usando JS submit --}}
@@ -625,11 +564,6 @@
                                 onclick="document.getElementById('submit-hidden').click();"
                                 {{ $eligibleTeams->isEmpty() ? 'disabled style=opacity:0.5;cursor:not-allowed;' : '' }}>
                             Guardar cambios
-                        </button>
-
-                        <button class="btn-rounded btn-cancel" type="button"
-                                onclick="window.location.href='{{ route('panel.participante') }}'">
-                            Cancelar
                         </button>
 
                         <hr style="border-color: rgba(148,163,184,0.4); margin: 16px 0;">
@@ -679,7 +613,7 @@
                                 <div>
                                     <h3 style="margin: 0; font-size: 1.2rem; font-weight: 600; color: #e5e7eb;">{{ $proj->name }}</h3>
                                     <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #94a3b8;">
-                                        Equipo: {{ $proj->team->name }} | Evento: {{ $proj->event->title ?? 'N/A' }} | Visibilidad: <span style="text-transform: capitalize;">{{ $proj->visibility }}</span>
+                                        Equipo: {{ $proj->team->name }} | Evento: {{ $proj->event->title ?? 'N/A' }}
                                         @if($proj->status === 'enviado')
                                             <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.5); border-radius: 999px; font-size: 0.75rem; margin-left: 8px;">
                                                 <i class="bi bi-lock-fill"></i> Enviado
@@ -690,7 +624,7 @@
                             </div>
                             @if($proj->status !== 'enviado')
                             <button type="button" 
-                                    onclick="editProject({{ $proj->id }}, '{{ $proj->name }}', '{{ $proj->visibility }}', {{ $proj->team_id }}, {{ $proj->event_id }})"
+                                    onclick="editProject({{ $proj->id }}, '{{ $proj->name }}', {{ $proj->team_id }}, {{ $proj->event_id }})"
                                     style="padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.6); background: rgba(15, 23, 42, 0.7); color: #e5e7eb; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;"
                                     onmouseover="this.style.background='rgba(59, 130, 246, 0.2)'; this.style.borderColor='#3b82f6';"
                                     onmouseout="this.style.background='rgba(15, 23, 42, 0.7)'; this.style.borderColor='rgba(148, 163, 184, 0.6)';">
@@ -968,19 +902,8 @@
 </style>
 
 <script>
-    function toggleVisibilityPills() {
-        const pills = document.querySelectorAll('.visibility-pill');
-        const privadoChecked = document.getElementById('visibility-privado').checked;
-
-        pills[0].classList.toggle('active', privadoChecked);
-        pills[0].classList.toggle('inactive', !privadoChecked);
-
-        pills[1].classList.toggle('active', !privadoChecked);
-        pills[1].classList.toggle('inactive', privadoChecked);
-    }
-
     // Función para editar un proyecto específico
-    function editProject(projectId, name, visibility, teamId, eventId) {
+    function editProject(projectId, name, teamId, eventId) {
         // Scroll al formulario
         document.getElementById('editFormSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
         
@@ -988,14 +911,6 @@
         document.querySelector('input[name="project_name"]').value = name;
         document.querySelector('select[name="team_id"]').value = teamId;
         document.querySelector('select[name="event_id"]').value = eventId;
-        
-        // Seleccionar la visibilidad
-        if (visibility === 'privado') {
-            document.getElementById('visibility-privado').checked = true;
-        } else {
-            document.getElementById('visibility-publico').checked = true;
-        }
-        toggleVisibilityPills();
     }
 
     function openPdfModal(projectId) {
@@ -1105,8 +1020,6 @@
             closePdfModal();
         }
     });
-
-    document.addEventListener('DOMContentLoaded', toggleVisibilityPills);
     
     // Función para alternar entre vista de proyecto y formulario de edición
     function toggleEditMode() {

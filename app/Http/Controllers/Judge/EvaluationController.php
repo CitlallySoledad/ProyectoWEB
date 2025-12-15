@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Judge;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreEvaluationScoresRequest;
 use App\Models\Evaluation;
 use App\Models\EvaluationEvidence;
 use App\Models\Project;
@@ -71,7 +72,7 @@ class EvaluationController extends Controller
         return view('judge.evaluations.show', compact('evaluation', 'criteria', 'project', 'rubric', 'existingScores'));
     }
 
-    public function store(Request $request, Project $project)
+    public function store(StoreEvaluationScoresRequest $request, Project $project)
     {
         // Crear la evaluación al momento de guardar si no existe.
         $evaluation = Evaluation::firstOrCreate(
@@ -92,15 +93,9 @@ class EvaluationController extends Controller
         return $this->storeScores($request, $evaluation);
     }
 
-    public function storeScores(Request $request, Evaluation $evaluation)
+    public function storeScores(StoreEvaluationScoresRequest $request, Evaluation $evaluation)
     {
-        $request->validate([
-            'scores.*.criterion_id' => 'required|exists:rubric_criteria,id',
-            'scores.*.score' => 'required|integer|min:0|max:10',
-            'scores.*.comment' => 'nullable|string',
-            'evidence_files.*' => 'nullable|file|max:10240|mimes:pdf,jpg,jpeg,png,doc,docx',
-            'evidence_descriptions.*' => 'nullable|string|max:500',
-        ]);
+        // Datos ya validados por el FormRequest
 
         foreach ($request->scores as $scoreData) {
             EvaluationScore::updateOrCreate(
