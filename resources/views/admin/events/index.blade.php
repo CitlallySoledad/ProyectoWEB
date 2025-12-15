@@ -4,6 +4,15 @@
 
 @push('styles')
 <style>
+/* ===== COLORES BLANCOS PARA TEXTO ===== */
+.h3, .fw-bold, .text-muted, .admin-card-title, .admin-table th, .admin-table td, .admin-table td strong {
+    color: #fff !important;
+}
+
+.text-muted {
+    color: #94a3b8 !important;
+}
+
 /* ===== PAGINACIÓN COMPACTA EVENTOS ===== */
 .events-pagination {
     margin: 24px auto 8px;
@@ -16,7 +25,7 @@
     width: auto;
     max-width: 100%;
     font-size: 0.85rem;
-    color: #1e293b;
+    color: #e5e7eb;
 }
 
 .events-pagination-info {
@@ -44,7 +53,7 @@
     justify-content: center;
     font-size: 0.85rem;
     text-decoration: none;
-    color: #1e293b;
+    color: #e5e7eb;
     background: transparent;
     transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
     cursor: pointer;

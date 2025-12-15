@@ -389,10 +389,18 @@
         {{-- CONTENIDO PRINCIPAL --}}
         <main class="panel-main">
             <div class="panel-header">
-                <div class="user-badge">
+                <a href="{{ route('panel.perfil') }}" class="user-badge" style="text-decoration: none; color: inherit; cursor: pointer;">
                     <i class="bi bi-person-fill"></i>
                     <span>{{ $user->name }}</span>
-                </div>
+                </a>
+            </div>
+
+            {{-- Botón para volver al panel --}}
+            <div style="margin-bottom: 20px;">
+                <a href="{{ route('panel.participante') }}" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-arrow-left"></i>
+                    Volver al Panel
+                </a>
             </div>
 
             <h1>Detalles de Mi Perfil</h1>
@@ -407,7 +415,21 @@
             <div class="profile-wrapper">
                 {{-- FOTO --}}
                 <div class="profile-image">
-                    <img src="{{ asset('imagenes/foto-perfil.jpg') }}" alt="Foto de perfil">
+                    @if($user->profile_photo)
+                        <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="Foto de perfil" style="object-fit: cover;">
+                    @else
+                        <img src="{{ asset('imagenes/foto-perfil.jpg') }}" alt="Foto de perfil">
+                    @endif
+                    
+                    {{-- Formulario para cambiar foto --}}
+                    <form action="{{ route('panel.perfil.updatePhoto') }}" method="POST" enctype="multipart/form-data" style="margin-top: 15px;">
+                        @csrf
+                        <label for="profile_photo" class="btn btn-sm btn-primary" style="cursor: pointer; display: inline-block; padding: 8px 16px; background: #3b82f6; color: white; border-radius: 8px; font-size: 0.9rem;">
+                            <i class="bi bi-camera-fill me-2"></i>Cambiar foto
+                        </label>
+                        <input type="file" id="profile_photo" name="profile_photo" accept=".jpg,.jpeg,.png,.gif,.webp,image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="this.form.submit()">
+                    </form>
+                    
                     <p class="profile-profession">
                         {{ $user->profesion ?? 'Ingeniería en Sistemas Computacionales' }}
                     </p>
@@ -421,25 +443,61 @@
 
                         @if(!empty($editDatos))
                             {{-- MODO EDICIÓN --}}
-                            <form action="{{ route('panel.perfil.updateDatos') }}" method="POST">
+                            <form action="{{ route('panel.perfil.updateDatos') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @method('PATCH')
 
-                                <label for="name">Nombre completo</label>
-                                <input type="text" id="name" name="name"
-                                       value="{{ old('name', $user->name) }}">
+                                <x-input-label for="name" value="Nombre completo" />
+                                <x-text-input 
+                                    id="name" 
+                                    name="name"
+                                    type="text"
+                                    :value="old('name', $user->name)"
+                                    required
+                                    minlength="3"
+                                    maxlength="255"
+                                    pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+                                    title="Solo se permiten letras y espacios"
+                                />
+                                <x-input-error :messages="$errors->get('name')" class="mt-2" />
 
-                                <label for="email">Correo electrónico</label>
-                                <input type="email" id="email" name="email"
-                                       value="{{ old('email', $user->email) }}">
+                                <x-input-label for="email" value="Correo electrónico" />
+                                <x-text-input 
+                                    id="email" 
+                                    name="email"
+                                    type="email"
+                                    :value="old('email', $user->email)"
+                                    required
+                                    maxlength="255"
+                                    title="Ingresa un correo electrónico válido"
+                                />
+                                <x-input-error :messages="$errors->get('email')" class="mt-2" />
 
-                                <label for="curp">CURP</label>
-                                <input type="text" id="curp" name="curp"
-                                       value="{{ old('curp', $user->curp) }}">
+                                <x-input-label for="curp" value="CURP" />
+                                <x-text-input 
+                                    id="curp" 
+                                    name="curp"
+                                    type="text"
+                                    :value="old('curp', $user->curp)"
+                                    minlength="18"
+                                    maxlength="18"
+                                    pattern="[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z][0-9]"
+                                    title="Ingresa un CURP válido de 18 caracteres en mayúsculas"
+                                    style="text-transform: uppercase;"
+                                />
+                                <x-input-error :messages="$errors->get('curp')" class="mt-2" />
 
-                                <label for="fecha_nacimiento">Fecha de nacimiento</label>
-                                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento"
-                                       value="{{ old('fecha_nacimiento', optional($user->fecha_nacimiento)->format('Y-m-d')) }}">
+                                <x-input-label for="fecha_nacimiento" value="Fecha de nacimiento" />
+                                <x-text-input 
+                                    id="fecha_nacimiento" 
+                                    name="fecha_nacimiento"
+                                    type="date"
+                                    :value="old('fecha_nacimiento', optional($user->fecha_nacimiento)->format('Y-m-d'))"
+                                    min="1950-01-01"
+                                    :max="date('Y-m-d', strtotime('-15 years'))"
+                                    title="Debes tener al menos 15 años"
+                                />
+                                <x-input-error :messages="$errors->get('fecha_nacimiento')" class="mt-2" />
 
                                 <label for="genero">Género</label>
                                 <select id="genero" name="genero">
@@ -452,6 +510,7 @@
                                     <option value="Otro" {{ $generoValue === 'Otro' ? 'selected' : '' }}>Otro</option>
                                     <option value="Prefiero no decirlo" {{ $generoValue === 'Prefiero no decirlo' ? 'selected' : '' }}>Prefiero no decirlo</option>
                                 </select>
+                                <x-input-error :messages="$errors->get('genero')" class="mt-2" />
 
                                 <label for="estado_civil">Estado civil</label>
                                 <select id="estado_civil" name="estado_civil">
@@ -466,14 +525,31 @@
                                     <option value="Viudo(a)" {{ $estadoValue === 'Viudo(a)' ? 'selected' : '' }}>Viudo(a)</option>
                                     <option value="Otro" {{ $estadoValue === 'Otro' ? 'selected' : '' }}>Otro</option>
                                 </select>
+                                <x-input-error :messages="$errors->get('estado_civil')" class="mt-2" />
 
-                                <label for="telefono">Teléfono</label>
-                                <input type="text" id="telefono" name="telefono"
-                                       value="{{ old('telefono', $user->telefono) }}">
+                                <x-input-label for="telefono" value="Teléfono" />
+                                <x-text-input 
+                                    id="telefono" 
+                                    name="telefono"
+                                    type="tel"
+                                    :value="old('telefono', $user->telefono)"
+                                    pattern="[0-9]{10}"
+                                    minlength="10"
+                                    maxlength="10"
+                                    title="Ingresa un número de teléfono válido de 10 dígitos"
+                                />
+                                <x-input-error :messages="$errors->get('telefono')" class="mt-2" />
 
-                                <label for="profesion">Profesión</label>
-                                <input type="text" id="profesion" name="profesion"
-                                       value="{{ old('profesion', $user->profesion) }}">
+                                <x-input-label for="profesion" value="Profesión" />
+                                <x-text-input 
+                                    id="profesion" 
+                                    name="profesion"
+                                    type="text"
+                                    :value="old('profesion', $user->profesion)"
+                                    maxlength="255"
+                                    title="Ingresa tu profesión o carrera"
+                                />
+                                <x-input-error :messages="$errors->get('profesion')" class="mt-2" />
 
                                 <button type="submit" class="btn-guardar">
                                     <i class="bi bi-save"></i>
@@ -546,5 +622,9 @@
 
     </div>
 </div>
+
+{{-- Sistema de notificaciones Toast --}}
+<x-toast-notification />
+
 @endsection
 

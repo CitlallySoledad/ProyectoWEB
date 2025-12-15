@@ -178,6 +178,9 @@
                         placeholder="tu@correo.com"
                         value="{{ old('email') }}"
                         required
+                        maxlength="255"
+                        autocomplete="email"
+                        title="Ingresa tu correo electrónico"
                     >
                 </div>
 
@@ -190,6 +193,9 @@
                         class="user-login-input"
                         placeholder="Contraseña"
                         required
+                        minlength="6"
+                        autocomplete="current-password"
+                        title="Ingresa tu contraseña (mínimo 6 caracteres)"
                     >
                 </div>
 

@@ -2,6 +2,84 @@
 
 @section('title', 'Equipos')
 
+@push('styles')
+<style>
+/* ===== COLORES BLANCOS PARA TEXTO ===== */
+.h4, .mb-0, .admin-card-title, .admin-table th, .admin-table td {
+    color: #fff !important;
+}
+
+/* ===== PAGINACIÓN COMPACTA EQUIPOS ===== */
+.teams-pagination {
+    margin: 24px auto 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    width: auto;
+    max-width: 100%;
+    font-size: 0.85rem;
+    color: #e5e7eb;
+}
+
+.teams-pagination-info {
+    white-space: nowrap;
+    opacity: 0.85;
+    font-weight: 500;
+}
+
+.teams-pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Botones de página */
+.page-number,
+.page-arrow {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid #2563eb;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: #e5e7eb;
+    background: transparent;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+    cursor: pointer;
+}
+
+.page-number:hover,
+.page-arrow:hover {
+    background: #2563eb;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* Página actual */
+.page-number.active {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #1d4ed8;
+    font-weight: 600;
+}
+
+/* Deshabilitados */
+.page-arrow.disabled {
+    opacity: 0.35;
+    border-color: #94a3b8;
+    cursor: default;
+    pointer-events: none;
+}
+</style>
+@endpush
+
 @section('content')
 
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -72,6 +150,40 @@
                     @endforeach
                 </tbody>
             </table>
+
+            {{-- PAGINACIÓN COMPACTA --}}
+            @if ($teams->hasPages())
+                <div class="teams-pagination">
+                    <span class="teams-pagination-info">
+                        Mostrando {{ $teams->firstItem() }} - {{ $teams->lastItem() }} de {{ $teams->total() }} equipos
+                    </span>
+
+                    <div class="teams-pagination-pages">
+                        {{-- Flecha Anterior --}}
+                        @if ($teams->onFirstPage())
+                            <span class="page-arrow disabled">&laquo;</span>
+                        @else
+                            <a href="{{ $teams->previousPageUrl() }}" class="page-arrow">&laquo;</a>
+                        @endif
+
+                        {{-- Números de página --}}
+                        @foreach ($teams->getUrlRange(1, $teams->lastPage()) as $page => $url)
+                            @if ($page == $teams->currentPage())
+                                <span class="page-number active">{{ $page }}</span>
+                            @else
+                                <a href="{{ $url }}" class="page-number">{{ $page }}</a>
+                            @endif
+                        @endforeach
+
+                        {{-- Flecha Siguiente --}}
+                        @if ($teams->hasMorePages())
+                            <a href="{{ $teams->nextPageUrl() }}" class="page-arrow">&raquo;</a>
+                        @else
+                            <span class="page-arrow disabled">&raquo;</span>
+                        @endif
+                    </div>
+                </div>
+            @endif
         @endif
     </div>
 

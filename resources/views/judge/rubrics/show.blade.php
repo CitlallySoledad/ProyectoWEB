@@ -78,22 +78,13 @@
                 </tbody>
             </table>
         @endif
-
-        <button type="button" class="btn btn-sm btn-light rounded-pill mt-2">
-            + Agregar criterio
-        </button>
     </div>
 
     {{-- BOTÓN VOLVER --}}
-    <div class="d-flex justify-content-between">
+    <div class="d-flex justify-content-start">
         <a href="{{ route('judge.rubrics.index') }}"
            class="admin-btn-secondary text-decoration-none">
             Volver a la lista de rúbricas
         </a>
-
-        {{-- Aquí más adelante podrías poner un botón para editar la rúbrica --}}
-        <button type="button" class="admin-btn-primary">
-            Editar rúbrica
-        </button>
     </div>
 @endsection

@@ -53,16 +53,8 @@
                onkeydown="if(event.key==='Enter'){window.location='?q='+encodeURIComponent(this.value)}">
     </div>
 
-    {{-- Toolbar de filtros (decorativo por ahora) --}}
+    {{-- Toolbar de acciones --}}
     <div class="judge-toolbar mb-3">
-        <button class="judge-toolbar-btn" type="button">
-            <span><i class="bi bi-funnel me-2"></i>Filtro</span>
-            <i class="bi bi-chevron-down"></i>
-        </button>
-        <button class="judge-toolbar-btn" type="button">
-            <span>Últimos 7 días</span>
-            <i class="bi bi-chevron-down"></i>
-        </button>
         <button class="judge-toolbar-btn" type="button"
                 onclick="window.location='{{ route('judge.evaluations.index') }}'">
             <span>Ver mis evaluaciones</span>

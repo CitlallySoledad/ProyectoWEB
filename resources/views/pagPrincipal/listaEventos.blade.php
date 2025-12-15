@@ -279,6 +279,7 @@
     font-size: 0.9rem;
     border-bottom: 1px solid rgba(30, 64, 175, 0.4);
     vertical-align: middle;
+    color: #fff !important;
 }
 
 .events-table tbody tr:last-child td {
@@ -299,8 +300,8 @@
     border-radius: 999px;
     border: none;
     padding: 7px 18px;
-    background: #e5e7eb;
-    color: #111827;
+    background: #1e293b;
+    color: #fff !important;
     font-size: 0.88rem;
     display: inline-flex;
     align-items: center;
@@ -311,7 +312,7 @@
 .btn-join-event i { font-size: 0.95rem; }
 .btn-join-event span { font-weight: 600; }
 .btn-join-event:hover {
-    background: #f9fafb;
+    background: #334155;
 }
 
 /* Lista de equipos inscritos */
@@ -364,6 +365,106 @@
 .btn-remove-team i {
     font-size: 0.9rem;
     font-weight: bold;
+}
+
+/* ===== PAGINACIÓN MODERNA ===== */
+.events-pagination {
+    margin-top: 24px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.events-pagination-info {
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+.events-pagination-pages {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.page-arrow,
+.page-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    background: linear-gradient(135deg, rgba(51, 65, 85, 0.6), rgba(30, 41, 59, 0.8));
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 10px;
+    color: #e2e8f0;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.page-arrow:hover,
+.page-number:hover {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-color: #60a5fa;
+    color: #ffffff;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
+}
+
+.page-number.active {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    border-color: #a78bfa;
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6), 
+                0 0 0 3px rgba(167, 139, 250, 0.2);
+    transform: scale(1.05);
+}
+
+.page-arrow.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+    background: rgba(30, 41, 59, 0.4);
+    border-color: rgba(148, 163, 184, 0.15);
+}
+
+@media (max-width: 768px) {
+    .events-pagination {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+    }
+    
+    .events-pagination-info {
+        font-size: 0.8rem;
+        text-align: center;
+    }
+    
+    .events-pagination-pages {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .page-arrow,
+    .page-number {
+        min-width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
+    }
 }
 
 /* ===== PANEL DERECHA INFORMACIÓN ===== */
@@ -460,13 +561,6 @@
                                 <i class="bi bi-house-door"></i><span>Inicio</span>
                             </a>
                         </li>
-                        <li class="sidebar-item">
-    <a class="sidebar-link {{ request()->routeIs('panel.eventos') ? 'active' : '' }}"
-       href="{{ route('panel.eventos') }}">
-        <i class="bi bi-calendar-event"></i>
-        <span>Eventos</span>
-    </a>
-</li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.perfil') }}"><i class="bi bi-person"></i> <span>Mi perfil</span></a></li>
 
 
@@ -524,10 +618,10 @@
 
                 <header class="panel-header">
                     <h1 class="panel-title">Lista eventos</h1>
-                    <div class="user-badge">
+                    <a href="{{ route('panel.perfil') }}" class="user-badge" style="text-decoration: none; color: inherit; cursor: pointer;">
                         <i class="bi bi-person-circle"></i>
                         <span>{{ auth()->check() ? auth()->user()->name : 'Usuario' }}</span>
-                    </div>
+                    </a>
                 </header>
 
                 <div class="events-layout">
@@ -539,15 +633,6 @@
                                 <input type="text" id="eventSearchInput" placeholder="Buscar Evento">
                             </div>
 
-                            <div class="events-filters">
-                                <button type="button" class="btn-filter-chip" id="btnFilter">
-                                    <i class="bi bi-funnel"></i>
-                                    <span>Filter</span>
-                                    <i class="bi bi-caret-down-fill"></i>
-                                </button>
-
-
-                            </div>
                         </div>
 
                         <section class="events-table-wrapper">
@@ -635,6 +720,40 @@
                                     @endforelse
                                 </tbody>
                             </table>
+
+                            {{-- PAGINACIÓN COMPACTA --}}
+                            @if ($events->hasPages())
+                                <div class="events-pagination">
+                                    <span class="events-pagination-info">
+                                        Mostrando {{ $events->firstItem() }} - {{ $events->lastItem() }} de {{ $events->total() }} eventos
+                                    </span>
+
+                                    <div class="events-pagination-pages">
+                                        {{-- Flecha Anterior --}}
+                                        @if ($events->onFirstPage())
+                                            <span class="page-arrow disabled">&laquo;</span>
+                                        @else
+                                            <a href="{{ $events->previousPageUrl() }}" class="page-arrow">&laquo;</a>
+                                        @endif
+
+                                        {{-- Números de página --}}
+                                        @foreach ($events->getUrlRange(1, $events->lastPage()) as $page => $url)
+                                            @if ($page == $events->currentPage())
+                                                <span class="page-number active">{{ $page }}</span>
+                                            @else
+                                                <a href="{{ $url }}" class="page-number">{{ $page }}</a>
+                                            @endif
+                                        @endforeach
+
+                                        {{-- Flecha Siguiente --}}
+                                        @if ($events->hasMorePages())
+                                            <a href="{{ $events->nextPageUrl() }}" class="page-arrow">&raquo;</a>
+                                        @else
+                                            <span class="page-arrow disabled">&raquo;</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
                         </section>
                     </section>
 
@@ -896,6 +1015,9 @@
 </style>
 
 @endsection
+
+{{-- Sistema de notificaciones Toast --}}
+<x-toast-notification />
 
 @push('scripts')
 <script>

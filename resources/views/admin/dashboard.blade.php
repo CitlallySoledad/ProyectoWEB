@@ -4,6 +4,15 @@
 
 @push('styles')
 <style>
+    /* Asegurar que todo el texto sea blanco */
+    .fs-4, .fw-semibold, .admin-card div {
+        color: #fff !important;
+    }
+    
+    .text-muted {
+        color: #94a3b8 !important;
+    }
+    
     .activity-list {
         border: 1px solid rgba(255,255,255,0.08);
         border-radius: 14px;
@@ -48,6 +57,75 @@
         padding: 6px 10px;
         border-radius: 999px;
         border: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    /* ===== PAGINACIÓN COMPACTA DASHBOARD ===== */
+    .dashboard-pagination {
+        margin: 24px auto 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(37, 99, 235, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        width: auto;
+        max-width: 100%;
+        font-size: 0.85rem;
+        color: #e5e7eb;
+    }
+
+    .dashboard-pagination-info {
+        white-space: nowrap;
+        opacity: 0.85;
+        font-weight: 500;
+    }
+
+    .dashboard-pagination-pages {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Botones de página */
+    .page-number,
+    .page-arrow {
+        min-width: 32px;
+        height: 32px;
+        padding: 0 10px;
+        border-radius: 999px;
+        border: 1px solid #2563eb;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        text-decoration: none;
+        color: #e5e7eb;
+        background: transparent;
+        transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+        cursor: pointer;
+    }
+
+    .page-number:hover,
+    .page-arrow:hover {
+        background: #2563eb;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    /* Página actual */
+    .page-number.active {
+        background: #2563eb;
+        color: #ffffff;
+        border-color: #1d4ed8;
+        font-weight: 600;
+    }
+
+    /* Deshabilitados */
+    .page-arrow.disabled {
+        opacity: 0.35;
+        border-color: #94a3b8;
+        cursor: default;
+        pointer-events: none;
     }
 </style>
 @endpush
@@ -100,10 +178,39 @@
                 @endforeach
             </div>
             
-            {{-- Paginación --}}
-            <div class="mt-4 d-flex justify-content-center">
-                {{ $recentTeams->links('pagination::bootstrap-5') }}
-            </div>
+            {{-- PAGINACIÓN COMPACTA --}}
+            @if ($recentTeams->hasPages())
+                <div class="dashboard-pagination">
+                    <span class="dashboard-pagination-info">
+                        Mostrando {{ $recentTeams->firstItem() }} - {{ $recentTeams->lastItem() }} de {{ $recentTeams->total() }} equipos
+                    </span>
+
+                    <div class="dashboard-pagination-pages">
+                        {{-- Flecha Anterior --}}
+                        @if ($recentTeams->onFirstPage())
+                            <span class="page-arrow disabled">&laquo;</span>
+                        @else
+                            <a href="{{ $recentTeams->previousPageUrl() }}" class="page-arrow">&laquo;</a>
+                        @endif
+
+                        {{-- Números de página --}}
+                        @foreach ($recentTeams->getUrlRange(1, $recentTeams->lastPage()) as $page => $url)
+                            @if ($page == $recentTeams->currentPage())
+                                <span class="page-number active">{{ $page }}</span>
+                            @else
+                                <a href="{{ $url }}" class="page-number">{{ $page }}</a>
+                            @endif
+                        @endforeach
+
+                        {{-- Flecha Siguiente --}}
+                        @if ($recentTeams->hasMorePages())
+                            <a href="{{ $recentTeams->nextPageUrl() }}" class="page-arrow">&raquo;</a>
+                        @else
+                            <span class="page-arrow disabled">&raquo;</span>
+                        @endif
+                    </div>
+                </div>
+            @endif
         @endif
     </div>
 

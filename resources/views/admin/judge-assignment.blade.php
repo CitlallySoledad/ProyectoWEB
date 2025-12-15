@@ -86,7 +86,7 @@
                         <td>
                             <strong>{{ $project->name }}</strong>
                             <br>
-                            <small style="color: #94a3b8;">{{ $project->visibility }}</small>
+                            <small style="color: #94a3b8;">Equipo: {{ $project->team ? $project->team->name : 'Sin equipo' }}</small>
                         </td>
                         <td>{{ $project->team ? $project->team->name : 'Sin equipo' }}</td>
                         <td>{{ $project->event ? $project->event->name : 'Sin evento' }}</td>

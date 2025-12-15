@@ -12,6 +12,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
     <style>
+        .invalid-feedback.d-block {
+            color: #ff4d4f !important;
+            background: transparent !important;
+            font-weight: 600;
+            font-size: 0.97rem;
+        }
         /* ===== CONTENEDOR GENERAL ===== */
         .panel-wrapper {
             min-height: 100vh;
@@ -116,10 +122,20 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 8px 10px;
+            padding: 10px 14px;
             border-radius: 999px;
-            color: #fecaca;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            color: #ffffff;
             cursor: pointer;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        }
+        .sidebar-logout:hover {
+            background: linear-gradient(135deg, #6d28d9, #9333ea);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
         }
         .sidebar-logout i {
             font-size: 1.15rem;
@@ -352,6 +368,9 @@
 
     </div>
 </div>
+
+{{-- Sistema de notificaciones Toast --}}
+<x-toast-notification />
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @stack('scripts')

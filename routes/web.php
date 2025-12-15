@@ -4,20 +4,29 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
-use App\Http\Controllers\RegistroController;
-use App\Http\Controllers\ParticipantTeamController;
-use App\Http\Controllers\SubmissionController;
-use App\Http\Controllers\PanelProfileController;
-use App\Http\Controllers\PanelParticipanteController;
-use App\Http\Controllers\AdminDashboardController;
-use App\Http\Controllers\AdminEventController;
-use App\Http\Controllers\AdminTeamController;
-use App\Http\Controllers\AdminEvaluationController;
-use App\Http\Controllers\AdminUserController;
+// Auth Controllers
+use App\Http\Controllers\Auth\RegistroController;
+use App\Http\Controllers\Auth\PasswordResetController;
+
+// Student Controllers
+use App\Http\Controllers\Student\TeamController;
+use App\Http\Controllers\Student\SubmissionController;
+use App\Http\Controllers\Student\ProfileController as StudentProfileController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Student\PasswordController as StudentPasswordController;
+use App\Http\Controllers\Student\EventController;
+
+// Admin Controllers
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\EventController as AdminEventController;
+use App\Http\Controllers\Admin\TeamController as AdminTeamController;
+use App\Http\Controllers\Admin\EvaluationController as AdminEvaluationController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+
+// Judge Controllers
 use App\Http\Controllers\Judge\ProjectController;
 use App\Http\Controllers\Judge\RubricController;
 use App\Http\Controllers\Judge\EvaluationController;
-use App\Http\Controllers\PanelPasswordController;
 
 
 // ==========================================================
@@ -25,6 +34,11 @@ use App\Http\Controllers\PanelPasswordController;
 // ==========================================================
 Route::get('/', fn() => view('pagPrincipal.pagPrincipal'))->name('public.home');
 Route::get('/pag-principal', fn() => view('pagPrincipal.pagPrincipal'))->name('pagPrincipal');
+
+// Ruta de prueba para mensajes flash - BORRAR DESPUÉS
+Route::get('/test-flash', function() {
+    return redirect('/')->with('warning', 'PRUEBA: Este es un mensaje de advertencia de prueba');
+});
 
 // ==========================================================
 // LOGIN UNIFICADO
@@ -57,16 +71,6 @@ Route::match(['get', 'post'], '/login', function (Request $request) {
     return view('pagPrincipal.loginPrin');
 })->name('login');
 
-// Función auxiliar para redirigir según rol
-if (!function_exists('getRedirectRouteByRole')) {
-    function getRedirectRouteByRole($user)
-    {
-        if ($user->hasRole('admin')) return 'admin.dashboard';
-        if ($user->hasRole('judge')) return 'judge.projects.index';
-        return 'panel.participante';
-    }
-}
-
 // ==========================================================
 // LOGOUT GENERAL
 // ==========================================================
@@ -86,7 +90,6 @@ Route::post('/registro', [RegistroController::class, 'store'])->name('registro.s
 // ==========================================================
 // RECUPERACIÓN DE CONTRASEÑA
 // ==========================================================
-use App\Http\Controllers\PasswordResetController;
 
 Route::get('/forgot-password', [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
 Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
@@ -96,38 +99,38 @@ Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name(
 // ==========================================================
 // INVITACIONES DE EQUIPO (sin autenticación requerida)
 // ==========================================================
-Route::get('/invitacion/{token}', [ParticipantTeamController::class, 'acceptInvitation'])->name('team-invitation.accept');
+Route::get('/invitacion/{token}', [TeamController::class, 'acceptInvitation'])->name('team-invitation.accept');
 
 // ==========================================================
 // PANEL PARTICIPANTE (role:student)
 // ==========================================================
 Route::middleware(['auth', 'role:student'])->group(function () {
-    Route::get('/panel', [PanelParticipanteController::class, 'index'])->name('panel.participante');
+    Route::get('/panel', [StudentDashboardController::class, 'index'])->name('panel.participante');
 
-    Route::get('/panel/mi-equipo', [ParticipantTeamController::class, 'miEquipo'])->name('panel.mi-equipo');
-    Route::get('/panel/lista-equipo', [ParticipantTeamController::class, 'index'])->name('panel.lista-equipo');
-    Route::get('/panel/crear-equipo', [ParticipantTeamController::class, 'create'])->name('panel.teams.create');
-    Route::post('/panel/crear-equipo', [ParticipantTeamController::class, 'store'])->name('panel.teams.store');
-    Route::post('/panel/unirse-equipo', [ParticipantTeamController::class, 'join'])->name('panel.teams.join');
+    Route::get('/panel/mi-equipo', [TeamController::class, 'miEquipo'])->name('panel.mi-equipo');
+    Route::get('/panel/lista-equipo', [TeamController::class, 'index'])->name('panel.lista-equipo');
+    Route::get('/panel/crear-equipo', [TeamController::class, 'create'])->name('panel.teams.create');
+    Route::post('/panel/crear-equipo', [TeamController::class, 'store'])->name('panel.teams.store');
+    Route::post('/panel/unirse-equipo', [TeamController::class, 'join'])->name('panel.teams.join');
     
     // Rutas para solicitudes de unirse a equipos
-    Route::post('/panel/solicitudes/{requestId}/aceptar', [ParticipantTeamController::class, 'acceptJoinRequest'])->name('panel.requests.accept');
-    Route::post('/panel/solicitudes/{requestId}/rechazar', [ParticipantTeamController::class, 'rejectJoinRequest'])->name('panel.requests.reject');
+    Route::post('/panel/solicitudes/{requestId}/aceptar', [TeamController::class, 'acceptJoinRequest'])->name('panel.requests.accept');
+    Route::post('/panel/solicitudes/{requestId}/rechazar', [TeamController::class, 'rejectJoinRequest'])->name('panel.requests.reject');
     
     // Ruta para eliminar miembros del equipo
-    Route::post('/panel/equipo/{teamId}/miembro/{userId}/eliminar', [ParticipantTeamController::class, 'removeMember'])->name('panel.members.remove');
+    Route::post('/panel/equipo/{teamId}/miembro/{userId}/eliminar', [TeamController::class, 'removeMember'])->name('panel.members.remove');
 
     // Rutas para invitaciones de líder
-    Route::post('/panel/equipo/invitar', [ParticipantTeamController::class, 'sendInvitation'])->name('panel.invitations.send');
+    Route::post('/panel/equipo/invitar', [TeamController::class, 'sendInvitation'])->name('panel.invitations.send');
 
-    Route::get('/eventos', fn() => view('pagPrincipal.eventos'))->name('panel.eventos');
+    // Route::get('/eventos', fn() => view('pagPrincipal.eventos'))->name('panel.eventos');
     
     Route::get('/lista-eventos', function() {
         // Mostrar eventos disponibles (publicados y activos) ordenados por fecha
         $events = \App\Models\Event::available()
             ->with('teams')
             ->orderBy('start_date', 'asc')
-            ->get();
+            ->paginate(6);
         return view('pagPrincipal.listaEventos', compact('events'));
     })->name('panel.lista-eventos');
 
@@ -137,16 +140,14 @@ Route::middleware(['auth', 'role:student'])->group(function () {
         return view('pagPrincipal.eventTeams', compact('event', 'teams'));
     })->name('panel.event.teams');
 
-    Route::get('/api/user/leader-teams', [App\Http\Controllers\EventParticipantController::class, 'getUserLeaderTeams'])->name('api.user.leader-teams');
+    Route::get('/api/user/leader-teams', [EventController::class, 'getUserLeaderTeams'])->name('api.user.leader-teams');
     Route::get('/api/user/eligible-teams', [SubmissionController::class, 'getEligibleTeams'])->name('api.user.eligible-teams');
-    Route::post('/eventos/{event}/join', [App\Http\Controllers\EventParticipantController::class, 'joinEvent'])->name('panel.events.join');
-    Route::delete('/eventos/{event}/leave/{team}', [App\Http\Controllers\EventParticipantController::class, 'leaveEvent'])->name('panel.events.leave');
+    Route::post('/eventos/{event}/join', [EventController::class, 'joinEvent'])->name('panel.events.join');
+    Route::delete('/eventos/{event}/leave/{team}', [EventController::class, 'leaveEvent'])->name('panel.events.leave');
 
-    Route::get('/panel/perfil', [PanelProfileController::class, 'show'])->name('panel.perfil');
-    Route::patch('/panel/perfil/datos', [PanelProfileController::class, 'updateDatos'])->name('panel.perfil.updateDatos');
-
-    Route::get('/cambiar-contrasena', fn() => view('pagPrincipal.cambiarContrasena'))->name('panel.cambiarContrasena');
-    Route::post('/cambiar-contrasena', [App\Http\Controllers\PasswordController::class, 'update'])->name('password.update');
+    Route::get('/panel/perfil', [StudentProfileController::class, 'show'])->name('panel.perfil');
+    Route::patch('/panel/perfil/datos', [StudentProfileController::class, 'updateDatos'])->name('panel.perfil.updateDatos');
+    Route::post('/panel/perfil/foto', [StudentProfileController::class, 'updatePhoto'])->name('panel.perfil.updatePhoto');
 
     Route::get('/roles', fn() => view('pagPrincipal.rolesParticipants'))->name('roles');
 
@@ -158,11 +159,11 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/submision-proyecto/repositorios', [SubmissionController::class, 'repositories'])->name('panel.submission.repositories');
 
     // Mostrar formulario de cambiar contraseña
-    Route::get('/panel/cambiar-contrasena', [PanelPasswordController::class, 'show'])
+    Route::get('/panel/cambiar-contrasena', [StudentPasswordController::class, 'show'])
         ->name('panel.cambiarContrasena');
 
     // Procesar el cambio de contraseña
-    Route::post('/panel/cambiar-contrasena', [PanelPasswordController::class, 'update'])
+    Route::post('/panel/cambiar-contrasena', [StudentPasswordController::class, 'update'])
         ->name('panel.cambiarContrasena.update');
 });
 
@@ -187,7 +188,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('equipos/{team}/editar', [AdminTeamController::class, 'edit'])->name('teams.edit');
     Route::put('equipos/{team}', [AdminTeamController::class, 'update'])->name('teams.update');
     Route::delete('equipos/{team}', [AdminTeamController::class, 'destroy'])->name('teams.destroy');
-    Route::post('/equipo/{team}/join', [ParticipantTeamController::class, 'join'])
+    Route::post('/equipo/{team}/join', [TeamController::class, 'join'])
     ->name('panel.equipo.join');
 
     // Eventos
@@ -219,6 +220,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('usuarios', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('usuarios/crear', [AdminUserController::class, 'create'])->name('users.create');
     Route::post('usuarios', [AdminUserController::class, 'store'])->name('users.store');
+    Route::delete('usuarios/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
     // Rúbricas (Admin tiene control total)
     Route::get('rubricas', [App\Http\Controllers\Admin\RubricController::class, 'index'])->name('rubrics.index');
@@ -263,4 +265,5 @@ Route::middleware(['auth', 'role:judge'])->prefix('juez')->name('judge.')->group
     
     // Rúbricas (solo lectura para jueces)
     Route::get('/rubricas', [RubricController::class, 'index'])->name('rubrics.index');
+    Route::get('/rubricas/{rubric}', [RubricController::class, 'show'])->name('rubrics.show');
 }); 

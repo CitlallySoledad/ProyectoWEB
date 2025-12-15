@@ -382,13 +382,21 @@
 
             {{-- HEADER SUPERIOR --}}
             <header class="panel-header">
-                <div class="user-badge">
+                <a href="{{ route('panel.perfil') }}" class="user-badge" style="text-decoration: none; color: inherit; cursor: pointer;">
                     <div class="user-avatar">
                         <i class="bi bi-person-fill"></i>
                     </div>
                     <span>{{ auth()->user()->name ?? 'Usuario' }}</span>
-                </div>
+                </a>
             </header>
+
+            {{-- Botón para volver al panel --}}
+            <div style="padding: 20px 40px;">
+                <a href="{{ route('panel.participante') }}" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-arrow-left"></i>
+                    Volver al Panel
+                </a>
+            </div>
 
             <section class="panel-content">
                 <div class="password-layout">

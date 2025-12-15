@@ -129,8 +129,20 @@
             gap: 10px;
             padding: 8px 10px;
             border-radius: 999px;
-            color: #fecaca;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            color: #fff;
+            border: none;
+            width: 100%;
+            font-size: 0.9rem;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-logout:hover {
+            background: linear-gradient(135deg, #6d28d9, #9333ea);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
         }
 
         .sidebar-logout i {
@@ -347,6 +359,9 @@
                 </header>
 
                 <section class="panel-content">
+                    <div class="container-fluid mt-3">
+                        <x-flash-message />
+                    </div>
                     @yield('content')
                 </section>
             </main>

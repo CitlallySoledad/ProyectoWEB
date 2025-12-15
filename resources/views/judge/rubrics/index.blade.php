@@ -21,6 +21,71 @@
         font-weight: 600;
         box-shadow: 0 12px 30px rgba(0,0,0,0.4);
     }
+    
+    /* Paginación estilo compacto */
+    .rubrics-pagination {
+        margin: 24px auto 8px;
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.95);
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        width: auto;
+        max-width: 100%;
+        font-size: 0.85rem;
+        color: #e5e7eb;
+        justify-content: center;
+    }
+    
+    .rubrics-pagination-info {
+        white-space: nowrap;
+        opacity: 0.85;
+    }
+    
+    .rubrics-pagination-pages {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .page-number,
+    .page-arrow {
+        min-width: 32px;
+        height: 32px;
+        padding: 0 10px;
+        border-radius: 999px;
+        border: 1px solid #1d4ed8;
+        background: rgba(30, 58, 138, 0.2);
+        color: #93c5fd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .page-number:hover,
+    .page-arrow:hover {
+        background: #1d4ed8;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+    
+    .page-number.active {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: #fff;
+        font-weight: 600;
+        border-color: transparent;
+    }
+    
+    .page-arrow.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
 </style>
 @endpush
 
@@ -58,7 +123,7 @@
                         @endif
                     </td>
                     <td>
-                        <a href="{{ route('judge.rubrics.index', ['rubric' => $rubricItem->id]) }}"
+                        <a href="{{ route('judge.rubrics.show', $rubricItem) }}"
                             class="btn btn-sm btn-light rounded-pill">
                             <i class="bi bi-eye"></i> Ver
                         </a>
@@ -75,6 +140,40 @@
             </tbody>
         </table>
     </div>
+
+    {{-- Paginación estilo compacto --}}
+    @if($rubrics->hasPages())
+        <div class="rubrics-pagination">
+            <span class="rubrics-pagination-info">
+                Mostrando {{ $rubrics->firstItem() }} - {{ $rubrics->lastItem() }} de {{ $rubrics->total() }} rúbricas
+            </span>
+
+            <div class="rubrics-pagination-pages">
+                {{-- Flecha Anterior --}}
+                @if ($rubrics->onFirstPage())
+                    <span class="page-arrow disabled">&laquo;</span>
+                @else
+                    <a href="{{ $rubrics->previousPageUrl() }}" class="page-arrow">&laquo;</a>
+                @endif
+
+                {{-- Números de página --}}
+                @foreach ($rubrics->getUrlRange(1, $rubrics->lastPage()) as $page => $url)
+                    @if ($page == $rubrics->currentPage())
+                        <span class="page-number active">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}" class="page-number">{{ $page }}</a>
+                    @endif
+                @endforeach
+
+                {{-- Flecha Siguiente --}}
+                @if ($rubrics->hasMorePages())
+                    <a href="{{ $rubrics->nextPageUrl() }}" class="page-arrow">&raquo;</a>
+                @else
+                    <span class="page-arrow disabled">&raquo;</span>
+                @endif
+            </div>
+        </div>
+    @endif
 
     {{-- Si hay rúbrica seleccionada, mostramos criterios debajo (solo lectura) --}}
     @if($rubric)

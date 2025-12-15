@@ -306,12 +306,6 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ route('panel.eventos') }}">
-                                <i class="bi bi-calendar2-week"></i>
-                                <span>Eventos</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
                             <a class="sidebar-link" href="{{ route('panel.perfil') }}">
                                 <i class="bi bi-person"></i>
                                 <span>Mi perfil</span>
@@ -375,10 +369,10 @@
                 <div class="panel-header">
                     <h1 class="panel-title">Gestión de repositorios</h1>
 
-                    <div class="user-badge">
+                    <a href="{{ route('panel.perfil') }}" class="user-badge" style="text-decoration: none; color: inherit; cursor: pointer;">
                         <i class="bi bi-person-circle"></i>
                         <span>{{ auth()->user()->name ?? 'Usuario' }}</span>
-                    </div>
+                    </a>
                 </div>
 
                 <div class="repo-header-row">

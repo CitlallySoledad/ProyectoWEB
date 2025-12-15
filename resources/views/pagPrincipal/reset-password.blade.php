@@ -217,6 +217,7 @@
                 placeholder="Confirma tu nueva contraseña"
                 required
                 minlength="8"
+                oninput="this.setCustomValidity(this.value !== document.getElementById('password').value ? 'Las contraseñas no coinciden' : '')"
             >
 
             <button type="submit" class="reset-password-btn">

@@ -112,7 +112,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>📊 Reporte de Evaluación</h1>
+        <h1> Reporte de Evaluación</h1>
         <p>Generado el: {{ now()->format('d/m/Y H:i') }}</p>
     </div>
 
@@ -174,7 +174,7 @@
     </table>
 
     <div class="final-score">
-        ⭐ Calificación Final: {{ number_format($evaluation->final_score ?? 0, 2) }} / 10
+         Calificación Final: {{ number_format($evaluation->final_score ?? 0, 2) }} / 10
     </div>
 
     @if($evaluation->general_comments)

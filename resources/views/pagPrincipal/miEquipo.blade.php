@@ -370,7 +370,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="sidebar-section-title">Menú</div>
                     <ul class="sidebar-nav">
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.participante') }}"><i class="bi bi-house-door"></i> <span>Inicio</span></a></li>
-                        <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.eventos') }}"><i class="bi bi-calendar-event"></i> <span>Eventos</span></a></li>
                         <li class="sidebar-item"><a class="sidebar-link" href="{{ route('panel.perfil') }}"><i class="bi bi-person"></i> <span>Mi perfil</span></a></li>
                     </ul>
                 </div>
@@ -403,10 +402,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 <header class="panel-header">
                     <h1 class="panel-title">Mi equipo</h1>
-                    <div class="user-badge">
+                    <a href="{{ route('panel.perfil') }}" class="user-badge" style="text-decoration: none; color: inherit; cursor: pointer;">
                         <i class="bi bi-person-circle"></i>
                         <span>{{ auth()->user()->name }}</span>
-                    </div>
+                    </a>
                 </header>
 
                 {{-- MODAL DE ALERTA PARA ERRORES --}}
@@ -584,7 +583,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                     name="email" 
                                     placeholder="Correo del usuario"
                                     style="width: 100%; padding: 10px; background: rgba(15, 23, 42, 0.3); border: 1px solid #475569; border-radius: 6px; color: #e2e8f0; font-size: 0.9rem;"
-                                    required>
+                                    required
+                                    maxlength="255"
+                                    title="Ingresa un correo electrónico válido">
                                 <select 
                                     name="role" 
                                     style="width: 100%; padding: 10px; background: rgba(15, 23, 42, 0.3); border: 1px solid #475569; border-radius: 6px; color: #e2e8f0; font-size: 0.9rem;"
@@ -801,3 +802,6 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 @endsection
+
+{{-- Sistema de notificaciones Toast --}}
+<x-toast-notification />

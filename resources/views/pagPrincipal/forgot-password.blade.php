@@ -185,6 +185,9 @@
                 value="{{ old('email') }}"
                 required
                 autofocus
+                maxlength="255"
+                autocomplete="email"
+                title="Ingresa el correo electrónico de tu cuenta"
             >
 
             <button type="submit" class="forgot-password-btn">

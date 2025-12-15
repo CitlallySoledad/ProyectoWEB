@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Judge;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreRubricRequest;
+use App\Http\Requests\UpdateRubricRequest;
 use App\Models\Rubric;
 use App\Models\RubricCriterion;
 use App\Models\Event;
@@ -15,7 +17,7 @@ class RubricController extends Controller
      */
     public function index(Request $request)
     {
-        $rubrics = Rubric::with('event')->get();
+        $rubrics = Rubric::with('event')->paginate(6);
 
         $rubric = null;
         if ($request->has('rubric')) {
@@ -31,13 +33,9 @@ class RubricController extends Controller
         return view('judge.rubrics.create', compact('events'));
     }
 
-    public function store(Request $request)
+    public function store(StoreRubricRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'event_id' => 'nullable|exists:events,id',
-            'status' => 'required|in:activa,inactiva',
-        ]);
+        $data = $request->validated();
 
         $rubric = Rubric::create($data);
 
@@ -82,13 +80,9 @@ class RubricController extends Controller
         return view('judge.rubrics.edit', compact('rubric', 'events'));
     }
 
-    public function update(Request $request, Rubric $rubric)
+    public function update(UpdateRubricRequest $request, Rubric $rubric)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'event_id' => 'nullable|exists:events,id',
-            'status' => 'required|in:activa,inactiva',
-        ]);
+        $data = $request->validated();
 
         $rubric->update($data);
 
