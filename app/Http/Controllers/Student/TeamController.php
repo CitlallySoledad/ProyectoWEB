@@ -94,6 +94,17 @@ class TeamController extends Controller
     {
         $team = Team::findOrFail($request->team_id);
 
+        // Bloquear nuevas solicitudes si el equipo participa en un evento activo
+        $hasActiveEvent = $team->projects()
+            ->whereHas('event', function($q) {
+                $q->where('status', 'activo');
+            })
+            ->exists();
+
+        if ($hasActiveEvent) {
+            return back()->with('error', 'No puedes enviar solicitudes porque el equipo participa en un evento activo.');
+        }
+
         // Validar que no esté lleno (incluyendo solicitudes pendientes)
         $memberCount = $team->members()->count();
         $pendingCount = $team->joinRequests()->where('status', 'pending')->count();
@@ -268,6 +279,17 @@ class TeamController extends Controller
         // Verificar que sea el líder del equipo
         if (auth()->id() !== $team->leader_id) {
             return back()->with('error', 'No tienes permiso para enviar invitaciones en este equipo.');
+        }
+
+        // Bloquear invitaciones si el equipo participa en un evento activo
+        $hasActiveEvent = $team->projects()
+            ->whereHas('event', function($q) {
+                $q->where('status', 'activo');
+            })
+            ->exists();
+
+        if ($hasActiveEvent) {
+            return back()->with('error', 'No puedes enviar invitaciones mientras el equipo participa en un evento activo.');
         }
 
         // Validar el email y rol
