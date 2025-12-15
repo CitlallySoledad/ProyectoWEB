@@ -8,29 +8,19 @@ use Carbon\Carbon;
 
 class UpdateEventStatuses extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+
     protected $signature = 'events:update-statuses';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+
     protected $description = 'Actualiza automáticamente los estados de los eventos basándose en sus fechas';
 
-    /**
-     * Execute the console command.
-     */
+
     public function handle()
     {
         $this->info('🔄 Actualizando estados de eventos...');
 
         $events = Event::whereNotNull('start_date')
-            ->where('status', '!=', 'borrador') // No tocar borradores
+            ->where('status', '!=', 'borrador') 
             ->get();
 
         $updated = 0;
@@ -43,7 +33,6 @@ class UpdateEventStatuses extends Command
             $oldStatus = $event->getRawStatusAttribute();
             $newStatus = null;
 
-            // Determinar nuevo estado
             if ($endDate && $now->gt($endDate)) {
                 $newStatus = 'cerrado';
             } elseif ($startDate && $now->gte($startDate)) {
@@ -52,9 +41,7 @@ class UpdateEventStatuses extends Command
                 $newStatus = 'publicado';
             }
 
-            // Actualizar si cambió
             if ($newStatus && $oldStatus !== $newStatus) {
-                // Actualizar directamente en la BD sin triggear el accessor
                 \DB::table('events')
                     ->where('id', $event->id)
                     ->update(['status' => $newStatus, 'updated_at' => now()]);
