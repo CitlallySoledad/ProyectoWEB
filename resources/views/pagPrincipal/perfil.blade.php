@@ -512,21 +512,6 @@
                                 </select>
                                 <x-input-error :messages="$errors->get('genero')" class="mt-2" />
 
-                                <label for="estado_civil">Estado civil</label>
-                                <select id="estado_civil" name="estado_civil">
-                                    @php
-                                        $estadoValue = old('estado_civil', $user->estado_civil);
-                                    @endphp
-                                    <option value="" {{ $estadoValue === null || $estadoValue === '' ? 'selected' : '' }}>Selecciona una opción</option>
-                                    <option value="Soltero(a)" {{ $estadoValue === 'Soltero(a)' ? 'selected' : '' }}>Soltero(a)</option>
-                                    <option value="Casado(a)" {{ $estadoValue === 'Casado(a)' ? 'selected' : '' }}>Casado(a)</option>
-                                    <option value="Unión libre" {{ $estadoValue === 'Unión libre' ? 'selected' : '' }}>Unión libre</option>
-                                    <option value="Divorciado(a)" {{ $estadoValue === 'Divorciado(a)' ? 'selected' : '' }}>Divorciado(a)</option>
-                                    <option value="Viudo(a)" {{ $estadoValue === 'Viudo(a)' ? 'selected' : '' }}>Viudo(a)</option>
-                                    <option value="Otro" {{ $estadoValue === 'Otro' ? 'selected' : '' }}>Otro</option>
-                                </select>
-                                <x-input-error :messages="$errors->get('estado_civil')" class="mt-2" />
-
                                 <x-input-label for="telefono" value="Teléfono" />
                                 <x-text-input 
                                     id="telefono" 
@@ -579,7 +564,6 @@
                             </p>
 
                             <p><strong>Género:</strong> {{ $user->genero ?? '—' }}</p>
-                            <p><strong>Estado civil:</strong> {{ $user->estado_civil ?? '—' }}</p>
                             <p><strong>Teléfono:</strong> {{ $user->telefono ?? '—' }}</p>
                             <p><strong>Profesión:</strong> {{ $user->profesion ?? '—' }}</p>
 

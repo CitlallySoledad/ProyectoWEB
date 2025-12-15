@@ -71,6 +71,7 @@
         background: #166534;
         padding: 10px 32px;
         gap: 8px;
+        min-height: 64px; /* mantiene la barra verde sin botones */
     }
 
     .landing-nav button {
@@ -127,10 +128,16 @@
         display: flex;
         align-items: center;
         gap: 10px;
+        color: #fff;
+        text-decoration: none;
     }
 
     .landing-social-item i {
         font-size: 1.4rem;
+    }
+
+    .landing-social-item:hover {
+        color: #4ade80;
     }
 
     /* -------- GALERÍA -------- */
@@ -245,13 +252,7 @@
             </div>
 
             {{-- NAV --}}
-            <div class="landing-nav">
-                <button>Bienvenido</button>
-                <button class="secondary">Eventos</button>
-                <button class="secondary">Reglamento</button>
-                <button class="secondary">Noticias</button>
-                <button class="secondary">Contáctanos</button>
-            </div>
+            <div class="landing-nav"></div>
 
             {{-- CONTENIDO PRINCIPAL --}}
             <div class="landing-body">
@@ -263,12 +264,16 @@
 
                     {{-- IZQUIERDA: REDES --}}
                     <div class="landing-social">
-                        <div class="landing-social-item">
-                            <i class="bi bi-facebook"></i> Big Programing
-                        </div>
-                        <div class="landing-social-item">
-                            <i class="bi bi-instagram"></i> Big Programing
-                        </div>
+                        <a class="landing-social-item"
+                           href="https://www.facebook.com/profile.php?id=100064684089409"
+                           target="_blank" rel="noopener noreferrer">
+                            <i class="bi bi-facebook"></i> <span>Big Programing</span>
+                        </a>
+                        <a class="landing-social-item"
+                           href="https://www.instagram.com/tecnm_oaxaca?igsh=Ymo5MGN3MDd4ZjB2"
+                           target="_blank" rel="noopener noreferrer">
+                            <i class="bi bi-instagram"></i> <span>Big Programing</span>
+                        </a>
                         <div class="landing-social-item">
                             <i class="bi bi-whatsapp"></i> 9518596325
                         </div>
@@ -307,4 +312,3 @@
     </div>
 </div>
 @endsection
-

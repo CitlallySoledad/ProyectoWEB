@@ -118,24 +118,29 @@
         font-size: 0.85rem; font-weight: 600; padding: 4px 12px; border-radius: 8px;
     }
 
-    /* Sección de Botones (Derecha en PC) */
+    /* Sección de Botones */
     .actions-section {
         flex: 1;
         display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: flex-end;
         padding-bottom: 10px;
+    }
+
+    .action-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
     }
 
     .btn-action {
         border: none; border-radius: 999px; padding: 12px 28px;
         font-size: 0.95rem; font-weight: 600; cursor: pointer;
-        transition: transform 0.2s, opacity 0.2s; width: 100%;
+        transition: transform 0.2s, opacity 0.2s; width: auto;
     }
     .btn-action:hover { transform: scale(1.05); opacity: 0.9; }
 
-    .btn-secondary { background-color: rgba(30, 45, 85, 0.8); color: #e5e7eb; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); margin-bottom: 10px;}
+    .btn-secondary { background-color: rgba(30, 45, 85, 0.8); color: #e5e7eb; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);}
     .btn-primary-create {
         background: linear-gradient(to right, #8b5cf6, #6366f1); color: white;
         box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4); padding: 14px 32px; font-size: 1rem;
@@ -156,8 +161,9 @@
         
         .create-team-layout { flex-direction: column; gap: 30px; }
         .actions-section { 
-            flex-direction: row; align-items: center; justify-content: flex-end; gap: 12px; width: 100%;
+            align-items: center; justify-content: flex-end; width: 100%;
         }
+        .action-row { width: 100%; justify-content: flex-end; }
         .btn-action { width: auto; margin-bottom: 0; }
     }
 
@@ -166,7 +172,8 @@
         .panel-card { border-radius: 16px; }
         .panel-main { padding: 20px; }
         .panel-header { flex-direction: column; align-items: flex-start; gap: 10px; }
-        .actions-section { flex-direction: column-reverse; gap: 12px; }
+        .actions-section { width: 100%; }
+        .action-row { width: 100%; flex-direction: column-reverse; gap: 12px; }
         .btn-action { width: 100%; text-align: center; }
     }
 </style>
@@ -303,18 +310,14 @@
                 </section>
 
                 <section class="actions-section">
-                    <div style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
-                        <button type="button" class="btn-action btn-secondary">
-                            Guardar cambios
-                        </button>
+                    <div class="action-row">
                         <button type="button" class="btn-action btn-secondary" onclick="window.location='{{ route('panel.lista-equipo') }}'">
                             Cancelar
                         </button>
+                        <button type="submit" form="createTeamForm" class="btn-action btn-primary-create">
+                            Crear Equipo
+                        </button>
                     </div>
-
-                    <button type="submit" form="createTeamForm" class="btn-action btn-primary-create">
-                        Crear Equipo
-                    </button>
                 </section>
 
             </div>

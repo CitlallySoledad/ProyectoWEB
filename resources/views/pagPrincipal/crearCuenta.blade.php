@@ -274,13 +274,29 @@ body {
 
                 <div class="form-group">
                     <label>Contraseña <span class="required">*</span></label>
-                    <input type="password" name="password" placeholder="Letras y números" required minlength="6">
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Mínimo 8, mayúscula, minúscula, número y símbolo"
+                        required
+                        minlength="8"
+                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}"
+                        title="Mínimo 8 caracteres, incluir mayúscula, minúscula, número y símbolo"
+                    >
                     @error('password')<span class="error-message">{{ $message }}</span>@enderror
                 </div>
 
                 <div class="form-group">
                     <label>Confirmar contraseña <span class="required">*</span></label>
-                    <input type="password" name="password_confirmation" placeholder="Confirmar contraseña" required minlength="6">
+                    <input
+                        type="password"
+                        name="password_confirmation"
+                        placeholder="Confirmar contraseña"
+                        required
+                        minlength="8"
+                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}"
+                        title="Mínimo 8 caracteres, incluir mayúscula, minúscula, número y símbolo"
+                    >
                 </div>
 
                 <div class="form-group">
@@ -330,4 +346,3 @@ body {
     </div>
 </div>
 @endsection
-
