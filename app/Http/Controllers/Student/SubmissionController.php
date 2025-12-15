@@ -215,15 +215,21 @@ class SubmissionController extends Controller
             $file = $request->file('pdf_file');
             $originalName = $file->getClientOriginalName();
             $fileName = time() . '_' . $originalName;
-            
-            // Guardar en storage/app/public/pdfs
-            $path = $file->storeAs('pdfs', $fileName, 'public');
+
+            // Guardar directamente en public/pdfs para no depender del symlink storage:link
+            $publicPdfPath = public_path('pdfs');
+            if (!file_exists($publicPdfPath)) {
+                mkdir($publicPdfPath, 0755, true);
+            }
+            $file->move($publicPdfPath, $fileName);
+
+            $relativePath = 'pdfs/' . $fileName;
             
             // Guardar información en la base de datos
             \App\Models\ProjectDocument::create([
                 'project_id' => $project->id,
                 'file_name' => $fileName,
-                'file_path' => $path,
+                'file_path' => $relativePath,
                 'original_name' => $originalName,
                 'file_size' => $file->getSize(),
                 'description' => $request->description,
@@ -263,9 +269,10 @@ class SubmissionController extends Controller
                 ->with('error', 'No puedes eliminar documentos de un proyecto ya enviado.');
         }
         
-        // Eliminar el archivo del storage
-        if (\Storage::disk('public')->exists($document->file_path)) {
-            \Storage::disk('public')->delete($document->file_path);
+        // Eliminar el archivo del public/pdfs
+        $fullPath = public_path($document->file_path);
+        if (file_exists($fullPath)) {
+            unlink($fullPath);
         }
         
         // Eliminar el registro de la base de datos
