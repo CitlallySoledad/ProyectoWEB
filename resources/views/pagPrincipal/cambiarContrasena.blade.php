@@ -454,7 +454,9 @@
                         @if ($errors->any())
                             <div class="status-card" style="margin-top: 10px; background:#fee2e2; color:#111;">
                                 <ul style="margin:0; padding-left:18px;">
-                                    <li>Las contraseñas no coinciden.</li>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
                                 </ul>
                             </div>
                         @endif

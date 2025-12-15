@@ -41,6 +41,10 @@ class PasswordController extends Controller
                 'current_password.required' => 'Debes escribir tu contraseña actual.',
                 'new_password.required'     => 'Debes escribir la nueva contraseña.',
                 'new_password.confirmed'    => 'La confirmación de la nueva contraseña no coincide.',
+                'new_password.min'          => 'La nueva contraseña debe tener al menos 8 caracteres.',
+                'new_password.mixed'        => 'La nueva contraseña debe incluir al menos una mayúscula y una minúscula.',
+                'new_password.numbers'      => 'La nueva contraseña debe incluir al menos un número.',
+                'new_password.symbols'      => 'La nueva contraseña debe incluir al menos un símbolo.',
             ]
         );
 
