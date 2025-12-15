@@ -644,7 +644,7 @@
                             <div style="display: flex; flex-wrap: wrap; gap: 12px;">
                                 @foreach($proj->documents as $doc)
                                 <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(148, 163, 184, 0.4); border-radius: 999px;">
-                                    <a href="{{ route('storage.file', ['path' => $doc->file_path]) }}" 
+                                    <a href="{{ asset('storage/' . $doc->file_path) }}" 
                                        target="_blank"
                                        style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #fbbf24; font-size: 0.9rem;"
                                        onmouseover="this.style.color='#fde047';"

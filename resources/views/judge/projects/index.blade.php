@@ -106,7 +106,7 @@
                         <td>
                             @if($project->documents->isNotEmpty())
                                 @foreach($project->documents as $doc)
-                                    <a href="{{ route('storage.file', ['path' => $doc->file_path]) }}" 
+                                    <a href="{{ asset('storage/' . $doc->file_path) }}" 
                                        target="_blank" 
                                        class="judge-pill-evaluate" 
                                        style="display: inline-block; margin: 2px; padding: 4px 10px; font-size: 0.85rem; text-decoration: none;">

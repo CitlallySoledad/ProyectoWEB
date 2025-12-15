@@ -269,15 +269,6 @@ Route::middleware(['auth', 'role:judge'])->prefix('juez')->name('judge.')->group
     Route::get('/rubricas/{rubric}', [RubricController::class, 'show'])->name('rubrics.show');
 }); 
 
-// ==========================================================
-// SERVIR ARCHIVOS PUBLICOS SIN DEPENDER DE SYMLINK
-// ==========================================================
 Route::get('/storage/{path}', function ($path) {
-    $safePath = ltrim(str_replace(['..', '\\'], '', $path), '/');
-
-    if (!Storage::disk('public')->exists($safePath)) {
-        abort(404);
-    }
-
-    return Storage::disk('public')->response($safePath);
-})->where('path', '.*')->name('storage.file');
+    abort(404);
+});
