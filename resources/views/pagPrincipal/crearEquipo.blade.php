@@ -145,7 +145,12 @@
     }
     .btn-action:hover { transform: scale(1.03); opacity: 0.92; }
 
-    .btn-secondary { background-color: rgba(30, 45, 85, 0.8); color: #e5e7eb; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);}
+    .btn-secondary {
+        background-color: rgba(30, 45, 85, 0.8);
+        color: #e5e7eb;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        width: 200px; /* botón Cancelar más grande */
+    }
     .btn-primary-create {
         background: linear-gradient(to right, #8b5cf6, #6366f1); color: white;
         box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4); padding: 14px 32px; font-size: 1rem;
