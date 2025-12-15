@@ -13,6 +13,8 @@ use App\Models\User;
 use App\Mail\TeamInvitationMail;
 use App\Mail\TeamJoinRequestMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -27,7 +29,7 @@ class TeamController extends Controller
 
     public function miEquipo()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $mainTeam = $user->team_id ? Team::with(['members', 'leader'])->find($user->team_id) : null;
 
         $userTeams = Team::with(['members', 'leader'])
@@ -58,7 +60,7 @@ class TeamController extends Controller
     public function store(StoreTeamRequest $request)
     {
         $data = $request->validated();
-        $user = auth()->user();
+        $user = Auth::user();
 
         $team = Team::create([
             'name'      => $data['team_name'],
@@ -96,7 +98,7 @@ class TeamController extends Controller
         }
 
         // Validar que no sea miembro ya
-        if ($team->members()->where('user_id', auth()->id())->exists()) {
+        if ($team->members()->where('user_id', Auth::id())->exists()) {
             return back()->with('error', 'Ya perteneces a este equipo.');
         }
 
@@ -104,7 +106,7 @@ class TeamController extends Controller
 
         // Verificar si ya tiene una solicitud pendiente
         $existingRequest = $team->joinRequests()
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->where('status', 'pending')
             ->first();
 
@@ -115,12 +117,12 @@ class TeamController extends Controller
 
         // Eliminar solicitudes previas para permitir un nuevo intento
         TeamJoinRequest::where('team_id', $team->id)
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->delete();
 
         $joinRequest = TeamJoinRequest::create([
             'team_id' => $team->id,
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'role'    => $role,
             'status'  => 'pending',
         ]);
@@ -144,7 +146,7 @@ class TeamController extends Controller
         $team = $joinRequest->team;
         $user = $joinRequest->user;
 
-        if (auth()->id() !== $team->leader_id) {
+        if (Auth::id() !== $team->leader_id) {
             return back()->with('error', 'No tienes permiso para aceptar solicitudes de este equipo.');
         }
 
@@ -182,7 +184,7 @@ class TeamController extends Controller
         $team = $joinRequest->team;
         $user = $joinRequest->user;
 
-        if (auth()->id() !== $team->leader_id) {
+        if (Auth::id() !== $team->leader_id) {
             return back()->with('error', 'No tienes permiso para rechazar solicitudes de este equipo.');
         }
 
@@ -196,7 +198,7 @@ class TeamController extends Controller
         $team = Team::findOrFail($teamId);
         $user = User::findOrFail($userId);
 
-        if (auth()->id() !== $team->leader_id) {
+        if (Auth::id() !== $team->leader_id) {
             return back()->with('error', 'No tienes permiso para eliminar miembros de este equipo.');
         }
 
@@ -233,7 +235,7 @@ class TeamController extends Controller
     {
         $team = Team::findOrFail($request->team_id);
 
-        if (auth()->id() !== $team->leader_id) {
+        if (Auth::id() !== $team->leader_id) {
             return back()->with('error', 'No tienes permiso para enviar invitaciones en este equipo.');
         }
 
@@ -283,7 +285,7 @@ class TeamController extends Controller
                 'status'     => 'pending',
                 'token'      => Str::random(64),
                 'role'       => $role,
-                'inviter_id' => auth()->id(),
+                'inviter_id' => Auth::id(),
             ]);
 
             Mail::to($email)->send(new TeamInvitationMail($acceptedInvitation));
@@ -302,13 +304,13 @@ class TeamController extends Controller
                 'role'       => $role,
                 'token'      => $token,
                 'status'     => 'pending',
-                'inviter_id' => auth()->id(),
+                'inviter_id' => Auth::id(),
             ]);
             $invitation = $existingInvitation;
         } else {
             $invitation = TeamInvitation::create([
                 'team_id'    => $team->id,
-                'inviter_id' => auth()->id(),
+                'inviter_id' => Auth::id(),
                 'email'      => $email,
                 'role'       => $role,
                 'token'      => $token,
@@ -319,7 +321,7 @@ class TeamController extends Controller
         try {
             Mail::to($email)->send(new TeamInvitationMail($invitation));
 
-            \Log::info('Invitación enviada', [
+            Log::info('Invitación enviada', [
                 'email' => $email,
                 'team'  => $team->name,
                 'token' => $token,
@@ -339,7 +341,7 @@ class TeamController extends Controller
 
             return back()->with('success', $mensaje);
         } catch (\Exception $e) {
-            \Log::error('Error al enviar invitación', [
+            Log::error('Error al enviar invitación', [
                 'email' => $email,
                 'error' => $e->getMessage()
             ]);
@@ -364,13 +366,13 @@ class TeamController extends Controller
                 ->with('token', $token);
         }
 
-        if (!auth()->check()) {
+        if (!Auth::check()) {
             return redirect()->route('login')
                 ->with('info', 'Por favor inicia sesión con tu cuenta para aceptar la invitación.')
                 ->with('token', $token);
         }
 
-        if (auth()->user()->email !== $invitation->email) {
+        if (Auth::user()->email !== $invitation->email) {
             return redirect()->route('panel.mi-equipo')
                 ->with('error', 'Esta invitación es para otro email. Debes iniciar sesión con ' . $invitation->email);
         }
