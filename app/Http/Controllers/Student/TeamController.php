@@ -21,14 +21,14 @@ use Illuminate\Support\Str;
 class TeamController extends Controller
 {
     /**
-     * Indica si el equipo está inscrito en un evento activo (status 'activo' o is_active=1).
+     * Indica si el equipo está inscrito en un evento activo.
      */
     protected function teamHasActiveEvent(Team $team): bool
     {
-        return $team->projects()
-            ->whereHas('event', function ($q) {
+        return $team->events()
+            ->where(function ($q) {
                 $q->whereRaw('LOWER(status) = ?', ['activo'])
-                  ->orWhere('is_active', true);
+                  ->orWhere('status', 'activo');
             })
             ->exists();
     }
