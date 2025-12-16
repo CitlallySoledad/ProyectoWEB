@@ -132,6 +132,26 @@ body {
     color: #8a8a8a;
 }
 
+.pwd-wrapper {
+    position: relative;
+}
+
+.pwd-wrapper input {
+    padding-right: 42px;
+}
+
+.pwd-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 0.95rem;
+}
+
 /* BOTÓN */
 .form-actions {
     margin-top: 14px;
@@ -274,29 +294,41 @@ body {
 
                 <div class="form-group">
                     <label>Contraseña <span class="required">*</span></label>
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Mínimo 8, mayúscula, minúscula, número y símbolo"
-                        required
-                        minlength="8"
-                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}"
-                        title="Mínimo 8 caracteres, incluir mayúscula, minúscula, número y símbolo"
-                    >
+                    <div class="pwd-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Mínimo 8 caracteres, mayúscula, minúscula y número"
+                            required
+                            minlength="8"
+                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d]{8,}"
+                            title="Mínimo 8 caracteres e incluir mayúscula, minúscula y número"
+                        >
+                        <button type="button" class="pwd-toggle" onclick="togglePwd('password','togglePwdIcon')">
+                            <i id="togglePwdIcon" class="bi bi-eye"></i>
+                        </button>
+                    </div>
                     @error('password')<span class="error-message">{{ $message }}</span>@enderror
                 </div>
 
                 <div class="form-group">
                     <label>Confirmar contraseña <span class="required">*</span></label>
-                    <input
-                        type="password"
-                        name="password_confirmation"
-                        placeholder="Confirmar contraseña"
-                        required
-                        minlength="8"
-                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}"
-                        title="Mínimo 8 caracteres, incluir mayúscula, minúscula, número y símbolo"
-                    >
+                    <div class="pwd-wrapper">
+                        <input
+                            type="password"
+                            id="password_confirmation"
+                            name="password_confirmation"
+                            placeholder="Confirmar contraseña"
+                            required
+                            minlength="8"
+                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d]{8,}"
+                            title="Mínimo 8 caracteres e incluir mayúscula, minúscula y número"
+                        >
+                        <button type="button" class="pwd-toggle" onclick="togglePwd('password_confirmation','togglePwdIcon2')">
+                            <i id="togglePwdIcon2" class="bi bi-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -343,6 +375,29 @@ body {
             </form>
         </main>
 
-    </div>
+</div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function togglePwd(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (!input) return;
+        if (input.type === 'password') {
+            input.type = 'text';
+            if (icon) {
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            }
+        } else {
+            input.type = 'password';
+            if (icon) {
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
+    }
+</script>
+@endpush
