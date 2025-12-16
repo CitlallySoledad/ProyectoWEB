@@ -296,40 +296,40 @@ body {
                     <label>Contraseña <span class="required">*</span></label>
                     <div class="pwd-wrapper">
                         <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Mínimo 8 caracteres, mayúscula, minúscula y número"
-                            required
-                            minlength="8"
-                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d]{8,}"
-                            title="Mínimo 8 caracteres e incluir mayúscula, minúscula y número"
-                        >
-                        <button type="button" class="pwd-toggle" onclick="togglePwd('password','togglePwdIcon')">
-                            <i id="togglePwdIcon" class="bi bi-eye"></i>
-                        </button>
-                    </div>
-                    @error('password')<span class="error-message">{{ $message }}</span>@enderror
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Mínimo 8 caracteres, mayúscula, minúscula y número"
+                        required
+                        minlength="8"
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"
+                        title="Mínimo 8 caracteres e incluir mayúscula, minúscula y número"
+                    >
+                    <button type="button" class="pwd-toggle" onclick="togglePwd('password','togglePwdIcon')">
+                        <i id="togglePwdIcon" class="bi bi-eye"></i>
+                    </button>
                 </div>
+                @error('password')<span class="error-message">{{ $message }}</span>@enderror
+            </div>
 
                 <div class="form-group">
                     <label>Confirmar contraseña <span class="required">*</span></label>
                     <div class="pwd-wrapper">
                         <input
-                            type="password"
-                            id="password_confirmation"
-                            name="password_confirmation"
-                            placeholder="Confirmar contraseña"
-                            required
-                            minlength="8"
-                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d]{8,}"
-                            title="Mínimo 8 caracteres e incluir mayúscula, minúscula y número"
-                        >
-                        <button type="button" class="pwd-toggle" onclick="togglePwd('password_confirmation','togglePwdIcon2')">
-                            <i id="togglePwdIcon2" class="bi bi-eye"></i>
-                        </button>
-                    </div>
+                        type="password"
+                        id="password_confirmation"
+                        name="password_confirmation"
+                        placeholder="Confirmar contraseña"
+                        required
+                        minlength="8"
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"
+                        title="Mínimo 8 caracteres e incluir mayúscula, minúscula y número"
+                    >
+                    <button type="button" class="pwd-toggle" onclick="togglePwd('password_confirmation','togglePwdIcon2')">
+                        <i id="togglePwdIcon2" class="bi bi-eye"></i>
+                    </button>
                 </div>
+            </div>
 
                 <div class="form-group">
                     <label>Correo electrónico <span class="required">*</span></label>
