@@ -302,7 +302,7 @@ body {
                         placeholder="Mínimo 8 caracteres, mayúscula, minúscula y número"
                         required
                         minlength="8"
-                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"
+                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}"
                         title="Mínimo 8 caracteres e incluir mayúscula, minúscula y número"
                     >
                     <button type="button" class="pwd-toggle" onclick="togglePwd('password','togglePwdIcon')">
@@ -322,7 +322,7 @@ body {
                         placeholder="Confirmar contraseña"
                         required
                         minlength="8"
-                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"
+                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}"
                         title="Mínimo 8 caracteres e incluir mayúscula, minúscula y número"
                     >
                     <button type="button" class="pwd-toggle" onclick="togglePwd('password_confirmation','togglePwdIcon2')">
